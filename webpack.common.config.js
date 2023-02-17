@@ -1,20 +1,18 @@
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const SRC = path.resolve(__dirname, "src");
 const OUTPUT = path.resolve(__dirname, "dist");
 
 // Webpack Configuration File
 const config = {
-    mode: "development",
-    devtool: "inline-source-map",
     entry: SRC + "/index.js",
     target: 'electron-renderer',
     output: {
         path: OUTPUT,
         filename: "[name].js",
-        chunkFilename: '[name].[id].[chunkhash].js',
         clean: true
     },
     module: {
@@ -28,32 +26,69 @@ const config = {
                     loader: "babel-loader"
                 }
             },
-            // SASS/CSS files
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
-                test: /\.(sa|sc|c)ss$/,
+                enforce: "pre",
+                test: /\.js$/,
+                loader: "source-map-loader"
+            },
+            // CSS/SASS files are dependent on build env. Check dev/qa/prod files
+            // Extract Font files
+            {
+                test: /\.(ttf|eot|woff|woff2|otf)$/,
                 use: [
-                    // Creates style nodes from JS strings
                     {
-                        loader: 'style-loader'
-                    },
-                    // translates CSS into CommonJS modules
+                        loader: "file-loader",
+                        options: {
+                            name: "[name].[ext]",
+                            outputPath: "assets/fonts/",
+                            esModule: false
+                        }
+                    }
+                ]
+            },
+            // Extract Image files
+            {
+                test: /\.(jpe?g|png|gif|svg)(?:\?.*|)$/i,
+                use: [
                     {
-                        loader: 'css-loader'
-                    },
-                    // compiles Sass to CSS
-                    {
-                        loader: 'sass-loader'
-                    }]
+                        loader: "file-loader",
+                        options: {
+                            hash: "sha512",
+                            digest: "hex",
+                            name: "[name].[ext]",
+                            outputPath: "assets/images/",
+                            esModule: false
+                        }
+                    }
+                ]
             },
         ]
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            jQuery: 'jquery',
+            $: 'jquery',
+            jquery: 'jquery'
+        }),
         new HtmlWebpackPlugin({
             template: SRC + '/index.html'
         }),
+        // Copies static files to dist folder
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: SRC + '/static',
+                    to: OUTPUT,
+                    globOptions: {
+                        ignore: ['.DS_Store']
+                    }
+                }
+            ]
+        })
     ],
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.js', '.json']
     }
 };
 
