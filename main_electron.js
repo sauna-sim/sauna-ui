@@ -1,30 +1,106 @@
-const {app, BrowserWindow, ipcMain, Notification} = require('electron');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const Store = require('electron-store');
 const path = require('path');
 const isDev = !app.isPackaged;
 
 // Create Local Electron Store
 const schema = {
-    uiSettings: {
+    settings: {
         type: "object",
         default: {
-            apiHostName: "localhost",
-            apiPort: 5000
+            apiServer: {
+                hostName: "localhost",
+                port: 5000
+            },
+            apiSettings: {
+                posCalcRate: 100,
+                commandFrequency: "199.998"
+            },
+            fsdConnection: {
+                networkId: "",
+                password: "",
+                hostname: "",
+                port: 6809,
+                protocol: "Classic"
+            }
         },
         properties: {
-            apiHostName: {
-                type: 'string',
-                default: "localhost"
+            apiServer: {
+                type: "object",
+                properties: {
+                    hostName: {
+                        type: 'string',
+                        default: "localhost"
+                    },
+                    port: {
+                        type: "number",
+                        default: 5000,
+                        minimum: 1,
+                        maximum: 100000
+                    }
+                },
+                default: {
+                    hostName: "localhost",
+                    port: 5000
+                }
             },
-            apiPort: {
-                type: "number",
-                default: 5000,
-                minimum: 1,
-                maximum: 100000
+            apiSettings: {
+                type: "object",
+                properties: {
+                    posCalcRate: {
+                        type: "number",
+                        default: 100,
+                        minimum: 10,
+                        maximum: 1000
+                    },
+                    commandFrequency: {
+                        type: "string",
+                        default: "199.998"
+                    }
+                },
+                default: {
+                    posCalcRate: 100,
+                    commandFrequency: "199.998"
+                }
+            },
+            fsdConnection: {
+                type: "object",
+                properties: {
+                    networkId: {
+                        type: "string",
+                        default: ""
+                    },
+                    password: {
+                        type: "string",
+                        default: ""
+                    },
+                    hostname: {
+                        type: "string",
+                        default: ""
+                    },
+                    port: {
+                        type: "number",
+                        default: 6809,
+                        minimum: 1,
+                        maximum: 100000
+                    },
+                    protocol: {
+                        type: "string",
+                        default: "Classic"
+                    },
+                },
+                default: {
+                    networkId: "",
+                    password: "",
+                    hostname: "",
+                    port: 6809,
+                    protocol: "Classic"
+                }
             }
         }
-    }
+    },
 };
+
 const electronStore = new Store({schema});
 
 if (isDev) {
@@ -67,6 +143,11 @@ app.on('window-all-closed', () => {
 ipcMain.on('electron-store-get', async (event, val) => {
     event.returnValue = electronStore.get(val);
 });
+
 ipcMain.on('electron-store-set', async (event, key, val) => {
     electronStore.set(key, val);
+});
+
+ipcMain.on('electron-open-file-dialog', async (event, data) => {
+    event.returnValue = dialog.showOpenDialogSync(data);
 });

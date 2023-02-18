@@ -1,4 +1,4 @@
-const { ipcRenderer, contextBridge } = require('electron');
+const { ipcRenderer, contextBridge, ipcMain} = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
     electronStore: {
@@ -8,5 +8,10 @@ contextBridge.exposeInMainWorld('electron', {
         set(property, val) {
             ipcRenderer.send("electron-store-set", property, val)
         }
+    },
+    electronDialog: {
+        open(data){
+            return ipcRenderer.sendSync("electron-open-file-dialog", data);
+        }
     }
-})
+});
