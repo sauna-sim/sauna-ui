@@ -1,9 +1,12 @@
 const { ipcRenderer, contextBridge } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
-    notificationApi: {
-        sendNotification(message) {
-            ipcRenderer.send('notify', message);
+    electronStore: {
+        get(key){
+            return ipcRenderer.sendSync("electron-store-get", key);
+        },
+        set(property, val) {
+            ipcRenderer.send("electron-store-set", property, val)
         }
     }
 })

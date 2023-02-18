@@ -1,6 +1,31 @@
 const {app, BrowserWindow, ipcMain, Notification} = require('electron');
+const Store = require('electron-store');
 const path = require('path');
 const isDev = !app.isPackaged;
+
+// Create Local Electron Store
+const schema = {
+    uiSettings: {
+        type: "object",
+        default: {
+            apiHostName: "localhost",
+            apiPort: 5000
+        },
+        properties: {
+            apiHostName: {
+                type: 'string',
+                default: "localhost"
+            },
+            apiPort: {
+                type: "number",
+                default: 5000,
+                minimum: 1,
+                maximum: 100000
+            }
+        }
+    }
+};
+const electronStore = new Store({schema});
 
 if (isDev) {
     require('electron-reload')(__dirname, {
@@ -39,6 +64,9 @@ app.on('window-all-closed', () => {
     }
 });
 
-ipcMain.on('notify', (_, message) => {
-    new Notification({title: 'Notify', body: message}).show();
+ipcMain.on('electron-store-get', async (event, val) => {
+    event.returnValue = electronStore.get(val);
+});
+ipcMain.on('electron-store-set', async (event, key, val) => {
+    electronStore.set(key, val);
 });
