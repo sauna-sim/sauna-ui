@@ -1,20 +1,21 @@
 import React, {Component} from "react";
-import {SettingsPage} from "./settings/settings";
-import {loadMagneticFile} from "../actions/data_actions";
+import {SettingsModal} from "./settings/settings";
 import {DataPage} from "./data/data";
 import {AircraftPage} from "./aircraft/aircraft";
+import Container from "react-bootstrap/Container";
 
 class MainApp extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    render(){
+    render() {
         return (
             <>
-                <SettingsPage />
-                <DataPage />
-                <AircraftPage />
+                <Container fluid>
+                    <DataPage/>
+                    <AircraftPage/>
+                </Container>
             </>
         );
     }

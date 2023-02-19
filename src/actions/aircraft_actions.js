@@ -15,3 +15,8 @@ export async function unpauseAllAircraft(){
     const url = `${getApiUrl()}/aircraft/all/unpause`;
     return (await axios.post(url)).data;
 }
+
+export async function removeAllAircraft(){
+    const url = `${getApiUrl()}/aircraft/all/remove`;
+    return (await axios.delete(url)).data;
+}

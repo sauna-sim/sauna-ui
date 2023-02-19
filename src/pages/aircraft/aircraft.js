@@ -1,6 +1,7 @@
 import React, {Component} from "react";
-import {getAircraftList, pauseAllAircraft, unpauseAllAircraft} from "../../actions/aircraft_actions";
+import {getAircraftList, pauseAllAircraft, removeAllAircraft, unpauseAllAircraft} from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
+import {Button, ButtonToolbar, Table} from "react-bootstrap";
 
 export class AircraftPage extends Component {
     constructor(props) {
@@ -29,7 +30,6 @@ export class AircraftPage extends Component {
         while (this.state.shouldPollForAircraft) {
             try {
                 const aircraftList = await getAircraftList(true);
-
 
                 this.setState({
                     aircraftList: aircraftList
@@ -65,9 +65,12 @@ export class AircraftPage extends Component {
         return (
             <>
                 <h3>Aircraft</h3>
-                <button onClick={() => pauseAllAircraft()}>Pause All</button>
-                <button onClick={() => unpauseAllAircraft()}>Unpause All</button>
-                <table>
+                <ButtonToolbar className={"mb-2"}>
+                    <Button variant="outline-info" className="me-2" onClick={() => pauseAllAircraft()}>Pause All</Button>
+                    <Button variant="outline-success" className="me-2" onClick={() => unpauseAllAircraft()}>Unpause All</Button>
+                    <Button variant="danger" className="me-2" onClick={() => removeAllAircraft()}>Delete All</Button>
+                </ButtonToolbar>
+                <Table striped bordered hover>
                     <thead>
                     <tr>
                         <th>Callsign</th>
@@ -88,7 +91,7 @@ export class AircraftPage extends Component {
                     <tbody>
                     {this.getAircraftTable()}
                     </tbody>
-                </table>
+                </Table>
             </>
         )
     }

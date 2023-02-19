@@ -1,9 +1,11 @@
 import React, {Component} from "react";
 import {loadEuroscopeScenario, loadMagneticFile, loadSectorFile} from "../../actions/data_actions";
 import {openElectronFileDialog} from "../../actions/electron_actions";
+import {Button, ButtonToolbar} from "react-bootstrap";
+import {SettingsModal} from "../settings/settings";
 
 export class DataPage extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
@@ -17,7 +19,7 @@ export class DataPage extends Component {
             properties: ["openFile"]
         });
         console.log(filenames);
-        if (filenames && filenames.length > 0){
+        if (filenames && filenames.length > 0) {
             await loadSectorFile(filenames[0]);
         }
     }
@@ -32,18 +34,20 @@ export class DataPage extends Component {
             properties: ["openFile"]
         });
         console.log(filenames);
-        if (filenames && filenames.length > 0){
+        if (filenames && filenames.length > 0) {
             await loadEuroscopeScenario(filenames[0]);
         }
     }
 
-    render(){
+    render() {
         return (
             <>
-                <h3>Load Data</h3>
-                <button onClick={() => loadMagneticFile()}>Load Magnetic Data</button>
-                <button onClick={this.chooseSectorFile}>Load Sector File</button>
-                <button onClick={this.chooseEsFile}>Load Euroscope Scenario</button>
+                <ButtonToolbar className={"mb-2 float-end"}>
+                    <Button variant={"info"} className="me-2" onClick={() => loadMagneticFile()}>Load Magnetic Data</Button>
+                    <Button variant={"info"} className="me-2" onClick={this.chooseSectorFile}>Load Sector File</Button>
+                    <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
+                    <SettingsModal/>
+                </ButtonToolbar>
             </>
         )
     }
