@@ -3,6 +3,9 @@ const Store = require('electron-store');
 const path = require('path');
 const isDev = !app.isPackaged;
 
+// run this as early in the main process as possible
+if (require('electron-squirrel-startup')) app.quit();
+
 // Create Local Electron Store
 const schema = {
     settings: {
@@ -113,6 +116,7 @@ const createWindow = () => {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             worldSafeExecuteJavaScript: true,

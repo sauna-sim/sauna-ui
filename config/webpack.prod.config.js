@@ -34,8 +34,8 @@ const config = {
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output
             // both options are optional
-            filename: 'assets/css/[name].[hash].css',
-            chunkFilename: 'assets/css/[id].[hash].css',
+            filename: 'assets/css/[name].[fullhash].css',
+            chunkFilename: 'assets/css/[id].[fullhash].css',
         })
     ],
 };
