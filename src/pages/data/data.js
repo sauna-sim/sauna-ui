@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {loadEuroscopeScenario, loadMagneticFile, loadSectorFile} from "../../actions/data_actions";
+import {loadEuroscopeScenario, loadSectorFile} from "../../actions/data_actions";
 import {openElectronFileDialog} from "../../actions/electron_actions";
 import {Button, ButtonToolbar} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
@@ -43,7 +43,6 @@ export class DataPage extends Component {
         return (
             <>
                 <ButtonToolbar className={"mb-2 float-end"}>
-                    <Button variant={"info"} className="me-2" onClick={() => loadMagneticFile()}>Load Magnetic Data</Button>
                     <Button variant={"info"} className="me-2" onClick={this.chooseSectorFile}>Load Sector File</Button>
                     <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
                     <SettingsModal/>

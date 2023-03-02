@@ -11,11 +11,6 @@ export async function updateServerSettings(settings){
     return (await axios.post(url, settings)).data;
 }
 
-export async function loadMagneticFile(){
-    const url = `${getApiUrl()}/data/loadMagneticFile`;
-    return (await axios.post(url)).data;
-}
-
 export async function loadSectorFile(filename){
     const url = `${getApiUrl()}/data/loadSectorFile`;
     return (await axios.post(url, {
@@ -25,6 +20,8 @@ export async function loadSectorFile(filename){
 
 export async function loadEuroscopeScenario(filename){
     const url = `${getApiUrl()}/data/loadEuroscopeScenario`;
+    // Resend settings
+    await updateServerSettings(getStoreItem("settings.apiSettings"));
     return (await axios.post(url, {
         fileName: filename,
         cid: getStoreItem("settings.fsdConnection.networkId"),
