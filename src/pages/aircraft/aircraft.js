@@ -45,7 +45,7 @@ export class AircraftPage extends Component {
         return this.state.aircraftList.map((aircraft) => {
             return <tr key={aircraft.callsign}>
                 <td>{aircraft.callsign}</td>
-                <td>{aircraft.connectionStatus} {aircraft.connectionStatus === "WAITING" ? aircraft.delayMs : ""}</td>
+                <td>{aircraft.connectionStatus} {aircraft.connectionStatus === "WAITING" ? aircraft.delayMs /* / 1000 / 60 + "min" */ : ""}</td>
                 <td>{aircraft.paused ? "Paused" : "Unpaused"}</td>
                 <td>{round(aircraft.position.heading_Mag)}</td>
                 <td>{round(aircraft.position.indicatedAirSpeed)}</td>
