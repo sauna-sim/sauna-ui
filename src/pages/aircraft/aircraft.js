@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {getAircraftList, pauseAllAircraft, removeAllAircraft, unpauseAllAircraft} from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
-import {Button, ButtonToolbar, Table} from "react-bootstrap";
+import {Button, ButtonToolbar, Col, Row, Table} from "react-bootstrap";
 
 export class AircraftPage extends Component {
     constructor(props) {
@@ -37,7 +37,7 @@ export class AircraftPage extends Component {
             } catch (e) {
                 console.log(e);
             }
-            await wait(1000);
+            await wait(200);
         }
     }
 
