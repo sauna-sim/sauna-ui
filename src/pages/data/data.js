@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {loadEuroscopeScenario, loadSectorFile} from "../../actions/data_actions";
+import {loadEuroscopeScenario, loadSectorFile, loadDFDFile} from "../../actions/data_actions";
 import {openElectronFileDialog} from "../../actions/electron_actions";
 import {Button, ButtonToolbar} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
@@ -9,18 +9,18 @@ export class DataPage extends Component {
         super(props);
     }
 
-    chooseSectorFile = async () => {
+    chooseDFD = async () => {
         const filenames = openElectronFileDialog({
-            title: "Select Sector File",
+            title: "Select DFD File",
             filters: [{
-                name: "Sector File",
-                extensions: ["sct", "sct2"]
+                name: "DFD file",
+                extensions: ["s3db"]
             }],
             properties: ["openFile"]
         });
         console.log(filenames);
         if (filenames && filenames.length > 0) {
-            await loadSectorFile(filenames[0]);
+            await loadDFDFile(filenames[0]);
         }
     }
 
@@ -43,7 +43,7 @@ export class DataPage extends Component {
         return (
             <>
                 <ButtonToolbar className={"mb-2 float-end"}>
-                    <Button variant={"info"} className="me-2" onClick={this.chooseSectorFile}>Load Sector File</Button>
+                    <Button variant={"info"} className="me-2" onClick={this.chooseDFD}>Load DFD</Button>
                     <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
                     <SettingsModal/>
                 </ButtonToolbar>

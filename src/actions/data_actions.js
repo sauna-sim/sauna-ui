@@ -1,24 +1,31 @@
-import {getApiHostname, getApiPort, getApiUrl, getStoreItem} from "./local_store_actions";
+import { getApiHostname, getApiPort, getApiUrl, getStoreItem } from "./local_store_actions";
 import axios from "axios";
 
-export async function getServerSettings(){
+export async function getServerSettings() {
     const url = `${getApiUrl()}/data/settings`;
     return (await axios.get(url)).data;
 }
 
-export async function updateServerSettings(settings){
+export async function updateServerSettings(settings) {
     const url = `${getApiUrl()}/data/settings`;
     return (await axios.post(url, settings)).data;
 }
 
-export async function loadSectorFile(filename){
+export async function loadSectorFile(filename) {
     const url = `${getApiUrl()}/data/loadSectorFile`;
     return (await axios.post(url, {
         fileName: filename
     })).data;
 }
 
-export async function loadEuroscopeScenario(filename){
+export async function loadDFDFile(filename) {
+    const url = `${getApiUrl()}/data/loadDFDNavData`;
+    return (await axios.post(url, {
+        fileName: filename
+    })).data;
+}
+
+export async function loadEuroscopeScenario(filename) {
     const url = `${getApiUrl()}/data/loadEuroscopeScenario`;
     // Resend settings
     await updateServerSettings(getStoreItem("settings.apiSettings"));
