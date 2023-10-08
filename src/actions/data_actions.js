@@ -1,4 +1,4 @@
-import { getApiHostname, getApiPort, getApiUrl, getStoreItem } from "./local_store_actions";
+import { getApiUrl, getStoreItem } from "./local_store_actions";
 import axios from "axios";
 
 export async function getServerSettings() {

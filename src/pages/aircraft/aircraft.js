@@ -17,7 +17,7 @@ export class AircraftPage extends Component {
         this.setState({
             shouldPollForAircraft: true
         });
-        this.pollForAircraft();
+        //this.pollForAircraft();
     }
 
     componentWillUnmount() {

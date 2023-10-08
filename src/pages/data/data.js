@@ -3,6 +3,7 @@ import {loadEuroscopeScenario, loadSectorFile, loadDFDFile} from "../../actions/
 import {openElectronFileDialog} from "../../actions/electron_actions";
 import {Button, ButtonToolbar} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
+import {NavigraphAuthButton} from "../settings/navigraph_auth";
 
 export class DataPage extends Component {
     constructor(props) {
@@ -40,10 +41,11 @@ export class DataPage extends Component {
     }
 
     render() {
+        // <Button variant={"info"} className="me-2" onClick={this.chooseDFD}>Load DFD</Button>
         return (
             <>
                 <ButtonToolbar className={"mb-2 float-end"}>
-                    <Button variant={"info"} className="me-2" onClick={this.chooseDFD}>Load DFD</Button>
+                    <NavigraphAuthButton />
                     <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
                     <SettingsModal/>
                 </ButtonToolbar>

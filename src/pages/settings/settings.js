@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Formik, Field, getIn} from "formik";
+import {Formik, getIn} from "formik";
 import {getStoreItem, getUiSettings, saveUiSettings} from "../../actions/local_store_actions";
 import {getFsdProtocolRevisions} from "../../actions/enum_actions";
 import {updateServerSettings} from "../../actions/data_actions";
@@ -26,7 +26,7 @@ export class SettingsModal extends Component {
 
     async componentDidMount() {
         const revisions = await getFsdProtocolRevisions();
-        console.log(revisions);
+
         this.setState({
             protocolRevisions: revisions
         });

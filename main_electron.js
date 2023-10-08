@@ -99,9 +99,27 @@ const schema = {
                     port: 6809,
                     protocol: "Classic"
                 }
-            }
+            },
+
         }
     },
+    navigraph: {
+        type: "object",
+        properties: {
+            authenticated: {
+                type: "boolean",
+                default: false
+            },
+            refreshToken: {
+                type: "string",
+                default: ""
+            }
+        },
+        default: {
+            authenticated: false,
+            refreshToken: ""
+        }
+    }
 };
 
 const electronStore = new Store({schema});
@@ -132,16 +150,20 @@ app.whenReady().then(() => {
     createWindow();
 
     app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0){
+        if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
     });
 });
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin'){
+    if (process.platform !== 'darwin') {
         app.quit();
     }
+});
+
+ipcMain.on('electron-app-path-get', async (event) => {
+    event.returnValue = app.getAppPath();
 });
 
 ipcMain.on('electron-store-get', async (event, val) => {

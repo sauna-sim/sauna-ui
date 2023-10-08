@@ -25,3 +25,16 @@ export function getApiPort(){
 export function getApiUrl(){
     return `http://${getApiHostname()}:${getApiPort()}/api`;
 }
+
+export function setNavigraphRefreshToken(refreshToken){
+    setStoreItem("navigraph.refreshToken", refreshToken);
+    setStoreItem("navigraph.authenticated", true);
+}
+
+export function getNavigraphRefreshToken(){
+    return getStoreItem("navigraph.refreshToken");
+}
+
+export function isNavigraphAuthenticated(){
+    return getStoreItem("navigraph.authenticated");
+}
