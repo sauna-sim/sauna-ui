@@ -13,7 +13,41 @@ import {
 import qs from "qs";
 
 const navigraphApiAuthUrl = "https://identity.api.navigraph.com";
-const navigraphApiUrl = "https://api.navigraph.com/v1";
+
+// Configure Axios Navigraph Interceptors
+const axiosNavigraphApi = axios.create({
+    baseURL: "https://api.navigraph.com/v1"
+});
+
+axiosNavigraphApi.interceptors.request.use(
+    config => {
+        config.headers["Authorization"] = getNavigraphFullToken();
+        return config;
+    }
+);
+
+axiosNavigraphApi.interceptors.response.use(
+    (response) => {
+        return response
+    }, async (error) => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            // Refresh Token
+            try {
+                await refreshNavigraphToken();
+                axiosNavigraphApi.defaults.headers.common["Authorization"] = getNavigraphFullToken();
+
+                return axiosNavigraphApi(originalRequest);
+            } catch (_e){
+                return Promise.reject(_e);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export async function hasNavigraphDataLoaded() {
     const url = `${getApiUrl()}/data/hasNavigraphDataLoaded`;
@@ -31,7 +65,7 @@ async function getNavigraphCreds() {
     return (await axios.get(url)).data;
 }
 
-export async function navigraphAuthFlow(onDeviceAuthResp){
+export async function navigraphAuthFlow(onDeviceAuthResp) {
     // Get Navigraph API Credentials
     const navigraphCreds = await getNavigraphCreds();
 
@@ -51,7 +85,7 @@ export async function navigraphAuthFlow(onDeviceAuthResp){
     storeToken(tokenResponse);
 }
 
-export function storeToken(tokenResponse){
+export function storeToken(tokenResponse) {
     // Session Storage
     sessionStorage.setItem(NAVIGRAPH_ACCESS_TOKEN, tokenResponse.access_token);
     sessionStorage.setItem(NAVIGRAPH_TOKEN_TYPE, tokenResponse.token_type);
@@ -100,7 +134,7 @@ export async function initNavigraphAuth(navigraphCreds, pkceCodes) {
  * @param interval Interval returned from device auth response
  * @returns {Promise<any>} Navigraph Token Response
  */
-export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, interval = 5){
+export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, interval = 5) {
     let authorized = false;
     const url = `${navigraphApiAuthUrl}/connect/token`;
     const params = {
@@ -113,7 +147,7 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
     };
 
     // Loop until we get the token or an error is thrown from Navigraph
-    while (!authorized){
+    while (!authorized) {
         // Wait the specified interval
         await new Promise(resolve => setTimeout(resolve, interval * 1000));
 
@@ -133,11 +167,11 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
             authorized = true;
             return tokenResp.data;
         } catch (e) {
-            if (e.response && e.response.status === 400 && e.response.data){
-                if (e.response.data.error === "slow_down"){
+            if (e.response && e.response.status === 400 && e.response.data) {
+                if (e.response.data.error === "slow_down") {
                     interval += 5;
                     continue;
-                } else if (e.response.data.error === "authorization_pending"){
+                } else if (e.response.data.error === "authorization_pending") {
                     continue;
                 }
             }
@@ -148,7 +182,7 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
     }
 }
 
-export async function refreshNavigraphToken(){
+export async function refreshNavigraphToken() {
     // Get Navigraph API Credentials
     const navigraphCreds = await getNavigraphCreds();
 
@@ -182,17 +216,10 @@ const parseJwt = (token) => {
 };
 
 
-export async function getNavigraphPackages(){
-    const url = `${navigraphApiUrl}/navdata/packages`;
-
+export async function getNavigraphPackages() {
     console.log(parseJwt(sessionStorage.getItem(NAVIGRAPH_ACCESS_TOKEN)));
 
-    const response = await axios.get(
-        url,
-        {
-            headers: {"Authorization": getNavigraphFullToken()}
-        }
-    );
+    const response = await axiosNavigraphApi.get("/navdata/packages");
 
     return response.data;
 }
