@@ -18,6 +18,8 @@ export class NavigraphAuthButton extends Component {
             await navigraphAuthFlow((deviceAuthResp) => {
                 // Get verification urls to display
                 console.log(deviceAuthResp);
+
+                this.open();
             });
         }
 

@@ -16,8 +16,16 @@ export class SettingsModal extends Component {
         }
     }
 
-    open = () => {
-        this.setState({showModal: true});
+    open = async () => {
+        this.setState({
+            showModal: true
+        });
+
+        const revisions = await getFsdProtocolRevisions();
+
+        this.setState({
+            protocolRevisions: revisions
+        });
     }
 
     close = () => {

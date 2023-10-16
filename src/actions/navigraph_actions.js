@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+    clearNavigraphRefreshToken,
     getApiUrl, getNavigraphRefreshToken,
     setNavigraphRefreshToken
 } from "./local_store_actions";
@@ -41,6 +42,8 @@ axiosNavigraphApi.interceptors.response.use(
 
                 return axiosNavigraphApi(originalRequest);
             } catch (_e){
+                // Clear out authentication since token doesn't work
+                clearNavigraphRefreshToken();
                 return Promise.reject(_e);
             }
         }
@@ -143,7 +146,7 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
         code_verifier: pkceCodes.code_verifier,
         grant_type: "urn:ietf:params:oauth:grant-type:device_code",
         device_code: deviceCode,
-        scope: "openid offline_access charts"
+        scope: "openid offline_access fmsdata"
     };
 
     // Loop until we get the token or an error is thrown from Navigraph
