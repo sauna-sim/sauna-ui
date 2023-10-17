@@ -6,14 +6,19 @@ export async function getAircraftList(withFms = false){
     return (await axios.get(url)).data;
 }
 
-export async function pauseAllAircraft(){
-    const url = `${getApiUrl()}/aircraft/all/pause`;
-    return (await axios.post(url)).data;
+export async function getSimState(){
+    const url = `${getApiUrl()}/aircraft/all/simState`;
+    return (await axios.get(url)).data;
 }
 
-export async function unpauseAllAircraft(){
-    const url = `${getApiUrl()}/aircraft/all/unpause`;
-    return (await axios.post(url)).data;
+export async function setSimState(newState){
+    const url = `${getApiUrl()}/aircraft/all/simState`;
+    return (await axios.post(url, newState)).data;
+}
+
+export async function setAircraftSimState(callsign, newState){
+    const url = `${getApiUrl()}/aircraft/byCallsign/${callsign}/simState`;
+    return (await axios.post(url, newState)).data;
 }
 
 export async function removeAllAircraft(){
