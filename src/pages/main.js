@@ -3,6 +3,7 @@ import {SettingsModal} from "./settings/settings";
 import {DataPage} from "./data/data";
 import {AircraftPage} from "./aircraft/aircraft";
 import Container from "react-bootstrap/Container";
+import {Col, Row} from "react-bootstrap";
 
 class MainApp extends Component {
     constructor(props) {
@@ -13,8 +14,17 @@ class MainApp extends Component {
         return (
             <>
                 <Container fluid>
-                    <DataPage/>
-                    <AircraftPage/>
+                    <Row>
+                        <Col md="auto">
+                            <h3>Aircraft</h3>
+                        </Col>
+                        <Col>
+                            <DataPage/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <AircraftPage/>
+                    </Row>
                 </Container>
             </>
         );
