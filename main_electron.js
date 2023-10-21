@@ -113,11 +113,44 @@ const schema = {
             refreshToken: {
                 type: "string",
                 default: ""
+            },
+            package: {
+                type: "object",
+                properties: {
+                    cycle: {
+                        type: "string",
+                        default: ""
+                    },
+                    revision: {
+                        type: "string",
+                        default: ""
+                    },
+                    package_id: {
+                        type: "string",
+                        default: ""
+                    },
+                    filename: {
+                        type: "string",
+                        default: ""
+                    }
+                },
+                default: {
+                    cycle: "",
+                    revision: "",
+                    package_id: "",
+                    filename: ""
+                }
             }
         },
         default: {
             authenticated: false,
-            refreshToken: ""
+            refreshToken: "",
+            package: {
+                cycle: "",
+                revision: "",
+                package_id: "",
+                filename: ""
+            }
         }
     }
 };
