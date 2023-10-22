@@ -28,7 +28,11 @@ class NavigraphAuthButtonComponent extends Component {
         this.setState({
             loading: true
         });
-        await this.props.checkNavigraphPackageRedux();
+        try {
+            await this.props.checkNavigraphPackageRedux();
+        } catch (e){
+            console.error(e);
+        }
         this.setState({
             loading: false
         });
@@ -46,7 +50,11 @@ class NavigraphAuthButtonComponent extends Component {
             this.openVerification(deviceAuthResp.verification_uri_complete);
         });
         this.closeVerification();
-        await this.props.checkNavigraphPackageRedux();
+        try {
+            await this.props.checkNavigraphPackageRedux();
+        } catch (e) {
+            console.error(e);
+        }
         this.setState({
             loading: false
         });
