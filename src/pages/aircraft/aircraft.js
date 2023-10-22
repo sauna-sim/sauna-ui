@@ -6,6 +6,8 @@ import {
 } from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
 import {Button, ButtonToolbar, Col, FormControl, InputGroup, Row, Table} from "react-bootstrap";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 
 export class AircraftPage extends Component {
     constructor(props) {
@@ -47,7 +49,7 @@ export class AircraftPage extends Component {
             } catch (e) {
                 console.log(e);
             }
-            await wait(500);
+            await wait(200);
         }
     }
 
@@ -74,14 +76,14 @@ export class AircraftPage extends Component {
                                       paused: false,
                                       simRate: simState.simRate
                                   })}
-            >Unpause All</Button>;
+            ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
-            pauseButton = <Button variant="outline-info" className="me-2"
+            pauseButton = <Button variant="outline-danger" className="me-2"
                                   onClick={() => this.updateSimState({
                                       paused: true,
                                       simRate: simState.simRate
                                   })}
-            >Pause</Button>
+            ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
             <>
@@ -111,7 +113,7 @@ export class AircraftPage extends Component {
                     />
                     <InputGroup.Text id="global-simrate-addon2">x</InputGroup.Text>
                 </InputGroup>
-                <Button variant="danger" className="me-2" onClick={() => removeAllAircraft()}>Delete All</Button>
+                <Button variant="danger" className="me-2" onClick={() => removeAllAircraft()}><FontAwesomeIcon icon={faTrash} /> All</Button>
             </>
         )
     }
@@ -124,14 +126,14 @@ export class AircraftPage extends Component {
                                       paused: false,
                                       simRate: aircraft.simState.simRate
                                   })}
-            >Unpause</Button>;
+            ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
-            pauseButton = <Button variant="outline-info" className="me-2"
+            pauseButton = <Button variant="outline-danger" className="me-2"
                                   onClick={() => setAircraftSimState(aircraft.callsign, {
                                       paused: true,
                                       simRate: aircraft.simState.simRate
                                   })}
-            >Pause</Button>
+            ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
             <>
