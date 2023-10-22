@@ -1,8 +1,9 @@
 import React, {Component} from "react";
-import {Button, Modal} from "react-bootstrap";
+import {Button, Image, Modal} from "react-bootstrap";
 import {
     checkNavigraphPackageRedux, navigraphAuthFlowRedux
 } from "../../actions/navigraph_actions";
+import NavigraphLogoPng from "../../assets/images/NavigraphLogo.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {connect} from "react-redux";
 import {faMap} from "@fortawesome/free-solid-svg-icons";
@@ -68,7 +69,7 @@ class NavigraphAuthButtonComponent extends Component {
                 variant={"secondary"}
                 onClick={this.attemptAuth}
                 disabled={loading}
-            >Authenticate Navigraph</Button>
+            ><Image src={NavigraphLogoPng} width={20} height={20} /> Log In</Button>
         }
 
         let packageVersion = navigraphState.packageInfo.cycle;
@@ -80,7 +81,7 @@ class NavigraphAuthButtonComponent extends Component {
             variant={navigraphState.isCurrent ? "success" : "warning"}
             onClick={async () => await this.refreshPackage()}
             disabled={loading}
-        ><FontAwesomeIcon icon={faMap} /> {packageVersion}</Button>
+        ><Image src={NavigraphLogoPng} width={20} height={20} /> {packageVersion}</Button>
     }
 
     render(){
