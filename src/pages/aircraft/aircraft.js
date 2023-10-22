@@ -27,7 +27,7 @@ export class AircraftPage extends Component {
         this.setState({
             shouldPollForAircraft: true
         });
-        //this.pollForAircraft();
+        this.pollForAircraft();
     }
 
     componentWillUnmount() {
@@ -49,7 +49,7 @@ export class AircraftPage extends Component {
             } catch (e) {
                 console.log(e);
             }
-            await wait(500);
+            await wait(200);
         }
     }
 
