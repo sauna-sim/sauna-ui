@@ -1,33 +1,53 @@
 import React, {Component} from "react";
 import {Button, Modal} from "react-bootstrap";
-import {getNavigraphPackages, navigraphAuthFlow} from "../../actions/navigraph_actions";
+import {
+    checkNavigraphPackageRedux, navigraphAuthFlowRedux
+} from "../../actions/navigraph_actions";
 import {isNavigraphAuthenticated} from "../../actions/local_store_actions";
+import {connect} from "react-redux";
 
-export class NavigraphAuthButton extends Component {
+class NavigraphAuthButtonComponent extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             showVerificationModal: false,
             verificationUrl: "",
+            loading: false
         }
+    }
+
+    async componentDidMount() {
+        await this.refreshPackage();
+    }
+
+    refreshPackage = async () => {
+        // Verify/Update NavData file
+        this.setState({
+            loading: true
+        });
+        await this.props.checkNavigraphPackageRedux();
+        this.setState({
+            loading: false
+        });
     }
 
     attemptAuth = async () => {
-        if (!isNavigraphAuthenticated()) {
-            // Perform navigraph auth
-            await navigraphAuthFlow((deviceAuthResp) => {
-                // Get verification urls to display
-                console.log(deviceAuthResp);
+        this.setState({
+            loading: true
+        });
+        // Perform navigraph auth
+        await this.props.navigraphAuthFlowRedux((deviceAuthResp) => {
+            // Get verification urls to display
+            console.log(deviceAuthResp);
 
-                this.openVerification(deviceAuthResp.verification_uri_complete);
-            });
-            this.closeVerification();
-        }
-    }
-
-    getPackages = async () => {
-        console.log(await getNavigraphPackages());
+            this.openVerification(deviceAuthResp.verification_uri_complete);
+        });
+        this.closeVerification();
+        await this.props.checkNavigraphPackageRedux();
+        this.setState({
+            loading: false
+        });
     }
 
     openVerification = (verifyUrl) => {
@@ -38,16 +58,38 @@ export class NavigraphAuthButton extends Component {
         this.setState({showVerificationModal: false});
     }
 
+    getNavigraphButton = () => {
+        const {navigraphState} = this.props;
+        const {loading} = this.state;
+
+        if (!navigraphState.authenticated){
+            return <Button
+                variant={"secondary"}
+                onClick={this.attemptAuth}
+                disabled={loading}
+            >Authenticate Navigraph</Button>
+        }
+
+        let packageVersion = navigraphState.packageInfo.cycle;
+        if (navigraphState.packageInfo.revision){
+            packageVersion += `r${navigraphState.packageInfo.revision}`;
+        }
+
+        return <Button
+            variant={navigraphState.isCurrent ? "success" : "warning"}
+            onClick={async () => await this.refreshPackage()}
+            disabled={loading}
+        >{packageVersion}</Button>
+    }
+
     render(){
         const {showVerificationModal, verificationUrl} = this.state;
+        const {navigraphState} = this.props;
+
+        console.log(navigraphState);
         return (
             <>
-                <Button onClick={this.getPackages}>Get Packages</Button>
-                <Button
-                    variant={"secondary"}
-                    disabled={isNavigraphAuthenticated()}
-                    onClick={this.attemptAuth}
-                >{isNavigraphAuthenticated() ? "Navigraph Authenticated" : "Authenticate with Navigraph"}</Button>
+                {this.getNavigraphButton()}
 
                 <Modal show={showVerificationModal} onHide={this.closeVerification}>
                     <Modal.Title>Navigraph Auth</Modal.Title>
@@ -72,3 +114,9 @@ export class NavigraphAuthButton extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => ({
+    navigraphState: state.navigraph
+});
+
+export const NavigraphAuthButton = connect(mapStateToProps, {checkNavigraphPackageRedux, navigraphAuthFlowRedux})(NavigraphAuthButtonComponent);

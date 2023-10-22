@@ -18,10 +18,11 @@ export async function loadSectorFile(filename) {
     })).data;
 }
 
-export async function loadDFDFile(filename) {
+export async function loadDFDFile(filename, uuid) {
     const url = `${getApiUrl()}/data/loadDFDNavData`;
     return (await axios.post(url, {
-        fileName: filename
+        fileName: filename,
+        uuid: uuid
     })).data;
 }
 

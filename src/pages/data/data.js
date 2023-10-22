@@ -4,6 +4,8 @@ import {openElectronFileDialog} from "../../actions/electron_actions";
 import {Button, ButtonToolbar} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 import {NavigraphAuthButton} from "../settings/navigraph_auth";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faFileCirclePlus, faPlane} from "@fortawesome/free-solid-svg-icons";
 
 export class DataPage extends Component {
     constructor(props) {
@@ -46,7 +48,7 @@ export class DataPage extends Component {
             <>
                 <ButtonToolbar className={"mb-2 float-end"}>
                     <NavigraphAuthButton />
-                    <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
+                    <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}><FontAwesomeIcon icon={faFileCirclePlus} /> <FontAwesomeIcon icon={faPlane} /></Button>
                     <SettingsModal/>
                 </ButtonToolbar>
             </>

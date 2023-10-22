@@ -48,6 +48,14 @@ export function getNavigraphRefreshToken(){
     return getStoreItem("navigraph.refreshToken");
 }
 
+export function setNavigraphPackageInfo(packageInfo){
+    setStoreItem("navigraph.package", packageInfo);
+}
+
+export function getNavigraphPackageInfo(){
+    return getStoreItem("navigraph.package");
+}
+
 export function isNavigraphAuthenticated(){
     return getStoreItem("navigraph.authenticated");
 }
