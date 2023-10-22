@@ -43,14 +43,14 @@ export class DataPage extends Component {
     }
 
     render() {
-        // <Button variant={"info"} className="me-2" onClick={this.chooseDFD}>Load DFD</Button>
         return (
             <>
-                <ButtonToolbar className={"mb-2 float-end"}>
-                    <NavigraphAuthButton />
-                    <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}><FontAwesomeIcon icon={faFileCirclePlus} /> <FontAwesomeIcon icon={faPlane} /></Button>
+                <div className={"mb-2 float-end"}>
+                    <NavigraphAuthButton />{' '}
+                    <Button variant={"success"} onClick={this.chooseEsFile}
+                    ><FontAwesomeIcon icon={faFileCirclePlus} /> <FontAwesomeIcon icon={faPlane} /> ES</Button>{' '}
                     <SettingsModal/>
-                </ButtonToolbar>
+                </div>
             </>
         )
     }

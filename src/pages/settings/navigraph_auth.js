@@ -3,8 +3,9 @@ import {Button, Modal} from "react-bootstrap";
 import {
     checkNavigraphPackageRedux, navigraphAuthFlowRedux
 } from "../../actions/navigraph_actions";
-import {isNavigraphAuthenticated} from "../../actions/local_store_actions";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {connect} from "react-redux";
+import {faMap} from "@fortawesome/free-solid-svg-icons";
 
 class NavigraphAuthButtonComponent extends Component {
     constructor(props) {
@@ -79,7 +80,7 @@ class NavigraphAuthButtonComponent extends Component {
             variant={navigraphState.isCurrent ? "success" : "warning"}
             onClick={async () => await this.refreshPackage()}
             disabled={loading}
-        >{packageVersion}</Button>
+        ><FontAwesomeIcon icon={faMap} /> {packageVersion}</Button>
     }
 
     render(){
