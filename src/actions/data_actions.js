@@ -1,5 +1,6 @@
 import { getApiUrl, getStoreItem } from "./local_store_actions";
 import axios from "axios";
+import {setSectorFiles} from "../redux/slices/sectorFilesSlice";
 
 export async function getServerSettings() {
     const url = `${getApiUrl()}/data/settings`;
@@ -16,6 +17,17 @@ export async function loadSectorFile(filename) {
     return (await axios.post(url, {
         fileName: filename
     })).data;
+}
+
+export function getLoadedSectorFiles() {
+    return async function (dispatch){
+        const url = `${getApiUrl()}/data/loadedSectorFiles`;
+        const sectorFiles = (await axios.get(url)).data;
+
+        dispatch(setSectorFiles(sectorFiles));
+
+        return sectorFiles;
+    }
 }
 
 export async function loadDFDFile(filename, uuid) {

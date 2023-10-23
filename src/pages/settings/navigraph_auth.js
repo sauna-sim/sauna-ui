@@ -4,9 +4,7 @@ import {
     checkNavigraphPackageRedux, navigraphAuthFlowRedux
 } from "../../actions/navigraph_actions";
 import NavigraphLogoPng from "../../assets/images/NavigraphLogo.png";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {connect} from "react-redux";
-import {faMap} from "@fortawesome/free-solid-svg-icons";
 
 class NavigraphAuthButtonComponent extends Component {
     constructor(props) {
@@ -102,7 +100,9 @@ class NavigraphAuthButtonComponent extends Component {
                 {this.getNavigraphButton()}
 
                 <Modal show={showVerificationModal} onHide={this.closeVerification}>
-                    <Modal.Title>Navigraph Auth</Modal.Title>
+                    <Modal.Header>
+                        <Modal.Title>Navigraph Authentication</Modal.Title>
+                    </Modal.Header>
                     <Modal.Body>
                         <a
                             href={verificationUrl}

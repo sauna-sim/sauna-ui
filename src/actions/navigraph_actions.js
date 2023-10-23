@@ -50,10 +50,6 @@ axiosNavigraphApi.interceptors.response.use(
                 // Clear out authentication since token doesn't work
                 clearNavigraphRefreshToken();
 
-                // Update reducer
-                const dispatch = useDispatch();
-                dispatch(setNvgAuthenticated(false));
-
                 return Promise.reject(_e);
             }
         }
