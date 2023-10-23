@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Button, Image, Modal} from "react-bootstrap";
+import {Button, Image, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {
     checkNavigraphPackageRedux, navigraphAuthFlowRedux
 } from "../../actions/navigraph_actions";
@@ -28,7 +28,7 @@ class NavigraphAuthButtonComponent extends Component {
         });
         try {
             await this.props.checkNavigraphPackageRedux();
-        } catch (e){
+        } catch (e) {
             console.error(e);
         }
         this.setState({
@@ -70,27 +70,43 @@ class NavigraphAuthButtonComponent extends Component {
         const {navigraphState} = this.props;
         const {loading} = this.state;
 
-        if (!navigraphState.authenticated){
+        if (!navigraphState.authenticated) {
             return <Button
                 variant={"secondary"}
                 onClick={this.attemptAuth}
                 disabled={loading}
-            ><Image src={NavigraphLogoPng} width={20} height={20} /> Log In</Button>
+            ><Image src={NavigraphLogoPng} width={20} height={20}/> Log In</Button>
         }
 
         let packageVersion = navigraphState.packageInfo.cycle;
-        if (navigraphState.packageInfo.revision){
+        if (navigraphState.packageInfo.revision) {
             packageVersion += `r${navigraphState.packageInfo.revision}`;
         }
 
-        return <Button
-            variant={navigraphState.isCurrent ? "success" : "warning"}
-            onClick={async () => await this.refreshPackage()}
-            disabled={loading}
-        ><Image src={NavigraphLogoPng} width={20} height={20} /> {packageVersion}</Button>
+        const renderTooltip = (props) => (
+            <Tooltip id="navigraph-auth-button-tooltip" {...props}>
+                Reload {navigraphState.isCurrent ? "Current" : "Outdated"} Navigraph Cycle {packageVersion}
+            </Tooltip>
+        );
+
+        return (
+            <>
+                <OverlayTrigger
+                    placement="bottom"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={renderTooltip}
+                >
+                    <Button
+                        variant={navigraphState.isCurrent ? "success" : "warning"}
+                        onClick={async () => await this.refreshPackage()}
+                        disabled={loading}
+                    ><Image src={NavigraphLogoPng} width={20} height={20}/> {packageVersion}</Button>
+                </OverlayTrigger>
+            </>
+        )
     }
 
-    render(){
+    render() {
         const {showVerificationModal, verificationUrl} = this.state;
         const {navigraphState} = this.props;
 
@@ -116,7 +132,7 @@ class NavigraphAuthButtonComponent extends Component {
                         <div className="p-2 rounded-lg bg-white mt-1">
                             <img
                                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${verificationUrl}`}
-                             alt="Navigraph Verification QR Qode"/>
+                                alt="Navigraph Verification QR Qode"/>
                         </div>
                     </Modal.Body>
                 </Modal>
@@ -129,4 +145,7 @@ const mapStateToProps = (state) => ({
     navigraphState: state.navigraph
 });
 
-export const NavigraphAuthButton = connect(mapStateToProps, {checkNavigraphPackageRedux, navigraphAuthFlowRedux})(NavigraphAuthButtonComponent);
+export const NavigraphAuthButton = connect(mapStateToProps, {
+    checkNavigraphPackageRedux,
+    navigraphAuthFlowRedux
+})(NavigraphAuthButtonComponent);

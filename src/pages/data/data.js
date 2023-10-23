@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {loadEuroscopeScenario, loadSectorFile, loadDFDFile} from "../../actions/data_actions";
 import {openElectronFileDialog} from "../../actions/electron_actions";
-import {Button, ButtonGroup, ButtonToolbar} from "react-bootstrap";
+import {Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 import {NavigraphAuthButton} from "../settings/navigraph_auth";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -29,6 +29,11 @@ export class DataPage extends Component {
     }
 
     render() {
+        const renderEsScenarioTooltip = (props) => (
+            <Tooltip id="es-scenario-button-tooltip" {...props}>
+                Load EuroScope Scenario File
+            </Tooltip>
+        );
         return (
             <>
                 <div className={"mb-2 float-end"}>
@@ -36,8 +41,14 @@ export class DataPage extends Component {
                         <NavigraphAuthButton/>
                         <SectorFilesButton/>
                     </ButtonGroup>{' '}
-                    <Button variant={"success"} onClick={this.chooseEsFile}
-                    ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>{' '}
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderEsScenarioTooltip}
+                    >
+                        <Button variant={"success"} onClick={this.chooseEsFile}
+                        ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
+                    </OverlayTrigger>{' '}
                     <SettingsModal/>
                 </div>
             </>

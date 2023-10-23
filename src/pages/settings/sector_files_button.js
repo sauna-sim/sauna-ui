@@ -1,13 +1,13 @@
 import React, {Component, Fragment} from "react";
 import {getLoadedSectorFiles, loadEuroscopeScenario, loadSectorFile} from "../../actions/data_actions";
 import {connect} from "react-redux";
-import {Badge, Button} from "react-bootstrap";
+import {Badge, Button, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMap} from "@fortawesome/free-solid-svg-icons";
 import {openElectronFileDialog} from "../../actions/electron_actions";
 
 class SectorFilesButtonComponent extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
@@ -38,13 +38,26 @@ class SectorFilesButtonComponent extends Component {
 
     render() {
         const {sectorFilesLoaded} = this.props;
-        console.log(sectorFilesLoaded);
+
+        const renderTooltip = (props) => (
+            <Tooltip id="sector-files-button-tooltip" {...props}>
+                Load Sector File NavData
+            </Tooltip>
+        );
+
         return (
             <>
-                <Button
-                    variant={sectorFilesLoaded && sectorFilesLoaded.length > 0 ? "success" : "secondary"}
-                    onClick={this.loadSectorFile}
-                ><FontAwesomeIcon icon={faMap}/> SCT <Badge bg={"secondary"}>{sectorFilesLoaded ? sectorFilesLoaded.length : 0}</Badge></Button>
+                <OverlayTrigger
+                    placement="bottom"
+                    delay={{show: 250, hide: 400}}
+                    overlay={renderTooltip}
+                >
+                    <Button
+                        variant={sectorFilesLoaded && sectorFilesLoaded.length > 0 ? "success" : "secondary"}
+                        onClick={this.loadSectorFile}
+                    ><FontAwesomeIcon icon={faMap}/> SCT <Badge
+                        bg={"secondary"}>{sectorFilesLoaded ? sectorFilesLoaded.length : 0}</Badge></Button>
+                </OverlayTrigger>
             </>
         )
     }
