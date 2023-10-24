@@ -1,6 +1,6 @@
-import React, {Component, Fragment} from "react";
+import React, {Component, Fragment, useMemo} from "react";
 import {closeMapWindow} from "../../actions/electron_actions";
-import {MapContainer, Marker, Popup, TileLayer, Tooltip} from "react-leaflet";
+import {MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip} from "react-leaflet";
 import {Container} from "react-bootstrap";
 import leafletMarkerIcon2xPng from "leaflet/dist/images/marker-icon-2x.png";
 import leafletMarkerIconPng from "leaflet/dist/images/marker-icon.png";
@@ -66,7 +66,7 @@ export class MapPage extends Component {
                     this.setState({
                         center: {
                             lat: aircraftList[0].position.latitude,
-                            lon: aircraftList[1].position.longitude
+                            lon: aircraftList[0].position.longitude
                         }
                     });
                 }
@@ -89,23 +89,27 @@ export class MapPage extends Component {
         console.log(aircraftList);
 
         return aircraftList.map((aircraft) => {
+            const routePolyline = aircraft.fms ? aircraft.fms.fmsLines.map((line) => {
+                return [
+                    [line.startLat, line.startLon],
+                    [line.endLat, line.endLon]
+                ]
+            }) : [];
             return (
-                <RotatedMarker
-                    position={[aircraft.position.latitude, aircraft.position.longitude]}
-                    key={aircraft.callsign}
-                    rotationAngle={aircraft.position.track_True}
-                    rotationOrigin="center"
-                    icon={planeIcon}
-                    eventHandlers={{
-                        click: () => {
-                            console.log('marker clicked')
-                        },
-                    }}
-                >
-                    <Tooltip direction="top" opacity={1} permanent>
-                        {aircraft.callsign}
-                    </Tooltip>
-                </RotatedMarker>
+                <Fragment key={aircraft.callsign}>
+                    <RotatedMarker
+                        position={[aircraft.position.latitude, aircraft.position.longitude]}
+                        rotationAngle={aircraft.position.track_True}
+                        rotationOrigin="center"
+                        icon={planeIcon}
+                    >
+                        <Tooltip direction="top" opacity={1} permanent>
+                            {aircraft.callsign}
+                        </Tooltip>
+                    </RotatedMarker>
+
+                    <Polyline pathOptions={{color: "red"}} positions={routePolyline}/>
+                </Fragment>
             )
         });
     }
