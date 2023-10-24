@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {loadEuroscopeScenario, loadSectorFile} from "../../actions/data_actions";
-import {openElectronFileDialog} from "../../actions/electron_actions";
-import {Button, ButtonToolbar} from "react-bootstrap";
+import {openElectronFileDialog, openMapWindow} from "../../actions/electron_actions";
+import {Button, ButtonToolbar, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 
 export class DataPage extends Component {
@@ -24,6 +24,10 @@ export class DataPage extends Component {
         }
     }
 
+    openMapPage = async () => {
+        await openMapWindow();
+    }
+
     chooseEsFile = async () => {
         const filenames = openElectronFileDialog({
             title: "Select Euroscope Scenario File",
@@ -40,9 +44,23 @@ export class DataPage extends Component {
     }
 
     render() {
+        const renderMapTooltip = (props) => (
+            <Tooltip id="map-button-tooltip" {...props}>
+                Open Map Window
+            </Tooltip>
+        )
+
         return (
             <>
                 <ButtonToolbar className={"mb-2 float-end"}>
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderMapTooltip}
+                    >
+                        <Button variant={"secondary"} onClick={this.openMapPage}
+                        >Map</Button>
+                    </OverlayTrigger>{' '}
                     <Button variant={"info"} className="me-2" onClick={this.chooseSectorFile}>Load Sector File</Button>
                     <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
                     <SettingsModal/>

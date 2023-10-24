@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import {SettingsModal} from "./settings/settings";
 import {DataPage} from "./data/data";
 import {AircraftPage} from "./aircraft/aircraft";
 import Container from "react-bootstrap/Container";
