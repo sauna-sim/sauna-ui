@@ -5,7 +5,8 @@ import {Container} from "react-bootstrap";
 import leafletMarkerIcon2xPng from "leaflet/dist/images/marker-icon-2x.png";
 import leafletMarkerIconPng from "leaflet/dist/images/marker-icon.png";
 import leafletMarkerShadowPng from "leaflet/dist/images/marker-shadow.png";
-import L, {Icon} from 'leaflet';
+import planeMarkerIconPng from "../../assets/images/TargetMarker.png";
+import L from 'leaflet';
 import {getAircraftList} from "../../actions/aircraft_actions";
 import {wait} from "../../actions/utilities";
 import {RotatedMarker} from "./rotated_marker";
@@ -16,6 +17,13 @@ L.Icon.Default.mergeOptions({
     iconRetinaUrl: leafletMarkerIcon2xPng,
     iconUrl: leafletMarkerIconPng,
     shadowUrl: leafletMarkerShadowPng
+});
+
+const planeIcon = new L.Icon({
+    iconUrl: planeMarkerIconPng,
+    iconSize: [10, 70],
+    iconAnchor: [5, 35],
+    popupAnchor: [0, 0]
 });
 
 export class MapPage extends Component {
@@ -85,8 +93,14 @@ export class MapPage extends Component {
                 <RotatedMarker
                     position={[aircraft.position.latitude, aircraft.position.longitude]}
                     key={aircraft.callsign}
-                    rotationAngle={aircraft.position.track_True + 180}
+                    rotationAngle={aircraft.position.track_True}
                     rotationOrigin="center"
+                    icon={planeIcon}
+                    eventHandlers={{
+                        click: () => {
+                            console.log('marker clicked')
+                        },
+                    }}
                 >
                     <Tooltip direction="top" opacity={1} permanent>
                         {aircraft.callsign}
