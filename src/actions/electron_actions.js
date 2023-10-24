@@ -22,3 +22,11 @@ export async function extractZipFile(zipfile, dir){
 export async function combinePath(...paths){
     return await window.electron.electronFile.joinPaths(...paths);
 }
+
+export async function openMapWindow(){
+    await window.electron.mapWindow.open();
+}
+
+export async function closeMapWindow(){
+    await window.electron.mapWindow.close();
+}

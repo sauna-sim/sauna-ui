@@ -166,6 +166,9 @@ if (isDev) {
     });
 }
 
+let mainWindow;
+let mapWindow;
+
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 800,
@@ -180,10 +183,12 @@ const createWindow = () => {
     });
 
     win.loadFile('./dist/index.html');
-    win.webContents.setWindowOpenHandler(({ url }) => {
+    win.webContents.setWindowOpenHandler(({url}) => {
         shell.openExternal(url);
-        return { action: 'deny' };
+        return {action: 'deny'};
     });
+
+    mainWindow = win;
 };
 
 app.whenReady().then(() => {
@@ -258,4 +263,32 @@ ipcMain.handle("electron-file-extract-zip", async (event, source, dir) => {
 
 ipcMain.handle("electron-path-join", async (event, ...paths) => {
     return path.join(...paths);
+});
+
+ipcMain.handle("electron-window-map-open", async (event, args) => {
+    if (!mapWindow || mapWindow.isDestroyed()) {
+        const win = new BrowserWindow({
+            height: 600,
+            width: 800,
+            show: false,
+            webPreferences: {
+                nodeIntegration: false,
+                worldSafeExecuteJavaScript: true,
+                contextIsolation: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
+        });
+        win.loadURL(`file://${path.join(__dirname, "./dist/index.html")}#map`);
+        win.once('ready-to-show', () => {
+            win.show();
+        });
+
+        mapWindow = win;
+    }
+});
+
+ipcMain.handle("electron-window-map-close", async (event, args) => {
+    if (mapWindow && !mapWindow.isDestroyed()) {
+        mapWindow.close();
+    }
 })

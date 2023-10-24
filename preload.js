@@ -14,6 +14,14 @@ contextBridge.exposeInMainWorld('electron', {
             return ipcRenderer.sendSync("electron-open-file-dialog", data);
         }
     },
+    mapWindow: {
+        async open(){
+            await ipcRenderer.invoke("electron-window-map-open");
+        },
+        async close(){
+            await ipcRenderer.invoke("electron-window-map-close");
+        }
+    },
     electronFile: {
         async doesFileExist(filename){
             return await ipcRenderer.invoke("electron-file-exists", filename);
