@@ -66,7 +66,7 @@ export class MapPage extends Component {
                     this.setState({
                         center: {
                             lat: aircraftList[0].position.latitude,
-                            lon: aircraftList[1].position.longitude
+                            lon: aircraftList[0].position.longitude
                         }
                     });
                 }
