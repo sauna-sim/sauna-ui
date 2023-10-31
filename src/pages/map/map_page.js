@@ -124,6 +124,46 @@ export class MapPage extends Component {
                         </Tooltip>
                     </Marker>
                 )
+                relevantPoints.push(
+                    <Marker
+                        position={[instruction.outboundTurnLeg.turnCircley.tangentialPointA.lat,instruction.outboundTurnLeg.turnCircley.tangentialPointA.lon]}
+                        key="center"
+                    >
+                        <Tooltip direction="top" opacity={.2}>
+                        tangentialPointA
+                        </Tooltip>
+                    </Marker>
+                )
+                relevantPoints.push(
+                    <Marker
+                        position={[instruction.outboundTurnLeg.turnCircley.tangentialPointB.lat,instruction.outboundTurnLeg.turnCircley.tangentialPointB.lon]}
+                        key="center"
+                    >
+                        <Tooltip direction="top" opacity={.2}>
+                        tangentialPointB
+                        </Tooltip>
+                    </Marker>
+                )
+                relevantPoints.push(
+                    <Marker
+                        position={[instruction.outboundTurnLeg.endPoint.point.pointPosition.lat,instruction.outboundTurnLeg.endPoint.point.pointPosition.lon]}
+                        key="center"
+                    >
+                        <Tooltip direction="top" opacity={.2}>
+                        endPoint
+                        </Tooltip>
+                    </Marker>
+                )
+                relevantPoints.push(
+                    <Marker
+                        position={[instruction.outboundTurnLeg.startPoint.point.pointPosition.lat,instruction.outboundTurnLeg.startPoint.point.pointPosition.lon]}
+                        key="center"
+                    >
+                        <Tooltip direction="top" opacity={.2}>
+                        startPoint
+                        </Tooltip>
+                    </Marker>
+                )
             }
 
             return (
