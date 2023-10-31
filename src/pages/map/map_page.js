@@ -89,12 +89,43 @@ export class MapPage extends Component {
         console.log(aircraftList);
 
         return aircraftList.map((aircraft) => {
-            const routePolyline = aircraft.fms ? aircraft.fms.fmsLines.map((line) => {
+            const routePolyline = aircraft.fms ? aircraft.fms.fmsLines.map((line) => { 
                 return [
                     [line.startLat, line.startLon],
                     [line.endLat, line.endLon]
                 ]
             }) : [];
+
+            const holdPolyline = [];
+            const relevantPoints = [];
+
+            if (aircraft.fms && aircraft.fms.activeLeg && aircraft.fms.activeLeg.legType === "HOLD_TO_MANUAL"){
+                const instruction = aircraft.fms.activeLeg.instr;
+                if (instruction.outboundTurnLeg.turnCircley.bisectorIntersection){
+                    holdPolyline.push([
+                        [instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lat, instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lon],
+                        [instruction.outboundTurnLeg.startPoint.point.pointPosition.lat, instruction.outboundTurnLeg.startPoint.point.pointPosition.lon]
+                    ])
+                    
+                    holdPolyline.push([
+                    [instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lat, instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lon],
+                    [instruction.outboundTurnLeg.endPoint.point.pointPosition.lat, instruction.outboundTurnLeg.endPoint.point.pointPosition.lon]
+                ])
+                }
+                
+
+                relevantPoints.push(
+                    <Marker
+                        position={[instruction.outboundTurnLeg.turnCircley.center.lat,instruction.outboundTurnLeg.turnCircley.center.lon]}
+                        key="center"
+                    >
+                        <Tooltip direction="top" opacity={.2}>
+                            Center
+                        </Tooltip>
+                    </Marker>
+                )
+            }
+
             return (
                 <Fragment key={aircraft.callsign}>
                     <RotatedMarker
@@ -108,7 +139,10 @@ export class MapPage extends Component {
                         </Tooltip>
                     </RotatedMarker>
 
+                    {relevantPoints}
+
                     <Polyline pathOptions={{color: "red"}} positions={routePolyline}/>
+                    <Polyline pathOptions={{color: "green"}} positions={holdPolyline}/>
                 </Fragment>
             )
         });
