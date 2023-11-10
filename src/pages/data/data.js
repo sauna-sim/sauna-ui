@@ -1,27 +1,16 @@
 import React, {Component} from "react";
-import {loadEuroscopeScenario, loadSectorFile} from "../../actions/data_actions";
+import {loadEuroscopeScenario} from "../../actions/data_actions";
 import {openElectronFileDialog, openMapWindow} from "../../actions/electron_actions";
-import {Button, ButtonToolbar, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
+import {NavigraphAuthButton} from "../settings/navigraph_auth";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
+import {SectorFilesButton} from "../settings/sector_files_button";
 
 export class DataPage extends Component {
     constructor(props) {
         super(props);
-    }
-
-    chooseSectorFile = async () => {
-        const filenames = openElectronFileDialog({
-            title: "Select Sector File",
-            filters: [{
-                name: "Sector File",
-                extensions: ["sct", "sct2"]
-            }],
-            properties: ["openFile"]
-        });
-        console.log(filenames);
-        if (filenames && filenames.length > 0) {
-            await loadSectorFile(filenames[0]);
-        }
     }
 
     openMapPage = async () => {
@@ -44,6 +33,11 @@ export class DataPage extends Component {
     }
 
     render() {
+        const renderEsScenarioTooltip = (props) => (
+            <Tooltip id="es-scenario-button-tooltip" {...props}>
+                Load EuroScope Scenario File
+            </Tooltip>
+        );
         const renderMapTooltip = (props) => (
             <Tooltip id="map-button-tooltip" {...props}>
                 Open Map Window
@@ -52,19 +46,29 @@ export class DataPage extends Component {
 
         return (
             <>
-                <ButtonToolbar className={"mb-2 float-end"}>
+                <div className={"mb-2 float-end"}>
                     <OverlayTrigger
                         placement="bottom"
                         delay={{show: 250, hide: 400}}
                         overlay={renderMapTooltip}
                     >
                         <Button variant={"secondary"} onClick={this.openMapPage}
-                        >Map</Button>
+                        ><FontAwesomeIcon icon={faMap}/></Button>
                     </OverlayTrigger>{' '}
-                    <Button variant={"info"} className="me-2" onClick={this.chooseSectorFile}>Load Sector File</Button>
-                    <Button variant={"success"} className="me-2" onClick={this.chooseEsFile}>Load Euroscope Scenario</Button>
+                    <ButtonGroup>
+                        <NavigraphAuthButton/>
+                        <SectorFilesButton/>
+                    </ButtonGroup>{' '}
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderEsScenarioTooltip}
+                    >
+                        <Button variant={"success"} onClick={this.chooseEsFile}
+                        ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
+                    </OverlayTrigger>{' '}
                     <SettingsModal/>
-                </ButtonToolbar>
+                </div>
             </>
         )
     }

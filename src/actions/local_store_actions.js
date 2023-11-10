@@ -14,6 +14,14 @@ export function saveUiSettings(uiSettings){
     setStoreItem("settings", uiSettings);
 }
 
+export function getApiServerDetails(){
+    return getStoreItem("settings.apiServer");
+}
+
+export function saveApiServerDetails(apiServerDetails){
+    setStoreItem("settings.apiServer", apiServerDetails);
+}
+
 export function getApiHostname(){
     return getStoreItem("settings.apiServer.hostName");
 }
@@ -24,4 +32,30 @@ export function getApiPort(){
 
 export function getApiUrl(){
     return `http://${getApiHostname()}:${getApiPort()}/api`;
+}
+
+export function setNavigraphRefreshToken(refreshToken){
+    setStoreItem("navigraph.refreshToken", refreshToken);
+    setStoreItem("navigraph.authenticated", true);
+}
+
+export function clearNavigraphRefreshToken(){
+    setStoreItem("navigraph.refreshToken", "");
+    setStoreItem("navigraph.authenticated", false);
+}
+
+export function getNavigraphRefreshToken(){
+    return getStoreItem("navigraph.refreshToken");
+}
+
+export function setNavigraphPackageInfo(packageInfo){
+    setStoreItem("navigraph.package", packageInfo);
+}
+
+export function getNavigraphPackageInfo(){
+    return getStoreItem("navigraph.package");
+}
+
+export function isNavigraphAuthenticated(){
+    return getStoreItem("navigraph.authenticated");
 }

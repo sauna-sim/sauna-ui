@@ -1,10 +1,12 @@
 import React, {Component} from "react";
-import {Formik, Field, getIn} from "formik";
+import {Formik, getIn} from "formik";
 import {getStoreItem, getUiSettings, saveUiSettings} from "../../actions/local_store_actions";
 import {getFsdProtocolRevisions} from "../../actions/enum_actions";
 import {updateServerSettings} from "../../actions/data_actions";
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faGear} from "@fortawesome/free-solid-svg-icons";
 
 export class SettingsModal extends Component {
     constructor(props) {
@@ -16,8 +18,16 @@ export class SettingsModal extends Component {
         }
     }
 
-    open = () => {
-        this.setState({showModal: true});
+    open = async () => {
+        this.setState({
+            showModal: true
+        });
+
+        const revisions = await getFsdProtocolRevisions();
+
+        this.setState({
+            protocolRevisions: revisions
+        });
     }
 
     close = () => {
@@ -26,7 +36,7 @@ export class SettingsModal extends Component {
 
     async componentDidMount() {
         const revisions = await getFsdProtocolRevisions();
-        console.log(revisions);
+
         this.setState({
             protocolRevisions: revisions
         });
@@ -77,7 +87,7 @@ export class SettingsModal extends Component {
         })
         return (
             <>
-                <Button variant={"secondary"} onClick={this.open}>Settings</Button>
+                <Button variant={"secondary"} onClick={this.open}><FontAwesomeIcon icon={faGear} /></Button>
 
                 <Modal show={this.state.showModal} onHide={this.close}>
                     <Modal.Header closeButton>
