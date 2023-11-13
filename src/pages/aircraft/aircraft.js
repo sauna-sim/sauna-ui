@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {
     getAircraftList,
-    getSimState,
-    removeAllAircraft, setAircraftSimState, setSimState,
+    getSimState, pauseAircraft, pauseall,
+    removeAllAircraft, setAircraftSimState, setAllSimRate, setSimState, unpauseAircraft, unpauseall,
 } from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
 import {Button, ButtonToolbar, Col, FormControl, InputGroup, Row, Table} from "react-bootstrap";
@@ -72,17 +72,21 @@ export class AircraftPage extends Component {
         let pauseButton;
         if (simState.paused){
             pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => this.updateSimState({
-                                      paused: false,
-                                      simRate: simState.simRate
-                                  })}
+                                  onClick={async () => {
+                                      const simState = await pauseall();
+                                      this.setState({
+                                          simState: simState
+                                      });
+                                  }}
             ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => this.updateSimState({
-                                      paused: true,
-                                      simRate: simState.simRate
-                                  })}
+                                  onClick={async () => {
+                                      const simState = await unpauseall();
+                                      this.setState({
+                                          simState: simState
+                                      });
+                                  }}
             ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
@@ -95,14 +99,14 @@ export class AircraftPage extends Component {
                         min="0.1"
                         step="0.1"
                         value={simState.simRate}
-                        onChange={(e) => {
+                        onChange={async (e) => {
                             let num = Number(e.target.value);
                             console.log(e.target.value);
                             console.log(num);
                             if (!isNaN(num) && num >= 0.1) {
-                                this.updateSimState({
-                                    paused: simState.paused,
-                                    simRate: Number(e.target.value)
+                                const simState = await setAllSimRate(Number(e.target.value));
+                                this.setState({
+                                    simState: simState
                                 });
                             }
                         }}
@@ -122,17 +126,11 @@ export class AircraftPage extends Component {
         let pauseButton;
         if (aircraft.simState.paused){
             pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => setAircraftSimState(aircraft.callsign, {
-                                      paused: false,
-                                      simRate: aircraft.simState.simRate
-                                  })}
+                                  onClick={() => pauseAircraft(aircraft.callsign)}
             ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => setAircraftSimState(aircraft.callsign, {
-                                      paused: true,
-                                      simRate: aircraft.simState.simRate
-                                  })}
+                                  onClick={() => unpauseAircraft(aircraft.callsign)}
             ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
