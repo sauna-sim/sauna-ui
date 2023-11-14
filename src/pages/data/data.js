@@ -64,7 +64,7 @@ export class DataPage extends Component {
                         delay={{show: 250, hide: 400}}
                         overlay={renderEsScenarioTooltip}
                     >
-                        <Button variant={"success"} onClick={this.chooseEsFile}
+                        <Button variant={"primary"} onClick={this.chooseEsFile}
                         ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
                     </OverlayTrigger>{' '}
                     <SettingsModal/>
