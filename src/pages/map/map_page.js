@@ -91,8 +91,8 @@ export class MapPage extends Component {
         return aircraftList.map((aircraft) => {
             const routePolyline = aircraft.fms ? aircraft.fms.fmsLines.map((line) => { 
                 return [
-                    [line.startLat, line.startLon],
-                    [line.endLat, line.endLon]
+                    [line.startPoint.lat, line.startPoint.lon],
+                    [line.endPoint.lat, line.endPoint.lon]
                 ]
             }) : [];
 
