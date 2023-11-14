@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {
     getAircraftList,
     getSimState, pauseAircraft, pauseall,
-    removeAllAircraft, setAircraftSimState, setAllSimRate, setSimState, unpauseAircraft, unpauseall,
+    removeAllAircraft, setAllSimRate, unpauseAircraft, unpauseall,
 } from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
 import {Button, ButtonToolbar, Col, FormControl, InputGroup, Row, Table} from "react-bootstrap";
@@ -60,20 +60,13 @@ export class AircraftPage extends Component {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    updateSimState = async (newState) => {
-        const updatedState = await setSimState(newState);
-        this.setState({
-            simState: updatedState
-        });
-    }
-
     getSimStateActions = () => {
         const {simState} = this.state;
         let pauseButton;
         if (simState.paused){
             pauseButton = <Button variant="outline-success" className="me-2"
                                   onClick={async () => {
-                                      const simState = await pauseall();
+                                      const simState = await unpauseall();
                                       this.setState({
                                           simState: simState
                                       });
@@ -82,7 +75,7 @@ export class AircraftPage extends Component {
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
                                   onClick={async () => {
-                                      const simState = await unpauseall();
+                                      const simState = await pauseall();
                                       this.setState({
                                           simState: simState
                                       });
@@ -126,11 +119,11 @@ export class AircraftPage extends Component {
         let pauseButton;
         if (aircraft.simState.paused){
             pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => pauseAircraft(aircraft.callsign)}
+                                  onClick={() => unpauseAircraft(aircraft.callsign)}
             ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => unpauseAircraft(aircraft.callsign)}
+                                  onClick={() => pauseAircraft(aircraft.callsign)}
             ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
