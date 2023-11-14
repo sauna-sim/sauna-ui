@@ -139,7 +139,7 @@ export class AircraftPage extends Component {
             return "";
         }
         let armedStr = "";
-        for (const armedMode in armedModes){
+        for (const armedMode of armedModes){
             armedStr += `${armedMode} `;
         }
 
@@ -205,6 +205,7 @@ export class AircraftPage extends Component {
                 <td>{round(aircraft.thrustLeverPos, 2)}</td>
                 <td>{`${round(aircraft.position.altimeterSetting_hPa)}hPa`}</td>
                 <td>{`${round(aircraft.position.windDirection)} @ ${round(aircraft.position.windSpeed)}kts`}</td>
+                <td>{aircraft.fms.asString}</td>
             </tr>
         })
     }
@@ -232,6 +233,7 @@ export class AircraftPage extends Component {
                         <th>Thrust</th>
                         <th>Baro</th>
                         <th>Wind</th>
+                        <th>Route</th>
                     </tr>
                     </thead>
                     <tbody>

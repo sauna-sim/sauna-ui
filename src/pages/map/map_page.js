@@ -99,9 +99,9 @@ export class MapPage extends Component {
             const holdPolyline = [];
             const relevantPoints = [];
 
-            if (aircraft.fms && aircraft.fms.activeLeg && aircraft.fms.activeLeg.legType === "HOLD_TO_MANUAL"){
+            /*if (aircraft.fms && aircraft.fms.activeLeg && aircraft.fms.activeLeg.legType === "HOLD_TO_MANUAL"){
                 const instruction = aircraft.fms.activeLeg.instr;
-                if (instruction.outboundTurnLeg.turnCircley.bisectorIntersection){
+                if (instruction.outboundTurnLeg.turnCircley && instruction.outboundTurnLeg.turnCircley.bisectorIntersection){
                     holdPolyline.push([
                         [instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lat, instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lon],
                         [instruction.outboundTurnLeg.startPoint.point.pointPosition.lat, instruction.outboundTurnLeg.startPoint.point.pointPosition.lon]
@@ -164,7 +164,7 @@ export class MapPage extends Component {
                         </Tooltip>
                     </Marker>
                 )
-            }
+            }*/
 
             return (
                 <Fragment key={aircraft.callsign}>
