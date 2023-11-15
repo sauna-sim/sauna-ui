@@ -10,6 +10,7 @@ import L from 'leaflet';
 import {getAircraftList} from "../../actions/aircraft_actions";
 import {wait} from "../../actions/utilities";
 import {RotatedMarker} from "./rotated_marker";
+import {LeafletSemicircle} from "./leaflet_semicircle";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -89,82 +90,38 @@ export class MapPage extends Component {
         console.log(aircraftList);
 
         return aircraftList.map((aircraft) => {
-            const routePolyline = aircraft.fms ? aircraft.fms.fmsLines.map((line) => { 
-                return [
-                    [line.startPoint.lat, line.startPoint.lon],
-                    [line.endPoint.lat, line.endPoint.lon]
-                ]
-            }) : [];
+            const routePolyline = [];
+            const routeCircles = [];
+            if (aircraft.fms){
+                let i = 0;
+                for (const line of aircraft.fms.fmsLines){
+                    if (line.center){
+                        let startAngle = line.clockwise ? line.startTrueBearing : line.endTrueBearing;
+                        let endAngle = line.clockwise ? line.endTrueBearing : line.startTrueBearing;
 
-            const holdPolyline = [];
-            const relevantPoints = [];
-
-            /*if (aircraft.fms && aircraft.fms.activeLeg && aircraft.fms.activeLeg.legType === "HOLD_TO_MANUAL"){
-                const instruction = aircraft.fms.activeLeg.instr;
-                if (instruction.outboundTurnLeg.turnCircley && instruction.outboundTurnLeg.turnCircley.bisectorIntersection){
-                    holdPolyline.push([
-                        [instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lat, instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lon],
-                        [instruction.outboundTurnLeg.startPoint.point.pointPosition.lat, instruction.outboundTurnLeg.startPoint.point.pointPosition.lon]
-                    ])
-                    
-                    holdPolyline.push([
-                    [instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lat, instruction.outboundTurnLeg.turnCircley.bisectorIntersection.lon],
-                    [instruction.outboundTurnLeg.endPoint.point.pointPosition.lat, instruction.outboundTurnLeg.endPoint.point.pointPosition.lon]
-                ])
+                        if (endAngle < startAngle){
+                            endAngle += 360;
+                        }
+                        routeCircles.push(
+                            <LeafletSemicircle
+                                key={i}
+                                color={"red"}
+                                fill={false}
+                                position={[line.center.lat, line.center.lon]}
+                                radius={line.radius_m}
+                                startAngle={startAngle}
+                                stopAngle={endAngle}
+                            />
+                        );
+                        i++;
+                    } else {
+                        routePolyline.push([
+                            [line.startPoint.lat, line.startPoint.lon],
+                            [line.endPoint.lat, line.endPoint.lon]
+                        ]);
+                    }
                 }
-                
-
-                relevantPoints.push(
-                    <Marker
-                        position={[instruction.outboundTurnLeg.turnCircley.center.lat,instruction.outboundTurnLeg.turnCircley.center.lon]}
-                        key="center"
-                    >
-                        <Tooltip direction="top" opacity={.2}>
-                            Center
-                        </Tooltip>
-                    </Marker>
-                )
-                relevantPoints.push(
-                    <Marker
-                        position={[instruction.outboundTurnLeg.turnCircley.tangentialPointA.lat,instruction.outboundTurnLeg.turnCircley.tangentialPointA.lon]}
-                        key="center"
-                    >
-                        <Tooltip direction="top" opacity={.2}>
-                        tangentialPointA
-                        </Tooltip>
-                    </Marker>
-                )
-                relevantPoints.push(
-                    <Marker
-                        position={[instruction.outboundTurnLeg.turnCircley.tangentialPointB.lat,instruction.outboundTurnLeg.turnCircley.tangentialPointB.lon]}
-                        key="center"
-                    >
-                        <Tooltip direction="top" opacity={.2}>
-                        tangentialPointB
-                        </Tooltip>
-                    </Marker>
-                )
-                relevantPoints.push(
-                    <Marker
-                        position={[instruction.outboundTurnLeg.endPoint.point.pointPosition.lat,instruction.outboundTurnLeg.endPoint.point.pointPosition.lon]}
-                        key="center"
-                    >
-                        <Tooltip direction="top" opacity={.2}>
-                        endPoint
-                        </Tooltip>
-                    </Marker>
-                )
-                relevantPoints.push(
-                    <Marker
-                        position={[instruction.outboundTurnLeg.startPoint.point.pointPosition.lat,instruction.outboundTurnLeg.startPoint.point.pointPosition.lon]}
-                        key="center"
-                    >
-                        <Tooltip direction="top" opacity={.2}>
-                        startPoint
-                        </Tooltip>
-                    </Marker>
-                )
-            }*/
+            }
 
             return (
                 <Fragment key={aircraft.callsign}>
@@ -179,10 +136,8 @@ export class MapPage extends Component {
                         </Tooltip>
                     </RotatedMarker>
 
-                    {relevantPoints}
-
                     <Polyline pathOptions={{color: "red"}} positions={routePolyline}/>
-                    <Polyline pathOptions={{color: "green"}} positions={holdPolyline}/>
+                    {routeCircles}
                 </Fragment>
             )
         });
