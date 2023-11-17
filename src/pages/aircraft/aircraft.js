@@ -197,12 +197,12 @@ export class AircraftPage extends Component {
                 </td>
                 <td>
                     <div className={"pfd-selected"}>{aircraft.autopilot.selectedFpa}</div>
-                    <div className={"pfd-measured"}></div>
+                    <div className={"pfd-measured"}>{round(aircraft.position.flightPathAngle, 2)}</div>
                 </td>
                 <td>{this.getFma(aircraft)}</td>
                 <td>{round(aircraft.position.pitch, 1)}</td>
                 <td>{round(aircraft.position.bank, 2)}</td>
-                <td>{round(aircraft.thrustLeverPos, 2)}</td>
+                <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
                 <td>{`${round(aircraft.position.altimeterSetting_hPa)}hPa`}</td>
                 <td>{`${round(aircraft.position.windDirection)} @ ${round(aircraft.position.windSpeed)}kts`}</td>
                 <td>{aircraft.fms.asString}</td>
