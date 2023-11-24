@@ -13,7 +13,8 @@ class NavigraphAuthButtonComponent extends Component {
         this.state = {
             showVerificationModal: false,
             verificationUrl: "",
-            loading: false
+            loading: false,
+            failed: false
         }
     }
 
@@ -24,38 +25,51 @@ class NavigraphAuthButtonComponent extends Component {
     refreshPackage = async () => {
         // Verify/Update NavData file
         this.setState({
-            loading: true
+            loading: true,
+            failed: false
         });
         try {
             await this.props.checkNavigraphPackageRedux();
+            this.setState({
+                loading: false,
+                failed: false
+            });
         } catch (e) {
             console.error(e);
+            this.setState({
+                failed: true,
+                loading: false
+            });
         }
-        this.setState({
-            loading: false
-        });
     }
 
     attemptAuth = async () => {
         this.setState({
-            loading: true
+            loading: true,
+            failed: false
         });
         // Perform navigraph auth
-        await this.props.navigraphAuthFlowRedux((deviceAuthResp) => {
-            // Get verification urls to display
-            console.log(deviceAuthResp);
-
-            this.openVerification(deviceAuthResp.verification_uri_complete);
-        });
-        this.closeVerification();
         try {
+            await this.props.navigraphAuthFlowRedux((deviceAuthResp) => {
+                // Get verification urls to display
+                console.log(deviceAuthResp);
+
+                this.openVerification(deviceAuthResp.verification_uri_complete);
+            });
+            this.closeVerification();
             await this.props.checkNavigraphPackageRedux();
-        } catch (e) {
+            this.setState({
+                loading: false,
+                failed: false
+            });
+        } catch (e){
+            this.closeVerification();
+            this.setState({
+                loading: false,
+                failed: true
+            });
             console.error(e);
         }
-        this.setState({
-            loading: false
-        });
     }
 
     openVerification = (verifyUrl) => {
@@ -68,14 +82,14 @@ class NavigraphAuthButtonComponent extends Component {
 
     getNavigraphButton = () => {
         const {navigraphState} = this.props;
-        const {loading} = this.state;
+        const {loading, failed} = this.state;
 
         if (!navigraphState.authenticated) {
             return <Button
-                variant={"secondary"}
+                variant={failed ? "danger" : "secondary"}
                 onClick={this.attemptAuth}
                 disabled={loading}
-            ><Image src={NavigraphLogoPng} width={20} height={20}/> Log In</Button>
+            ><Image src={NavigraphLogoPng} width={20} height={20}/> {failed ? "Failed" : "Log In"}</Button>
         }
 
         let packageVersion = navigraphState.packageInfo.cycle;
@@ -89,6 +103,16 @@ class NavigraphAuthButtonComponent extends Component {
             </Tooltip>
         );
 
+        let buttonVariant = "success";
+
+        if (failed){
+            buttonVariant = "danger";
+        } else if (navigraphState.isCurrent){
+            buttonVariant = "success";
+        } else {
+            buttonVariant = "warning";
+        }
+
         return (
             <>
                 <OverlayTrigger
@@ -97,10 +121,10 @@ class NavigraphAuthButtonComponent extends Component {
                     overlay={renderTooltip}
                 >
                     <Button
-                        variant={navigraphState.isCurrent ? "success" : "warning"}
+                        variant={buttonVariant}
                         onClick={async () => await this.refreshPackage()}
                         disabled={loading}
-                    ><Image src={NavigraphLogoPng} width={20} height={20}/> {packageVersion}</Button>
+                    ><Image src={NavigraphLogoPng} width={20} height={20}/> {failed ? "Failed" : packageVersion}</Button>
                 </OverlayTrigger>
             </>
         )

@@ -9,9 +9,25 @@ contextBridge.exposeInMainWorld('electron', {
             ipcRenderer.send("electron-store-set", property, val)
         }
     },
+    mapWindow: {
+        async open(){
+            await ipcRenderer.invoke("electron-window-map-open");
+        },
+        async close(){
+            await ipcRenderer.invoke("electron-window-map-close");
+        }
+    },
     electronDialog: {
         open(data){
             return ipcRenderer.sendSync("electron-open-file-dialog", data);
+        }
+    },
+    mapWindow: {
+        async open(){
+            await ipcRenderer.invoke("electron-window-map-open");
+        },
+        async close(){
+            await ipcRenderer.invoke("electron-window-map-close");
         }
     },
     electronFile: {

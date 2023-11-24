@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {
     getAircraftList,
-    getSimState,
-    removeAllAircraft, setAircraftSimState, setSimState,
+    getSimState, pauseAircraft, pauseall,
+    removeAllAircraft, setAllSimRate, unpauseAircraft, unpauseall,
 } from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
 import {Button, ButtonToolbar, Col, FormControl, InputGroup, Row, Table} from "react-bootstrap";
@@ -60,29 +60,26 @@ export class AircraftPage extends Component {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    updateSimState = async (newState) => {
-        const updatedState = await setSimState(newState);
-        this.setState({
-            simState: updatedState
-        });
-    }
-
     getSimStateActions = () => {
         const {simState} = this.state;
         let pauseButton;
         if (simState.paused){
             pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => this.updateSimState({
-                                      paused: false,
-                                      simRate: simState.simRate
-                                  })}
+                                  onClick={async () => {
+                                      const simState = await unpauseall();
+                                      this.setState({
+                                          simState: simState
+                                      });
+                                  }}
             ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => this.updateSimState({
-                                      paused: true,
-                                      simRate: simState.simRate
-                                  })}
+                                  onClick={async () => {
+                                      const simState = await pauseall();
+                                      this.setState({
+                                          simState: simState
+                                      });
+                                  }}
             ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
@@ -95,14 +92,14 @@ export class AircraftPage extends Component {
                         min="0.1"
                         step="0.1"
                         value={simState.simRate}
-                        onChange={(e) => {
+                        onChange={async (e) => {
                             let num = Number(e.target.value);
                             console.log(e.target.value);
                             console.log(num);
                             if (!isNaN(num) && num >= 0.1) {
-                                this.updateSimState({
-                                    paused: simState.paused,
-                                    simRate: Number(e.target.value)
+                                const simState = await setAllSimRate(Number(e.target.value));
+                                this.setState({
+                                    simState: simState
                                 });
                             }
                         }}
@@ -122,17 +119,11 @@ export class AircraftPage extends Component {
         let pauseButton;
         if (aircraft.simState.paused){
             pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => setAircraftSimState(aircraft.callsign, {
-                                      paused: false,
-                                      simRate: aircraft.simState.simRate
-                                  })}
+                                  onClick={() => unpauseAircraft(aircraft.callsign)}
             ><FontAwesomeIcon icon={faPlay} /></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => setAircraftSimState(aircraft.callsign, {
-                                      paused: true,
-                                      simRate: aircraft.simState.simRate
-                                  })}
+                                  onClick={() => pauseAircraft(aircraft.callsign)}
             ><FontAwesomeIcon icon={faPause} /></Button>
         }
         return (
@@ -143,22 +134,87 @@ export class AircraftPage extends Component {
         )
     }
 
+    getArmedModes = (armedModes) => {
+        if (!armedModes){
+            return "";
+        }
+        let armedStr = "";
+        for (const armedMode of armedModes){
+            armedStr += `${armedMode} `;
+        }
+
+        return armedStr;
+    }
+
+    isModeFms = (mode) => {
+        return (
+            mode === "LNAV" ||
+                mode === "APCH" ||
+                mode === "VPTH" ||
+                mode === "VFLCH" ||
+                mode === "VASEL" ||
+                mode === "VALT"
+        );
+    }
+
+    getFma = (aircraft) => {
+        return <>
+            <Row>
+
+            </Row>
+            <Row>
+                <Col className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</Col>
+                <Col className={this.isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
+                <Col className={this.isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
+            </Row>
+            <Row>
+                <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedThrustModes)}</Col>
+                <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedLateralModes)}</Col>
+                <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedVerticalModes)}</Col>
+            </Row>
+        </>
+    }
+
     getAircraftTable = () => {
         return this.state.aircraftList.map((aircraft) => {
             return <tr key={aircraft.callsign}>
                 <td>{this.getAircraftActions(aircraft)}</td>
                 <td>{aircraft.callsign}</td>
-                <td>{aircraft.connectionStatus} {aircraft.connectionStatus === "WAITING" ? this.getTimeStr(aircraft.delayMs) + "min" : ""}</td>
-                <td>{round(aircraft.position.heading_Mag)}</td>
-                <td>{round(aircraft.position.indicatedAirSpeed)}</td>
-                <td>{round(aircraft.position.indicatedAltitude)}</td>
+                <td>
+                    <div>{aircraft.connectionStatus}</div>
+                    <div>{aircraft.connectionStatus === "WAITING" ? this.getTimeStr(aircraft.delayMs) + "min" : ""}</div>
+                </td>
+                <td>
+                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedHeading}</div>
+                    <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag, 2)}</div>
+                </td>
+                <td>
+                    <div className={aircraft.autopilot.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
+                        {aircraft.autopilot.selectedSpeedUnits === "KNOTS" ?
+                            aircraft.autopilot.selectedSpeed :
+                            `M${round(aircraft.autopilot.selectedSpeed / 100.0, 2)}`}
+                    </div>
+                    <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed, 2)}</div>
+                </td>
+                <td>
+                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedAltitude}</div>
+                    <div className={"pfd-measured"}>{round(aircraft.position.indicatedAltitude, 2)}</div>
+                </td>
+                <td>
+                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedVerticalSpeed}</div>
+                    <div className={"pfd-measured"}>{round(aircraft.position.verticalSpeed, 2)}</div>
+                </td>
+                <td>
+                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedFpa}</div>
+                    <div className={"pfd-measured"}>{round(aircraft.position.flightPathAngle, 2)}</div>
+                </td>
+                <td>{this.getFma(aircraft)}</td>
+                <td>{round(aircraft.position.pitch, 1)}</td>
+                <td>{round(aircraft.position.bank, 2)}</td>
+                <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
                 <td>{`${round(aircraft.position.altimeterSetting_hPa)}hPa`}</td>
                 <td>{`${round(aircraft.position.windDirection)} @ ${round(aircraft.position.windSpeed)}kts`}</td>
-                <td>{aircraft.control.currentLateralModeStr}</td>
-                <td>{aircraft.control.armedLateralModeStr}</td>
-                <td>{aircraft.control.currentVerticalModeStr}</td>
-                <td>{aircraft.control.armedVerticalModesStr}</td>
-                <td>{aircraft.control.fms.asString}</td>
+                <td>{aircraft.fms.asString}</td>
             </tr>
         })
     }
@@ -169,22 +225,24 @@ export class AircraftPage extends Component {
                 <ButtonToolbar className={"mb-2"}>
                     {this.getSimStateActions()}
                 </ButtonToolbar>
-                <Table striped bordered hover>
+                <Table striped bordered hover size={"sm"}>
                     <thead>
                     <tr>
                         <th/>
                         <th>Callsign</th>
                         <th>Connection</th>
-                        <th>Heading (Magnetic)</th>
-                        <th>Airspeed (KIAS)</th>
-                        <th>Altitude (ft)</th>
-                        <th>Altimeter Setting</th>
+                        <th>Heading</th>
+                        <th>Airspeed</th>
+                        <th>Altitude</th>
+                        <th>V/S</th>
+                        <th>FPA</th>
+                        <th>FMA</th>
+                        <th>Pitch</th>
+                        <th>Bank</th>
+                        <th>Thrust</th>
+                        <th>Baro</th>
                         <th>Wind</th>
-                        <th>Lateral Mode</th>
-                        <th>Armed Lateral Mode</th>
-                        <th>Vertical Mode</th>
-                        <th>Armed Vertical Mode</th>
-                        <th>FMS Route</th>
+                        <th>Route</th>
                     </tr>
                     </thead>
                     <tbody>

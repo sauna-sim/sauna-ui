@@ -157,7 +157,7 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
         code_verifier: pkceCodes.code_verifier,
         grant_type: "urn:ietf:params:oauth:grant-type:device_code",
         device_code: deviceCode,
-        scope: "openid offline_access" // fmsdata
+        scope: "openid offline_access fmsdata"
     };
 
     // Loop until we get the token or an error is thrown from Navigraph
@@ -337,7 +337,7 @@ export async function getNavigraphPackages() {
     console.log(parseJwt(sessionStorage.getItem(NAVIGRAPH_ACCESS_TOKEN)));
 
     const params = {
-        format: "orbx_v1", // TODO: Change this to our actual format
+        //format: "orbx_v1", // TODO: Change this to our actual format
         package_status: "current,outdated"
     }
     const response = await axiosNavigraphApi.get("/navdata/packages", {

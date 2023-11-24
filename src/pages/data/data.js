@@ -1,16 +1,20 @@
 import React, {Component} from "react";
-import {loadEuroscopeScenario, loadSectorFile, loadDFDFile} from "../../actions/data_actions";
-import {openElectronFileDialog} from "../../actions/electron_actions";
+import {loadEuroscopeScenario} from "../../actions/data_actions";
+import {openElectronFileDialog, openMapWindow} from "../../actions/electron_actions";
 import {Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 import {NavigraphAuthButton} from "../settings/navigraph_auth";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faFileCirclePlus, faPlane} from "@fortawesome/free-solid-svg-icons";
+import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
 
 export class DataPage extends Component {
     constructor(props) {
         super(props);
+    }
+
+    openMapPage = async () => {
+        await openMapWindow();
     }
 
     chooseEsFile = async () => {
@@ -34,9 +38,23 @@ export class DataPage extends Component {
                 Load EuroScope Scenario File
             </Tooltip>
         );
+        const renderMapTooltip = (props) => (
+            <Tooltip id="map-button-tooltip" {...props}>
+                Open Map Window
+            </Tooltip>
+        )
+
         return (
             <>
                 <div className={"mb-2 float-end"}>
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderMapTooltip}
+                    >
+                        <Button variant={"secondary"} onClick={this.openMapPage}
+                        ><FontAwesomeIcon icon={faMap}/></Button>
+                    </OverlayTrigger>{' '}
                     <ButtonGroup>
                         <NavigraphAuthButton/>
                         <SectorFilesButton/>
@@ -46,7 +64,7 @@ export class DataPage extends Component {
                         delay={{show: 250, hide: 400}}
                         overlay={renderEsScenarioTooltip}
                     >
-                        <Button variant={"success"} onClick={this.chooseEsFile}
+                        <Button variant={"primary"} onClick={this.chooseEsFile}
                         ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
                     </OverlayTrigger>{' '}
                     <SettingsModal/>
