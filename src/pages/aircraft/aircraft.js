@@ -146,6 +146,17 @@ export class AircraftPage extends Component {
         return armedStr;
     }
 
+    isModeFms = (mode) => {
+        return (
+            mode === "LNAV" ||
+                mode === "APCH" ||
+                mode === "VPTH" ||
+                mode === "VFLCH" ||
+                mode === "VASEL" ||
+                mode === "VALT"
+        );
+    }
+
     getFma = (aircraft) => {
         return <>
             <Row>
@@ -153,8 +164,8 @@ export class AircraftPage extends Component {
             </Row>
             <Row>
                 <Col className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</Col>
-                <Col className={"fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
-                <Col className={"fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
+                <Col className={this.isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
+                <Col className={this.isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
             </Row>
             <Row>
                 <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedThrustModes)}</Col>
@@ -163,8 +174,6 @@ export class AircraftPage extends Component {
             </Row>
         </>
     }
-
-
 
     getAircraftTable = () => {
         return this.state.aircraftList.map((aircraft) => {
