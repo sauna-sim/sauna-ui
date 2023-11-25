@@ -12,7 +12,20 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": false,
+      "fs": {
+        "all": true,
+        "scope": ["**"]
+      },
+      "path": {
+        "all": true
+      },
+      "dialog": {
+        "all": true
+      },
+      "shell": {
+        "open": true
+      }
     },
     "bundle": {
       "active": true,
@@ -29,7 +42,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "sauna-ui",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

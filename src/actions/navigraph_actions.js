@@ -12,10 +12,11 @@ import {
     NAVIGRAPH_TOKEN_TYPE
 } from "./session_storage_actions";
 import qs from "qs";
-import {combinePath, doesFileExist, downloadFileFromUrl, extractZipFile, getUserDataPath} from "./electron_actions";
 import {loadDFDFile} from "./data_actions";
-import {useDispatch} from "react-redux";
 import {setNvgAuthenticated, setNvgIsCurrent, setNvgPackageInfo} from "../redux/slices/navigraphSlice";
+import {appDataDir, join} from "@tauri-apps/api/path";
+import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
+import {exists} from "@tauri-apps/api/fs";
 
 const navigraphApiAuthUrl = "https://identity.api.navigraph.com";
 
@@ -48,7 +49,7 @@ axiosNavigraphApi.interceptors.response.use(
                 return axiosNavigraphApi(originalRequest);
             } catch (_e){
                 // Clear out authentication since token doesn't work
-                clearNavigraphRefreshToken();
+                await clearNavigraphRefreshToken();
 
                 return Promise.reject(_e);
             }
@@ -59,7 +60,7 @@ axiosNavigraphApi.interceptors.response.use(
 );
 
 export async function hasNavigraphDataLoaded() {
-    const url = `${getApiUrl()}/data/hasNavigraphDataLoaded`;
+    const url = `${await getApiUrl()}/data/hasNavigraphDataLoaded`;
     return (await axios.get(url)).data;
 }
 
@@ -69,7 +70,7 @@ export async function hasNavigraphDataLoaded() {
  * @returns API Client ID and Secret
  */
 async function getNavigraphCreds() {
-    const url = `${getApiUrl()}/data/navigraphApiCreds`;
+    const url = `${await getApiUrl()}/data/navigraphApiCreds`;
 
     return (await axios.get(url)).data;
 }
@@ -92,13 +93,13 @@ export function navigraphAuthFlowRedux(onDeviceAuthResp) {
         const tokenResponse = await pollNavigraphToken(navigraphCreds, pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
 
         // Store Token Info
-        storeToken(tokenResponse);
+        await storeToken(tokenResponse);
 
         dispatch(setNvgAuthenticated(true));
     }
 }
 
-export function storeToken(tokenResponse) {
+export async function storeToken(tokenResponse) {
     console.log(tokenResponse);
     // Session Storage
     sessionStorage.setItem(NAVIGRAPH_ACCESS_TOKEN, tokenResponse.access_token);
@@ -106,7 +107,7 @@ export function storeToken(tokenResponse) {
     sessionStorage.setItem(NAVIGRAPH_TOKEN_EXPIRATION, tokenResponse.expires_in);
 
     // Electron Store
-    setNavigraphRefreshToken(tokenResponse.refresh_token);
+    await setNavigraphRefreshToken(tokenResponse.refresh_token);
 }
 
 /**
@@ -205,7 +206,7 @@ export async function refreshNavigraphToken() {
         client_id: navigraphCreds.clientId,
         client_secret: navigraphCreds.clientSecret,
         grant_type: "refresh_token",
-        refresh_token: getNavigraphRefreshToken()
+        refresh_token: await getNavigraphRefreshToken()
     };
 
     const tokenResp = await axios.post(
@@ -220,7 +221,7 @@ export async function refreshNavigraphToken() {
 
     console.log("Token refreshed");
 
-    storeToken(tokenResp.data);
+    await storeToken(tokenResp.data);
 }
 
 const parseJwt = (token) => {
@@ -236,7 +237,7 @@ export async function updateApiNavigraphPackage(){
     const apiPackageInfo = await hasNavigraphDataLoaded();
 
     // Get Local Package Info
-    const localPackage = getNavigraphPackageInfo();
+    const localPackage = await getNavigraphPackageInfo();
 
     if (!apiPackageInfo.loaded || apiPackageInfo.uuid !== localPackage.package_id){
         // Push package to api server
@@ -247,7 +248,7 @@ export async function updateApiNavigraphPackage(){
 export function checkNavigraphPackageRedux(){
     return async function (dispatch) {
         // Get Local Package Info
-        const localPackage = getNavigraphPackageInfo();
+        const localPackage = await getNavigraphPackageInfo();
 
         // Get Server Packages
         const serverPackages = await getNavigraphPackages();
@@ -287,17 +288,17 @@ export function checkNavigraphPackageRedux(){
         dispatch(setNvgIsCurrent(isCurrentPkg));
 
         console.log("Latest Server Package", latestServerPackage);
-        console.log(`${getUserDataPath()}/navdata`);
+        console.log(`${await appDataDir()}/navdata`);
 
         // Check if we have the latest package
         if (latestServerPackage && latestServerPackage.files && latestServerPackage.files.length > 0) {
             // If we don't, update the local package
-            if (!localPackage.filename || !(await doesFileExist(localPackage.filename)) ||
+            if (!localPackage.filename || !(await exists(localPackage.filename)) ||
                 localPackage.cycle !== latestServerPackage.cycle ||
                 localPackage.package_id !== latestServerPackage.package_id ||
                 localPackage.revision !== latestServerPackage.revision) {
                 // Download package
-                const dir = `${getUserDataPath()}/navdata`;
+                const dir = `${await appDataDir()}/navdata`;
                 const filename = await downloadFileFromUrl(latestServerPackage.files[0].signed_url, dir);
                 console.log("File downloaded", filename);
 
@@ -310,13 +311,13 @@ export function checkNavigraphPackageRedux(){
                             package_id: latestServerPackage.package_id,
                             cycle: latestServerPackage.cycle,
                             revision: latestServerPackage.revision,
-                            filename: await combinePath(dir, filesInZip[0])
+                            filename: await join(dir, filesInZip[0])
                         };
 
                         console.log("New Package", newPackageInfo);
 
                         // Update package
-                        setNavigraphPackageInfo(newPackageInfo);
+                        await setNavigraphPackageInfo(newPackageInfo);
 
                         // Update reducer
                         dispatch(setNvgPackageInfo(newPackageInfo));
