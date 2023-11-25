@@ -2,7 +2,7 @@ import axios from "axios";
 import {
     clearNavigraphRefreshToken,
     getApiUrl, getNavigraphPackageInfo, getNavigraphRefreshToken, setNavigraphPackageInfo,
-    setNavigraphRefreshToken
+    setNavigraphRefreshToken, storeSave
 } from "./local_store_actions";
 import pkce from "@navigraph/pkce";
 import {
@@ -77,25 +77,30 @@ async function getNavigraphCreds() {
 
 export function navigraphAuthFlowRedux(onDeviceAuthResp) {
     return async function(dispatch) {
-        // Get Navigraph API Credentials
-        const navigraphCreds = await getNavigraphCreds();
+        try {
+            // Get Navigraph API Credentials
+            const navigraphCreds = await getNavigraphCreds();
 
-        // Get PKCE Codes
-        const pkceCodes = pkce();
+            // Get PKCE Codes
+            const pkceCodes = pkce();
 
-        // Do DeviceAuthorization
-        const deviceAuthResp = await initNavigraphAuth(navigraphCreds, pkceCodes);
+            // Do DeviceAuthorization
+            const deviceAuthResp = await initNavigraphAuth(navigraphCreds, pkceCodes);
 
-        // Handle URL display/redirect to allow user to authorize the app
-        onDeviceAuthResp(deviceAuthResp);
+            // Handle URL display/redirect to allow user to authorize the app
+            onDeviceAuthResp(deviceAuthResp);
 
-        // Poll for token
-        const tokenResponse = await pollNavigraphToken(navigraphCreds, pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
+            // Poll for token
+            const tokenResponse = await pollNavigraphToken(navigraphCreds, pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
 
-        // Store Token Info
-        await storeToken(tokenResponse);
+            // Store Token Info
+            await storeToken(tokenResponse);
 
-        dispatch(setNvgAuthenticated(true));
+            dispatch(setNvgAuthenticated(true));
+        } catch (e){
+            console.error(e);
+            dispatch(setNvgAuthenticated(false))
+        }
     }
 }
 
@@ -108,6 +113,7 @@ export async function storeToken(tokenResponse) {
 
     // Electron Store
     await setNavigraphRefreshToken(tokenResponse.refresh_token);
+    await storeSave();
 }
 
 /**

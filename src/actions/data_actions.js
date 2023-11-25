@@ -22,11 +22,19 @@ export async function loadSectorFile(filename) {
 export function getLoadedSectorFiles() {
     return async function (dispatch){
         const url = `${await getApiUrl()}/data/loadedSectorFiles`;
-        const sectorFiles = (await axios.get(url)).data;
 
-        dispatch(setSectorFiles(sectorFiles));
+        try {
+            const sectorFiles = (await axios.get(url)).data;
 
-        return sectorFiles;
+            dispatch(setSectorFiles(sectorFiles));
+
+            return sectorFiles;
+        } catch (e){
+            console.error(e);
+
+            dispatch(setSectorFiles([]));
+            return [];
+        }
     }
 }
 

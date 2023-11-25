@@ -53,7 +53,7 @@ export class SettingsModal extends Component {
     onSubmit = async (values) => {
         await saveUiSettings(values);
         await updateServerSettings(await getStoreItem("settings.apiSettings"));
-        //await storeSave();
+        await storeSave();
         this.close();
     }
 
