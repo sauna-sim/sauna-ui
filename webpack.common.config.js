@@ -9,7 +9,6 @@ const OUTPUT = path.resolve(__dirname, "dist");
 // Webpack Configuration File
 const config = {
     entry: SRC + "/index.js",
-    target: 'electron-renderer',
     output: {
         path: OUTPUT,
         filename: "[name].js",
@@ -87,6 +86,12 @@ const config = {
             ]
         })
     ],
+    devServer: {
+        static: {
+            directory: OUTPUT
+        },
+        port: 5003
+    },
     resolve: {
         extensions: ['.js', '.json']
     }
