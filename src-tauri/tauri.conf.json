@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build",
+    "beforeBuildCommand": "npm run build-prod",
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:5003",
     "distDir": "../dist"
@@ -15,7 +15,7 @@
       "all": false,
       "fs": {
         "all": true,
-        "scope": ["**"]
+        "scope": ["$APPDATA/**/*"]
       },
       "path": {
         "all": true

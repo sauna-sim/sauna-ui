@@ -1,5 +1,3 @@
-import {Store} from "tauri-plugin-store-api";
-import {appDataDir, join} from "@tauri-apps/api/path";
 import {invoke} from "@tauri-apps/api";
 
 export async function getStoreItem(key){

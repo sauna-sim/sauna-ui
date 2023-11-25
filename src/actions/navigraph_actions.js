@@ -294,7 +294,7 @@ export function checkNavigraphPackageRedux(){
         dispatch(setNvgIsCurrent(isCurrentPkg));
 
         console.log("Latest Server Package", latestServerPackage);
-        console.log(`${await appDataDir()}/navdata`);
+        console.log(await join(await appDataDir(), "navdata"));
 
         // Check if we have the latest package
         if (latestServerPackage && latestServerPackage.files && latestServerPackage.files.length > 0) {
@@ -304,7 +304,7 @@ export function checkNavigraphPackageRedux(){
                 localPackage.package_id !== latestServerPackage.package_id ||
                 localPackage.revision !== latestServerPackage.revision) {
                 // Download package
-                const dir = `${await appDataDir()}/navdata`;
+                const dir = await join(await appDataDir(), "navdata");
                 const filename = await downloadFileFromUrl(latestServerPackage.files[0].signed_url, dir);
                 console.log("File downloaded", filename);
 
