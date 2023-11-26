@@ -1,5 +1,4 @@
-import axios from "axios";
-import {createDir, writeBinaryFile} from "@tauri-apps/api/fs";
+import {createDir} from "@tauri-apps/api/fs";
 import {invoke} from "@tauri-apps/api";
 import {getAll, WebviewWindow} from "@tauri-apps/api/window";
 import {storeSave} from "./local_store_actions";

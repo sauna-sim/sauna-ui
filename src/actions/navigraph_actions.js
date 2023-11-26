@@ -1,8 +1,13 @@
 import axios from "axios";
 import {
     clearNavigraphRefreshToken,
-    getApiUrl, getNavigraphPackageInfo, getNavigraphRefreshToken, setNavigraphPackageInfo, setNavigraphPackageIsCurrent,
-    setNavigraphRefreshToken, storeSave
+    getApiUrl,
+    getNavigraphPackageInfo,
+    getNavigraphRefreshToken,
+    setNavigraphPackageInfo,
+    setNavigraphPackageIsCurrent,
+    setNavigraphRefreshToken,
+    storeSave
 } from "./local_store_actions";
 import pkce from "@navigraph/pkce";
 import {
@@ -13,7 +18,6 @@ import {
 } from "./session_storage_actions";
 import qs from "qs";
 import {loadDFDFile} from "./data_actions";
-import {setNvgAuthenticated, setNvgIsCurrent, setNvgPackageInfo} from "../redux/slices/navigraphSlice";
 import {appDataDir, join} from "@tauri-apps/api/path";
 import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
 import {exists} from "@tauri-apps/api/fs";

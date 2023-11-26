@@ -1,4 +1,4 @@
-import { getApiUrl, getStoreItem } from "./local_store_actions";
+import {getApiUrl, getStoreItem} from "./local_store_actions";
 import axios from "axios";
 import {setSectorFiles} from "../redux/slices/sectorFilesSlice";
 
