@@ -25,6 +25,6 @@ This will start the webpack dev server to serve the web content and will compile
 
 ### Production Build
 To build a bundle for production:
-- Run `npm run build`
+- Run `npm run package`
 
 This generates an installer in `src-tauri/target/release/bundle`
