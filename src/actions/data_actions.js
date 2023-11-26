@@ -1,19 +1,19 @@
-import { getApiUrl, getStoreItem } from "./local_store_actions";
+import {getApiUrl, getStoreItem} from "./local_store_actions";
 import axios from "axios";
 import {setSectorFiles} from "../redux/slices/sectorFilesSlice";
 
 export async function getServerSettings() {
-    const url = `${getApiUrl()}/data/settings`;
+    const url = `${await getApiUrl()}/data/settings`;
     return (await axios.get(url)).data;
 }
 
 export async function updateServerSettings(settings) {
-    const url = `${getApiUrl()}/data/settings`;
+    const url = `${await getApiUrl()}/data/settings`;
     return (await axios.post(url, settings)).data;
 }
 
 export async function loadSectorFile(filename) {
-    const url = `${getApiUrl()}/data/loadSectorFile`;
+    const url = `${await getApiUrl()}/data/loadSectorFile`;
     return (await axios.post(url, {
         fileName: filename
     })).data;
@@ -21,17 +21,25 @@ export async function loadSectorFile(filename) {
 
 export function getLoadedSectorFiles() {
     return async function (dispatch){
-        const url = `${getApiUrl()}/data/loadedSectorFiles`;
-        const sectorFiles = (await axios.get(url)).data;
+        const url = `${await getApiUrl()}/data/loadedSectorFiles`;
 
-        dispatch(setSectorFiles(sectorFiles));
+        try {
+            const sectorFiles = (await axios.get(url)).data;
 
-        return sectorFiles;
+            dispatch(setSectorFiles(sectorFiles));
+
+            return sectorFiles;
+        } catch (e){
+            console.error(e);
+
+            dispatch(setSectorFiles([]));
+            return [];
+        }
     }
 }
 
 export async function loadDFDFile(filename, uuid) {
-    const url = `${getApiUrl()}/data/loadDFDNavData`;
+    const url = `${await getApiUrl()}/data/loadDFDNavData`;
     return (await axios.post(url, {
         fileName: filename,
         uuid: uuid
@@ -39,15 +47,15 @@ export async function loadDFDFile(filename, uuid) {
 }
 
 export async function loadEuroscopeScenario(filename) {
-    const url = `${getApiUrl()}/data/loadEuroscopeScenario`;
+    const url = `${await getApiUrl()}/data/loadEuroscopeScenario`;
     // Resend settings
-    await updateServerSettings(getStoreItem("settings.apiSettings"));
+    await updateServerSettings(await getStoreItem("settings.apiSettings"));
     return (await axios.post(url, {
         fileName: filename,
-        cid: getStoreItem("settings.fsdConnection.networkId"),
-        password: getStoreItem("settings.fsdConnection.password"),
-        server: getStoreItem("settings.fsdConnection.hostname"),
-        port: getStoreItem("settings.fsdConnection.port"),
-        protocol: getStoreItem("settings.fsdConnection.protocol")
+        cid: await getStoreItem("settings.fsdConnection.networkId"),
+        password: await getStoreItem("settings.fsdConnection.password"),
+        server: await getStoreItem("settings.fsdConnection.hostname"),
+        port: await getStoreItem("settings.fsdConnection.port"),
+        protocol: await getStoreItem("settings.fsdConnection.protocol")
     })).data;
 }

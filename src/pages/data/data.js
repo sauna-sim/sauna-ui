@@ -1,12 +1,13 @@
 import React, {Component} from "react";
+import {open} from '@tauri-apps/api/dialog';
 import {loadEuroscopeScenario} from "../../actions/data_actions";
-import {openElectronFileDialog, openMapWindow} from "../../actions/electron_actions";
-import {Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {Button, ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 import {NavigraphAuthButton} from "../settings/navigraph_auth";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
+import {createMapWindow} from "../../actions/tauri_actions";
 
 export class DataPage extends Component {
     constructor(props) {
@@ -14,21 +15,29 @@ export class DataPage extends Component {
     }
 
     openMapPage = async () => {
-        await openMapWindow();
+        await createMapWindow();
     }
 
     chooseEsFile = async () => {
-        const filenames = openElectronFileDialog({
+        const selected = await open({
             title: "Select Euroscope Scenario File",
+            multiple: true,
             filters: [{
                 name: "Euroscope Scenario File",
                 extensions: ["txt"]
-            }],
-            properties: ["openFile"]
+            }]
         });
-        console.log(filenames);
-        if (filenames && filenames.length > 0) {
-            await loadEuroscopeScenario(filenames[0]);
+
+        if (selected !== null){
+            if (Array.isArray(selected)){
+                // Multiple scenario files selected
+                for (const filename of selected){
+                    await loadEuroscopeScenario(filename);
+                }
+            } else {
+                // Single file selected
+                await loadEuroscopeScenario(selected);
+            }
         }
     }
 

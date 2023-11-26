@@ -4,8 +4,8 @@ import {getNavigraphPackageInfo, isNavigraphAuthenticated} from "../../actions/l
 export const navigraphSlice = createSlice({
     name: "navigraph",
     initialState: {
-        authenticated: isNavigraphAuthenticated(),
-        packageInfo: getNavigraphPackageInfo(),
+        authenticated: await isNavigraphAuthenticated(),
+        packageInfo: await getNavigraphPackageInfo(),
         isCurrent: false
     },
     reducers: {

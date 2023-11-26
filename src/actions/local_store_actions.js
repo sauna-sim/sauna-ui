@@ -1,61 +1,93 @@
-export function getStoreItem(key){
-    return window.electron.electronStore.get(key);
+import {invoke} from "@tauri-apps/api";
+import {store as reduxStore} from '../redux/store';
+import {setNvgAuthenticated, setNvgIsCurrent, setNvgPackageInfo} from "../redux/slices/navigraphSlice";
+
+export async function getStoreItem(key){
+    // Invoke Rust command
+    return await invoke('store_get', {
+        key
+    });
 }
 
-export function setStoreItem(key, value){
-    window.electron.electronStore.set(key, value);
+export async function setStoreItem(key, value){
+    // Invoke Rust command
+    return await invoke('store_set', {
+        key,
+        value
+    });
 }
 
-export function getUiSettings(){
-    return getStoreItem("settings");
+export async function storeSave(){
+    // Invoke Rust command
+    return await invoke('store_save', {});
 }
 
-export function saveUiSettings(uiSettings){
-    setStoreItem("settings", uiSettings);
+export async function getUiSettings(){
+    return await getStoreItem("settings");
 }
 
-export function getApiServerDetails(){
-    return getStoreItem("settings.apiServer");
+export async function saveUiSettings(uiSettings){
+    await setStoreItem("settings", uiSettings);
 }
 
-export function saveApiServerDetails(apiServerDetails){
-    setStoreItem("settings.apiServer", apiServerDetails);
+export async function getApiServerDetails(){
+    return await getStoreItem("settings.apiServer");
 }
 
-export function getApiHostname(){
-    return getStoreItem("settings.apiServer.hostName");
+export async function saveApiServerDetails(apiServerDetails){
+    await setStoreItem("settings.apiServer", apiServerDetails);
 }
 
-export function getApiPort(){
-    return getStoreItem("settings.apiServer.port");
+export async function getApiHostname(){
+    return await getStoreItem("settings.apiServer.hostName");
 }
 
-export function getApiUrl(){
-    return `http://${getApiHostname()}:${getApiPort()}/api`;
+export async function getApiPort(){
+    return await getStoreItem("settings.apiServer.port");
 }
 
-export function setNavigraphRefreshToken(refreshToken){
-    setStoreItem("navigraph.refreshToken", refreshToken);
-    setStoreItem("navigraph.authenticated", true);
+export async function getApiUrl(){
+    return `http://${await getApiHostname()}:${await getApiPort()}/api`;
 }
 
-export function clearNavigraphRefreshToken(){
-    setStoreItem("navigraph.refreshToken", "");
-    setStoreItem("navigraph.authenticated", false);
+export async function setNavigraphRefreshToken(refreshToken){
+    await setStoreItem("navigraph.refreshToken", refreshToken);
+    await setStoreItem("navigraph.authenticated", true);
+
+    // Update redux state
+    reduxStore.dispatch(setNvgAuthenticated(true));
 }
 
-export function getNavigraphRefreshToken(){
-    return getStoreItem("navigraph.refreshToken");
+export async function clearNavigraphRefreshToken(){
+    await setStoreItem("navigraph.refreshToken", "");
+    await setStoreItem("navigraph.authenticated", false);
+
+    // Update redux state
+    reduxStore.dispatch(setNvgAuthenticated(false));
 }
 
-export function setNavigraphPackageInfo(packageInfo){
-    setStoreItem("navigraph.package", packageInfo);
+export async function getNavigraphRefreshToken(){
+    return await getStoreItem("navigraph.refreshToken");
 }
 
-export function getNavigraphPackageInfo(){
-    return getStoreItem("navigraph.package");
+export async function setNavigraphPackageInfo(packageInfo){
+    await setStoreItem("navigraph.package", packageInfo);
+
+    // Update redux state
+    reduxStore.dispatch(setNvgPackageInfo(packageInfo));
 }
 
-export function isNavigraphAuthenticated(){
-    return getStoreItem("navigraph.authenticated");
+export async function setNavigraphPackageIsCurrent(isCurrent){
+    await setStoreItem("navigraph.package.current", isCurrent);
+
+    // Update redux state
+    reduxStore.dispatch(setNvgIsCurrent(isCurrent));
+}
+
+export async function getNavigraphPackageInfo(){
+    return await getStoreItem("navigraph.package");
+}
+
+export async function isNavigraphAuthenticated(){
+    return await getStoreItem("navigraph.authenticated");
 }

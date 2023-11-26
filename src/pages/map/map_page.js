@@ -1,5 +1,4 @@
 import React, {Component, Fragment, useMemo} from "react";
-import {closeMapWindow} from "../../actions/electron_actions";
 import {MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip} from "react-leaflet";
 import {Container} from "react-bootstrap";
 import leafletMarkerIcon2xPng from "leaflet/dist/images/marker-icon-2x.png";
@@ -55,7 +54,7 @@ export class MapPage extends Component {
         });
 
         // Close Electron Window
-        await closeMapWindow();
+        //await closeMapWindow();
     }
 
     pollForAircraft = async () => {

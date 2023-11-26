@@ -1,10 +1,10 @@
 import React, {Component, Fragment} from "react";
+import { open } from '@tauri-apps/api/dialog';
 import {getLoadedSectorFiles, loadEuroscopeScenario, loadSectorFile} from "../../actions/data_actions";
 import {connect} from "react-redux";
 import {Badge, Button, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMap} from "@fortawesome/free-solid-svg-icons";
-import {openElectronFileDialog} from "../../actions/electron_actions";
 
 class SectorFilesButtonComponent extends Component {
     constructor(props) {
@@ -20,17 +20,26 @@ class SectorFilesButtonComponent extends Component {
     }
 
     loadSectorFile = async () => {
-        const filenames = openElectronFileDialog({
+        const selected = await open({
+            multiple: true,
             title: "Select Sector File",
             filters: [{
                 name: "Sector File",
                 extensions: ["sct", "sct2"]
             }],
-            properties: ["openFile"]
         });
 
-        if (filenames && filenames.length > 0) {
-            await loadSectorFile(filenames[0]);
+        if (selected !== null){
+            if (Array.isArray(selected)){
+                // Multiple scenario files selected
+                for (const filename of selected){
+                    await loadSectorFile(filename);
+                    await loadEuroscopeScenario(filename);
+                }
+            } else {
+                // Single file selected
+                await loadSectorFile(selected);
+            }
         }
 
         await this.refreshSectorFiles();

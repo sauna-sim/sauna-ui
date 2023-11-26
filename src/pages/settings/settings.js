@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Formik, getIn} from "formik";
-import {getStoreItem, getUiSettings, saveUiSettings} from "../../actions/local_store_actions";
+import {getStoreItem, getUiSettings, saveUiSettings, storeSave} from "../../actions/local_store_actions";
 import {getFsdProtocolRevisions} from "../../actions/enum_actions";
 import {updateServerSettings} from "../../actions/data_actions";
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
@@ -20,13 +20,16 @@ export class SettingsModal extends Component {
 
     open = async () => {
         this.setState({
-            showModal: true
+            showModal: true,
+            uiSettings: null
         });
 
         const revisions = await getFsdProtocolRevisions();
+        const uiSettings = await getUiSettings();
 
         this.setState({
-            protocolRevisions: revisions
+            protocolRevisions: revisions,
+            uiSettings: uiSettings
         });
     }
 
@@ -48,12 +51,19 @@ export class SettingsModal extends Component {
     }
 
     onSubmit = async (values) => {
-        saveUiSettings(values);
-        await updateServerSettings(getStoreItem("settings.apiSettings"));
+        await saveUiSettings(values);
+        await updateServerSettings(await getStoreItem("settings.apiSettings"));
+        await storeSave();
         this.close();
     }
 
+    getButton = () => <Button variant={"secondary"} onClick={this.open}><FontAwesomeIcon icon={faGear}/></Button>
+
     render() {
+        if (!this.state.uiSettings){
+            return this.getButton();
+        }
+
         const formSchema = Yup.object().shape({
             apiServer: Yup.object().shape({
                 hostName: Yup.string()
@@ -87,14 +97,15 @@ export class SettingsModal extends Component {
         })
         return (
             <>
-                <Button variant={"secondary"} onClick={this.open}><FontAwesomeIcon icon={faGear} /></Button>
+                {this.getButton()}
 
                 <Modal show={this.state.showModal} onHide={this.close}>
                     <Modal.Header closeButton>
                         <Modal.Title>Settings</Modal.Title>
                     </Modal.Header>
+
                     <Formik
-                        initialValues={getUiSettings()}
+                        initialValues={this.state.uiSettings}
                         onSubmit={this.onSubmit}
                         validationSchema={formSchema}>
                         {({
