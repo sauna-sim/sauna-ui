@@ -116,7 +116,7 @@ pub struct LocalStore {
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-struct Settings {
+pub struct Settings {
     #[serde(default)]
     api_server: ApiServerSettings,
     #[serde(default)]
@@ -127,11 +127,11 @@ struct Settings {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ApiServerSettings {
+pub struct ApiServerSettings {
     #[serde(default = "default_api_host_name")]
-    host_name: String,
+    pub host_name: String,
     #[serde(default = "default_api_port")]
-    port: u16
+    pub port: u16
 }
 impl Default for ApiServerSettings {
     fn default() -> Self {
