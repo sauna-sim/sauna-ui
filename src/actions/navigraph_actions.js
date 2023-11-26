@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
     clearNavigraphRefreshToken,
-    getApiUrl, getNavigraphPackageInfo, getNavigraphRefreshToken, setNavigraphPackageInfo,
+    getApiUrl, getNavigraphPackageInfo, getNavigraphRefreshToken, setNavigraphPackageInfo, setNavigraphPackageIsCurrent,
     setNavigraphRefreshToken, storeSave
 } from "./local_store_actions";
 import pkce from "@navigraph/pkce";
@@ -47,7 +47,7 @@ axiosNavigraphApi.interceptors.response.use(
                 axiosNavigraphApi.defaults.headers.common["Authorization"] = getNavigraphFullToken();
 
                 return axiosNavigraphApi(originalRequest);
-            } catch (_e){
+            } catch (_e) {
                 // Clear out authentication since token doesn't work
                 await clearNavigraphRefreshToken();
 
@@ -75,33 +75,24 @@ async function getNavigraphCreds() {
     return (await axios.get(url)).data;
 }
 
-export function navigraphAuthFlowRedux(onDeviceAuthResp) {
-    return async function(dispatch) {
-        try {
-            // Get Navigraph API Credentials
-            const navigraphCreds = await getNavigraphCreds();
+export async function navigraphAuthFlow(onDeviceAuthResp) {
+    // Get Navigraph API Credentials
+    const navigraphCreds = await getNavigraphCreds();
 
-            // Get PKCE Codes
-            const pkceCodes = pkce();
+    // Get PKCE Codes
+    const pkceCodes = pkce();
 
-            // Do DeviceAuthorization
-            const deviceAuthResp = await initNavigraphAuth(navigraphCreds, pkceCodes);
+    // Do DeviceAuthorization
+    const deviceAuthResp = await initNavigraphAuth(navigraphCreds, pkceCodes);
 
-            // Handle URL display/redirect to allow user to authorize the app
-            onDeviceAuthResp(deviceAuthResp);
+    // Handle URL display/redirect to allow user to authorize the app
+    onDeviceAuthResp(deviceAuthResp);
 
-            // Poll for token
-            const tokenResponse = await pollNavigraphToken(navigraphCreds, pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
+    // Poll for token
+    const tokenResponse = await pollNavigraphToken(navigraphCreds, pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
 
-            // Store Token Info
-            await storeToken(tokenResponse);
-
-            dispatch(setNvgAuthenticated(true));
-        } catch (e){
-            console.error(e);
-            dispatch(setNvgAuthenticated(false))
-        }
-    }
+    // Store Token Info
+    await storeToken(tokenResponse);
 }
 
 export async function storeToken(tokenResponse) {
@@ -238,105 +229,99 @@ const parseJwt = (token) => {
     }
 };
 
-export async function updateApiNavigraphPackage(){
+export async function updateApiNavigraphPackage() {
     // Check package on server
     const apiPackageInfo = await hasNavigraphDataLoaded();
 
     // Get Local Package Info
     const localPackage = await getNavigraphPackageInfo();
 
-    if (!apiPackageInfo.loaded || apiPackageInfo.uuid !== localPackage.package_id){
+    if (!apiPackageInfo.loaded || apiPackageInfo.uuid !== localPackage.package_id) {
         // Push package to api server
         await loadDFDFile(localPackage.filename, localPackage.package_id);
     }
 }
 
-export function checkNavigraphPackageRedux(){
-    return async function (dispatch) {
-        // Get Local Package Info
-        const localPackage = await getNavigraphPackageInfo();
+export async function checkNavigraphPackage() {
+    // Get Local Package Info
+    const localPackage = await getNavigraphPackageInfo();
 
-        // Get Server Packages
-        const serverPackages = await getNavigraphPackages();
+    // Get Server Packages
+    const serverPackages = await getNavigraphPackages();
 
-        console.log("Local Package", localPackage);
-        console.log("Server Packages", serverPackages);
+    console.log("Local Package", localPackage);
+    console.log("Server Packages", serverPackages);
 
-        // Find current and latest outdated package
-        let currentPackage;
-        let outdatedPackage;
-        let outdatedPackageCycle = 0;
-        serverPackages.forEach((pckg) => {
-            if (pckg.package_status === "current") {
-                currentPackage = pckg;
-            } else if (pckg.package_status === "outdated") {
-                let cycle = pckg.cycle;
-                if (pckg.revision) {
-                    cycle += `.${pckg.revision}`;
-                }
-                cycle = Number(cycle);
-                if (!outdatedPackage || cycle > outdatedPackageCycle) {
-                    outdatedPackage = pckg;
-                    outdatedPackageCycle = cycle;
-                }
+    // Find current and latest outdated package
+    let currentPackage;
+    let outdatedPackage;
+    let outdatedPackageCycle = 0;
+    serverPackages.forEach((pckg) => {
+        if (pckg.package_status === "current") {
+            currentPackage = pckg;
+        } else if (pckg.package_status === "outdated") {
+            let cycle = pckg.cycle;
+            if (pckg.revision) {
+                cycle += `.${pckg.revision}`;
             }
-        });
-
-        // Check if we have access to the current or an outdated package
-        let latestServerPackage = currentPackage;
-        let isCurrentPkg = true;
-        if (!currentPackage) {
-            latestServerPackage = outdatedPackage;
-            isCurrentPkg = false;
-        }
-
-        // Set redux packge_status
-        dispatch(setNvgIsCurrent(isCurrentPkg));
-
-        console.log("Latest Server Package", latestServerPackage);
-        console.log(await join(await appDataDir(), "navdata"));
-
-        // Check if we have the latest package
-        if (latestServerPackage && latestServerPackage.files && latestServerPackage.files.length > 0) {
-            // If we don't, update the local package
-            if (!localPackage.filename || !(await exists(localPackage.filename)) ||
-                localPackage.cycle !== latestServerPackage.cycle ||
-                localPackage.package_id !== latestServerPackage.package_id ||
-                localPackage.revision !== latestServerPackage.revision) {
-                // Download package
-                const dir = await join(await appDataDir(), "navdata");
-                const filename = await downloadFileFromUrl(latestServerPackage.files[0].signed_url, dir);
-                console.log("File downloaded", filename);
-
-                // Extract zip
-                try {
-                    const filesInZip = await extractZipFile(filename, dir);
-                    console.log(filesInZip);
-                    if (filesInZip.length > 0) {
-                        const newPackageInfo = {
-                            package_id: latestServerPackage.package_id,
-                            cycle: latestServerPackage.cycle,
-                            revision: latestServerPackage.revision,
-                            filename: await join(dir, filesInZip[0])
-                        };
-
-                        console.log("New Package", newPackageInfo);
-
-                        // Update package
-                        await setNavigraphPackageInfo(newPackageInfo);
-
-                        // Update reducer
-                        dispatch(setNvgPackageInfo(newPackageInfo));
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
+            cycle = Number(cycle);
+            if (!outdatedPackage || cycle > outdatedPackageCycle) {
+                outdatedPackage = pckg;
+                outdatedPackageCycle = cycle;
             }
         }
+    });
 
-        // Update API package if necessary
-        await updateApiNavigraphPackage();
+    // Check if we have access to the current or an outdated package
+    let latestServerPackage = currentPackage;
+    let isCurrentPkg = true;
+    if (!currentPackage) {
+        latestServerPackage = outdatedPackage;
+        isCurrentPkg = false;
     }
+
+    await setNavigraphPackageIsCurrent(isCurrentPkg);
+
+    console.log("Latest Server Package", latestServerPackage);
+    console.log(await join(await appDataDir(), "navdata"));
+
+    // Check if we have the latest package
+    if (latestServerPackage && latestServerPackage.files && latestServerPackage.files.length > 0) {
+        // If we don't, update the local package
+        if (!localPackage.filename || !(await exists(localPackage.filename)) ||
+            localPackage.cycle !== latestServerPackage.cycle ||
+            localPackage.package_id !== latestServerPackage.package_id ||
+            localPackage.revision !== latestServerPackage.revision) {
+            // Download package
+            const dir = await join(await appDataDir(), "navdata");
+            const filename = await downloadFileFromUrl(latestServerPackage.files[0].signed_url, dir);
+            console.log("File downloaded", filename);
+
+            // Extract zip
+            try {
+                const filesInZip = await extractZipFile(filename, dir);
+                console.log(filesInZip);
+                if (filesInZip.length > 0) {
+                    const newPackageInfo = {
+                        package_id: latestServerPackage.package_id,
+                        cycle: latestServerPackage.cycle,
+                        revision: latestServerPackage.revision,
+                        filename: await join(dir, filesInZip[0])
+                    };
+
+                    console.log("New Package", newPackageInfo);
+
+                    // Update package
+                    await setNavigraphPackageInfo(newPackageInfo);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    // Update API package if necessary
+    await updateApiNavigraphPackage();
 }
 
 

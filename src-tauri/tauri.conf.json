@@ -25,6 +25,10 @@
       },
       "shell": {
         "open": true
+      },
+      "window": {
+        "create": true,
+        "close": true
       }
     },
     "bundle": {
@@ -72,7 +76,9 @@
         "height": 600,
         "resizable": true,
         "title": "Sauna",
-        "width": 800
+        "width": 800,
+        "minHeight": 400,
+        "minWidth": 450
       }
     ]
   }

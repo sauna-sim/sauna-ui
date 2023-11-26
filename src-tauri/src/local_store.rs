@@ -213,5 +213,7 @@ struct NavigraphPackageSettings {
     #[serde(default)]
     revision: String,
     #[serde(default)]
-    filename: String
+    filename: String,
+    #[serde(default)]
+    current: bool
 }

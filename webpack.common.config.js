@@ -90,7 +90,8 @@ const config = {
         static: {
             directory: OUTPUT
         },
-        port: 5003
+        port: 5003,
+        historyApiFallback: true
     },
     resolve: {
         extensions: ['.js', '.json']

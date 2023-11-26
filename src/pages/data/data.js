@@ -7,6 +7,8 @@ import {NavigraphAuthButton} from "../settings/navigraph_auth";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
+import {openMapWindow} from "../../actions/electron_actions";
+import {createMapWindow} from "../../actions/tauri_actions";
 
 export class DataPage extends Component {
     constructor(props) {
@@ -14,6 +16,7 @@ export class DataPage extends Component {
     }
 
     openMapPage = async () => {
+        await createMapWindow();
         //await openMapWindow();
     }
 

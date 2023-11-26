@@ -1,7 +1,8 @@
 import React, {Component} from "react";
 import {Button, Image, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {
-    checkNavigraphPackageRedux, navigraphAuthFlowRedux
+    checkNavigraphPackage,
+    navigraphAuthFlow
 } from "../../actions/navigraph_actions";
 import NavigraphLogoPng from "../../assets/images/NavigraphLogo.png";
 import {connect} from "react-redux";
@@ -29,7 +30,7 @@ class NavigraphAuthButtonComponent extends Component {
             failed: false
         });
         try {
-            await this.props.checkNavigraphPackageRedux();
+            await checkNavigraphPackage();
             this.setState({
                 loading: false,
                 failed: false
@@ -50,14 +51,14 @@ class NavigraphAuthButtonComponent extends Component {
         });
         // Perform navigraph auth
         try {
-            await this.props.navigraphAuthFlowRedux((deviceAuthResp) => {
+            await navigraphAuthFlow((deviceAuthResp) => {
                 // Get verification urls to display
                 console.log(deviceAuthResp);
 
                 this.openVerification(deviceAuthResp.verification_uri_complete);
             });
             this.closeVerification();
-            await this.props.checkNavigraphPackageRedux();
+            await checkNavigraphPackage();
             this.setState({
                 loading: false,
                 failed: false
@@ -169,7 +170,4 @@ const mapStateToProps = (state) => ({
     navigraphState: state.navigraph
 });
 
-export const NavigraphAuthButton = connect(mapStateToProps, {
-    checkNavigraphPackageRedux,
-    navigraphAuthFlowRedux
-})(NavigraphAuthButtonComponent);
+export const NavigraphAuthButton = connect(mapStateToProps, null)(NavigraphAuthButtonComponent);
