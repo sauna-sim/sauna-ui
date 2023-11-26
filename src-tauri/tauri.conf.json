@@ -46,7 +46,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "sauna-ui",
+      "identifier": "com.sauna.saunasim",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

@@ -10,55 +10,73 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #arch: [x64, x86, arm, arm64]
-        arch: [x64, x86]
+        arch: [x64, x86, arm, arm64]
         os: [macos-latest, windows-latest, ubuntu-latest]
         include:
           - os: macos-latest
             short-os: osx
             rust-os: apple-darwin
+            tauri-bundles: dmg
           - os: windows-latest
             short-os: win
             rust-os: pc-windows-msvc
+            tauri-bundles: nsis
           - os: ubuntu-latest
             short-os: linux
             rust-os: unknown-linux-gnu
+            tauri-bundles: deb
           - arch: x86
             rust-arch: i686
           - arch: x64
             rust-arch: x86_64
+          - arch: arm
+            rust-arch: armv7
+            rust-target-suffix: eabihf
+          - arch: arm64
+            rust-arch: aarch64
         exclude:
-          #- os: windows-latest
-          #  arch: arm
-          #- os: windows-latest
-          #  arch: arm64
+          - os: windows-latest
+            arch: arm
           - os: ubuntu-latest
             arch: x86
           - os: macos-latest
             arch: x86
-          #- os: macos-latest
-          #  arch: arm
-          #- os: macos-latest
-          #  arch: arm64
+          - os: macos-latest
+            arch: arm
+          - os: ubuntu-latest
+            arch: arm
+          - os: ubuntu-latest
+            arch: arm64
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 'lts/*'
           cache: 'npm'
+      - name: Use Stable Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+      - name: Install Linux Dependencies
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
       - name: npm install
         run: npm install
       - name: Build and Package
-        run: npm run package -- -t ${{ matrix.rust-arch }}-${{ matrix.rust-os }}
+        run: npm run package -- -t ${{ matrix.rust-arch }}-${{ matrix.rust-os }}${{ matrix.rust-target-suffix }} --bundles ${{ matrix.tauri-bundles }}
       - name: Copy Installers
         shell: pwsh
         run: |
           New-Item -ItemType Directory '${{ github.workspace }}/installers'
-          Get-ChildItem '${{ github.workspace }}/src-tauri/target/release/bundle' -Recurse -Include *.exe,*.msi,*.deb,*.AppImage,*.dmg,*.app | Copy-Item -Destination '${{ github.workspace }}/installers'
+          Get-ChildItem '${{ github.workspace }}/src-tauri/target/${{ matrix.rust-arch }}-${{ matrix.rust-os }}${{ matrix.rust-target-suffix }}/release/bundle' -Recurse -Include *.exe,*.deb,*.dmg,*.app,*.msi,*.AppImage | Copy-Item -Destination '${{ github.workspace }}/installers'
       - name: Archive Installers
         uses: actions/upload-artifact@v3
         continue-on-error: true
