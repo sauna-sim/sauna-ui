@@ -63,11 +63,15 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
+      - name: Install Rust Target
+        shell: pwsh
+        run: |
+          rustup target add ${{ matrix.rust-arch }}-${{ matrix.rust-os }}${{ matrix.rust-target-suffix }}
       - name: Install Linux Dependencies
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y build-essential curl wget file libssl-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev libappindicator3-dev librsvg2-dev patchelf
       - name: npm install
         run: npm install
       - name: Build and Package
