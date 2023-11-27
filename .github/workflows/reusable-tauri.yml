@@ -39,6 +39,11 @@ on:
         default: false
         required: false
         type: boolean
+      api-ref:
+        description: 'Sauna API git Ref'
+        default: 'master'
+        required: false
+        type: string
 
 jobs:
   build-api:
@@ -48,7 +53,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'Sauna-ATC-Training-Simulator/sauna-api'
+          ref: ${{ inputs.api-ref }}
           submodules: 'recursive'
+      - name: Checkout Sauna Vatsim Private Project
+        uses: actions/checkout@v4
+        with:
+          repository: 'Sauna-ATC-Training-Simulator/sauna-vatsim-private'
+          token: ${{ secrets.SAUNA_PAT }}
+          path: 'sauna-vatsim-private'
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -62,17 +74,22 @@ jobs:
         run: |
           cd ${{ github.workspace }}/sauna-api
           dotnet build --verbosity normal -c Release -r ${{ inputs.short-os }}-${{ inputs.arch }} -p:PlatformTarget=${{ inputs.arch }} -o ${{ github.workspace }}/bin --self-contained
+      - name: Build Sauna Vatsim Private
+        shell: pwsh
+        run: |
+          cd ${{ github.workspace }}/sauna-vatsim-private/sauna-vatsim-private
+          dotnet build sauna-vatsim-private.csproj --verbosity normal -c Release -o ${{ github.workspace }}/bin
       - name: Tar output folder
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/bin
-          tar -cvzf ${{ github.workspace }}/SaunaApi.tar.gz *
+          tar -cvzf ${{ github.workspace }}/SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
       - name: Archive binaries
         uses: actions/upload-artifact@v3
         with:
           name: SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}
           path: |
-            ${{ github.workspace }}/SaunaApi.tar.gz
+            ${{ github.workspace }}/SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
   build:
     needs: build-api
     runs-on: ${{ inputs.os }}
@@ -107,8 +124,8 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/src-tauri/sauna-api
-          tar -xvf SaunaApi.tar.gz
-          rm SaunaApi.tar.gz
+          tar -xvf SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
+          rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
       - name: npm install
         run: npm install
       - name: Build and Package
