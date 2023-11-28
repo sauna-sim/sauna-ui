@@ -1,6 +1,12 @@
 import React, {Component} from "react";
 import {Formik, getIn} from "formik";
-import {getStoreItem, getUiSettings, saveUiSettings, storeSave} from "../../actions/local_store_actions";
+import {
+    getApiSettings,
+    getFsdSettings,
+    getStoreItem,
+    saveApiSettings, saveFsdSettings,
+    storeSave
+} from "../../actions/local_store_actions";
 import {getFsdProtocolRevisions} from "../../actions/enum_actions";
 import {updateServerSettings} from "../../actions/data_actions";
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
@@ -25,7 +31,12 @@ export class SettingsModal extends Component {
         });
 
         const revisions = await getFsdProtocolRevisions();
-        const uiSettings = await getUiSettings();
+        const apiSettings = await getApiSettings();
+        const fsdConnection = await getFsdSettings();
+        const uiSettings = {
+            apiSettings,
+            fsdConnection
+        }
 
         this.setState({
             protocolRevisions: revisions,
@@ -51,7 +62,8 @@ export class SettingsModal extends Component {
     }
 
     onSubmit = async (values) => {
-        await saveUiSettings(values);
+        await saveApiSettings(values.apiSettings);
+        await saveFsdSettings(values.fsdConnection);
         await updateServerSettings(await getStoreItem("settings.apiSettings"));
         await storeSave();
         this.close();
@@ -65,18 +77,10 @@ export class SettingsModal extends Component {
         }
 
         const formSchema = Yup.object().shape({
-            apiServer: Yup.object().shape({
-                hostName: Yup.string()
-                    .required("Required"),
-                port: Yup.number()
-                    .required("Required")
-                    .min(1, "1 or more")
-                    .max(65535, "65635 or less")
-            }),
             apiSettings: Yup.object().shape({
                 posCalcRate: Yup.number()
                     .required("Required")
-                    .min(50, "50 or more")
+                    .min(10, "50 or more")
                     .max(5000, "5000 or less"),
                 commandFrequency: Yup.string()
                     .required("Required")
@@ -121,40 +125,13 @@ export class SettingsModal extends Component {
                                 <Modal.Body>
                                     <h5>Sauna API Server Settings</h5>
                                     <Row className="mb-3">
-                                        <Form.Group as={Col} sm={9} xs={8} controlId={"settingsFormApiHostName"}>
-                                            <Form.Label>Hostname</Form.Label>
-                                            <Form.Control
-                                                name="apiServer.hostName"
-                                                value={values.apiServer.hostName}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                isInvalid={getIn(touched, "apiServer.hostName") && getIn(errors, "apiServer.hostName")}
-                                            />
-                                            <Form.Control.Feedback type="invalid">
-                                                {getIn(errors, "apiServer.hostName")}
-                                            </Form.Control.Feedback>
-                                        </Form.Group>
-                                        <Form.Group as={Col} sm={3} xs={4} controlId={"settingsFormApiPort"}>
-                                            <Form.Label>Port</Form.Label>
-                                            <Form.Control
-                                                name="apiServer.port"
-                                                type="number"
-                                                value={values.apiServer.port}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                isInvalid={getIn(touched, "apiServer.port") && getIn(errors, "apiServer.port")}
-                                            />
-                                            <Form.Control.Feedback type="invalid">
-                                                {getIn(errors, "apiServer.port")}
-                                            </Form.Control.Feedback>
-                                        </Form.Group>
-                                    </Row>
-                                    <Row className="mb-3">
                                         <Col sm={6}>
                                             <Form.Label>Position Calculation Rate</Form.Label>
                                             <InputGroup hasValidation>
                                                 <Form.Control
                                                     name="apiSettings.posCalcRate"
+                                                    type="number"
+                                                    disabled={true}
                                                     value={values.apiSettings.posCalcRate}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}

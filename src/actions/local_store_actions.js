@@ -22,12 +22,20 @@ export async function storeSave(){
     return await invoke('store_save', {});
 }
 
-export async function getUiSettings(){
-    return await getStoreItem("settings");
+export async function getApiSettings(){
+    return await getStoreItem("settings.apiSettings");
 }
 
-export async function saveUiSettings(uiSettings){
-    await setStoreItem("settings", uiSettings);
+export async function saveApiSettings(apiSettings){
+    await setStoreItem("settings.apiSettings", apiSettings);
+}
+
+export async function getFsdSettings(){
+    return await getStoreItem("settings.fsdConnection");
+}
+
+export async function saveFsdSettings(fsdSettings){
+    await setStoreItem("settings.fsdConnection", fsdSettings);
 }
 
 export async function getApiServerDetails(){

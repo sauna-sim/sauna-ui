@@ -6,12 +6,15 @@ import {
 } from "../../actions/aircraft_actions";
 import {round, wait} from "../../actions/utilities";
 import {Button, ButtonToolbar, Col, FormControl, InputGroup, Row, Table} from "react-bootstrap";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {AircraftDetail} from "./aircraft_detail";
 
 export class AircraftPage extends Component {
     constructor(props) {
         super(props);
+
+        this.ws = null;
 
         this.state = {
             aircraftList: [],
@@ -63,7 +66,7 @@ export class AircraftPage extends Component {
     getSimStateActions = () => {
         const {simState} = this.state;
         let pauseButton;
-        if (simState.paused){
+        if (simState.paused) {
             pauseButton = <Button variant="outline-success" className="me-2"
                                   onClick={async () => {
                                       const simState = await unpauseall();
@@ -71,7 +74,7 @@ export class AircraftPage extends Component {
                                           simState: simState
                                       });
                                   }}
-            ><FontAwesomeIcon icon={faPlay} /></Button>;
+            ><FontAwesomeIcon icon={faPlay}/></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
                                   onClick={async () => {
@@ -80,7 +83,7 @@ export class AircraftPage extends Component {
                                           simState: simState
                                       });
                                   }}
-            ><FontAwesomeIcon icon={faPause} /></Button>
+            ><FontAwesomeIcon icon={faPause}/></Button>
         }
         return (
             <>
@@ -110,21 +113,22 @@ export class AircraftPage extends Component {
                     />
                     <InputGroup.Text id="global-simrate-addon2">x</InputGroup.Text>
                 </InputGroup>
-                <Button variant="danger" className="me-2" onClick={() => removeAllAircraft()}><FontAwesomeIcon icon={faTrash} /> All</Button>
+                <Button variant="danger" className="me-2" onClick={() => removeAllAircraft()}><FontAwesomeIcon
+                    icon={faTrash}/> All</Button>
             </>
         )
     }
 
     getAircraftActions = (aircraft) => {
         let pauseButton;
-        if (aircraft.simState.paused){
+        if (aircraft.simState.paused) {
             pauseButton = <Button variant="outline-success" className="me-2"
                                   onClick={() => unpauseAircraft(aircraft.callsign)}
-            ><FontAwesomeIcon icon={faPlay} /></Button>;
+            ><FontAwesomeIcon icon={faPlay}/></Button>;
         } else {
             pauseButton = <Button variant="outline-danger" className="me-2"
                                   onClick={() => pauseAircraft(aircraft.callsign)}
-            ><FontAwesomeIcon icon={faPause} /></Button>
+            ><FontAwesomeIcon icon={faPause}/></Button>
         }
         return (
             <>
@@ -135,11 +139,11 @@ export class AircraftPage extends Component {
     }
 
     getArmedModes = (armedModes) => {
-        if (!armedModes){
+        if (!armedModes) {
             return "";
         }
         let armedStr = "";
-        for (const armedMode of armedModes){
+        for (const armedMode of armedModes) {
             armedStr += `${armedMode} `;
         }
 
@@ -149,11 +153,11 @@ export class AircraftPage extends Component {
     isModeFms = (mode) => {
         return (
             mode === "LNAV" ||
-                mode === "APCH" ||
-                mode === "VPTH" ||
-                mode === "VFLCH" ||
-                mode === "VASEL" ||
-                mode === "VALT"
+            mode === "APCH" ||
+            mode === "VPTH" ||
+            mode === "VFLCH" ||
+            mode === "VASEL" ||
+            mode === "VALT"
         );
     }
 
@@ -164,8 +168,10 @@ export class AircraftPage extends Component {
             </Row>
             <Row>
                 <Col className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</Col>
-                <Col className={this.isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
-                <Col className={this.isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
+                <Col
+                    className={this.isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
+                <Col
+                    className={this.isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
             </Row>
             <Row>
                 <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedThrustModes)}</Col>
@@ -209,12 +215,13 @@ export class AircraftPage extends Component {
                     <div className={"pfd-measured"}>{round(aircraft.position.flightPathAngle, 2)}</div>
                 </td>
                 <td>{this.getFma(aircraft)}</td>
-                <td>{round(aircraft.position.pitch, 1)}</td>
+                <td>{round(aircraft.position.pitch, 2)}</td>
                 <td>{round(aircraft.position.bank, 2)}</td>
                 <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
                 <td>{`${round(aircraft.position.altimeterSetting_hPa)}hPa`}</td>
                 <td>{`${round(aircraft.position.windDirection)} @ ${round(aircraft.position.windSpeed)}kts`}</td>
                 <td>{aircraft.fms.asString}</td>
+                <td><AircraftDetail aircraft={aircraft}/></td>
             </tr>
         })
     }
@@ -243,6 +250,7 @@ export class AircraftPage extends Component {
                         <th>Baro</th>
                         <th>Wind</th>
                         <th>Route</th>
+                        <th/>
                     </tr>
                     </thead>
                     <tbody>

@@ -1,7 +1,6 @@
 import axios from "axios";
 import {
-    clearNavigraphRefreshToken,
-    getApiUrl,
+    clearNavigraphRefreshToken, getApiUrl,
     getNavigraphPackageInfo,
     getNavigraphRefreshToken,
     setNavigraphPackageInfo,
@@ -21,6 +20,7 @@ import {loadDFDFile} from "./data_actions";
 import {appDataDir, join} from "@tauri-apps/api/path";
 import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
 import {exists} from "@tauri-apps/api/fs";
+import {axiosSaunaApi} from "./api_connection_handler";
 
 const navigraphApiAuthUrl = "https://identity.api.navigraph.com";
 
@@ -65,7 +65,7 @@ axiosNavigraphApi.interceptors.response.use(
 
 export async function hasNavigraphDataLoaded() {
     const url = `${await getApiUrl()}/data/hasNavigraphDataLoaded`;
-    return (await axios.get(url)).data;
+    return (await axiosSaunaApi.get(url)).data;
 }
 
 /**
@@ -76,7 +76,7 @@ export async function hasNavigraphDataLoaded() {
 async function getNavigraphCreds() {
     const url = `${await getApiUrl()}/data/navigraphApiCreds`;
 
-    return (await axios.get(url)).data;
+    return (await axiosSaunaApi.get(url)).data;
 }
 
 export async function navigraphAuthFlow(onDeviceAuthResp) {
