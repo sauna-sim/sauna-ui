@@ -1,46 +1,48 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {getNavigraphPackageInfo, isNavigraphAuthenticated} from "../../actions/local_store_actions";
 
 export const aircraftSlice = createSlice({
     name: "aircraftList",
     initialState: [],
     reducers: {
         onAircraftCreated: (state, action) => {
-            state.push(action.payload.data);
+            state.push(action.payload.callsign);
         },
         onAircraftDeleted: (state, action) => {
-            const index = state.findIndex((aircraft) => aircraft.callsign === action.payload)
-            if (index > -1) {
-                state.splice(index, 1);
-            }
+            const index = state.indexOf(action.payload.callsign);
+            state.splice(index, 1);
         },
-        onAircraftStatusChange: (state, action) => {
-            const foundAircraft = state.find((acft) => acft.callsign === action.payload.callsign);
-            if (foundAircraft) {
-                foundAircraft.connectionStatus = action.payload.data;
-            }
-        },
-        onAircraftSimStateChange: (state, action) => {
-            const foundAircraft = state.find((acft) => acft.callsign === action.payload.callsign);
-            if (foundAircraft) {
-                foundAircraft.simState = action.payload.data;
-            }
-        },
-        onAircraftPositionUpdate: (state, action) => {
-            const index = state.findIndex((aircraft) => aircraft.callsign === action.payload.callsign)
-            if (index > -1) {
-                state[index] = action.payload.data;
-            }
-        }
+        // onAircraftStatusChange: (state, action) => {
+        //     const foundAircraft = state[action.payload.callsign];
+        //     if (foundAircraft) {
+        //         foundAircraft.connectionStatus = action.payload.data;
+        //     }
+        // },
+        // onAircraftSimStateChange: (state, action) => {
+        //     const foundAircraft = state[action.payload.callsign];
+        //     if (foundAircraft) {
+        //         foundAircraft.simState = action.payload.data;
+        //     }
+        // },
+        // onAircraftPositionUpdate: (state, action) => {
+        //     state[action.payload.callsign] = action.payload.data;
+        // },
+        // setAircraftList: (state, action) => {
+        //     const newState = {};
+        //     action.payload.forEach((acft) => {
+        //         state[acft.callsign] = acft;
+        //     });
+        //     console.log(state);
+        // }
     }
 });
 
 export const {
     onAircraftCreated,
     onAircraftDeleted,
-    onAircraftStatusChange,
-    onAircraftSimStateChange,
-    onAircraftPositionUpdate
+    // onAircraftStatusChange,
+    // onAircraftSimStateChange,
+    // onAircraftPositionUpdate,
+    // setAircraftList
 } = aircraftSlice.actions;
 
 export const aircraftReducer = aircraftSlice.reducer;

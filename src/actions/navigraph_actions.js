@@ -54,8 +54,8 @@ axiosNavigraphApi.interceptors.response.use(
             } catch (_e) {
                 // Clear out authentication since token doesn't work
                 await clearNavigraphRefreshToken();
-
-                return Promise.reject(_e);
+                //console.error(_e);
+                return Promise.reject("NAVIGRAPH_AUTH_EXPIRED");
             }
         }
 

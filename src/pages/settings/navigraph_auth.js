@@ -37,10 +37,17 @@ class NavigraphAuthButtonComponent extends Component {
             });
         } catch (e) {
             console.error(e);
-            this.setState({
-                failed: true,
-                loading: false
-            });
+            if (e === "NAVIGRAPH_AUTH_EXPIRED"){
+                this.setState({
+                    failed: false,
+                    loading: false
+                });
+            } else {
+                this.setState({
+                    failed: true,
+                    loading: false
+                });
+            }
         }
     }
 

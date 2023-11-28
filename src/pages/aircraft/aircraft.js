@@ -9,8 +9,10 @@ import {Button, ButtonToolbar, Col, FormControl, InputGroup, Row, Table} from "r
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {AircraftDetail} from "./aircraft_detail";
+import {connect} from "react-redux";
+import {AircraftRow} from "./aircraft_row";
 
-export class AircraftPage extends Component {
+class AircraftPageComponent extends Component {
     constructor(props) {
         super(props);
 
@@ -30,7 +32,7 @@ export class AircraftPage extends Component {
         this.setState({
             shouldPollForAircraft: true
         });
-        this.pollForAircraft();
+        //this.pollForAircraft();
     }
 
     componentWillUnmount() {
@@ -56,15 +58,8 @@ export class AircraftPage extends Component {
         }
     }
 
-    getTimeStr = (ms) => {
-        let secs = Math.floor(ms / 1000);
-        let mins = Math.floor(secs / 60);
-        secs -= (mins * 60);
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
     getSimStateActions = () => {
-        const {simState} = this.state;
+        const {simState} = this.props.apiServer;
         let pauseButton;
         if (simState.paused) {
             pauseButton = <Button variant="outline-success" className="me-2"
@@ -119,111 +114,8 @@ export class AircraftPage extends Component {
         )
     }
 
-    getAircraftActions = (aircraft) => {
-        let pauseButton;
-        if (aircraft.simState.paused) {
-            pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => unpauseAircraft(aircraft.callsign)}
-            ><FontAwesomeIcon icon={faPlay}/></Button>;
-        } else {
-            pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => pauseAircraft(aircraft.callsign)}
-            ><FontAwesomeIcon icon={faPause}/></Button>
-        }
-        return (
-            <>
-                {pauseButton}
-                {aircraft.simState.simRate}x
-            </>
-        )
-    }
-
-    getArmedModes = (armedModes) => {
-        if (!armedModes) {
-            return "";
-        }
-        let armedStr = "";
-        for (const armedMode of armedModes) {
-            armedStr += `${armedMode} `;
-        }
-
-        return armedStr;
-    }
-
-    isModeFms = (mode) => {
-        return (
-            mode === "LNAV" ||
-            mode === "APCH" ||
-            mode === "VPTH" ||
-            mode === "VFLCH" ||
-            mode === "VASEL" ||
-            mode === "VALT"
-        );
-    }
-
-    getFma = (aircraft) => {
-        return <>
-            <Row>
-
-            </Row>
-            <Row>
-                <Col className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</Col>
-                <Col
-                    className={this.isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
-                <Col
-                    className={this.isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
-            </Row>
-            <Row>
-                <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedThrustModes)}</Col>
-                <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedLateralModes)}</Col>
-                <Col className={"fma-armed"}>{this.getArmedModes(aircraft.autopilot.armedVerticalModes)}</Col>
-            </Row>
-        </>
-    }
-
     getAircraftTable = () => {
-        return this.state.aircraftList.map((aircraft) => {
-            return <tr key={aircraft.callsign}>
-                <td>{this.getAircraftActions(aircraft)}</td>
-                <td>{aircraft.callsign}</td>
-                <td>
-                    <div>{aircraft.connectionStatus}</div>
-                    <div>{aircraft.connectionStatus === "WAITING" ? this.getTimeStr(aircraft.delayMs) + "min" : ""}</div>
-                </td>
-                <td>
-                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedHeading}</div>
-                    <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag, 2)}</div>
-                </td>
-                <td>
-                    <div className={aircraft.autopilot.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
-                        {aircraft.autopilot.selectedSpeedUnits === "KNOTS" ?
-                            aircraft.autopilot.selectedSpeed :
-                            `M${round(aircraft.autopilot.selectedSpeed / 100.0, 2)}`}
-                    </div>
-                    <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed, 2)}</div>
-                </td>
-                <td>
-                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedAltitude}</div>
-                    <div className={"pfd-measured"}>{round(aircraft.position.indicatedAltitude, 2)}</div>
-                </td>
-                <td>
-                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedVerticalSpeed}</div>
-                    <div className={"pfd-measured"}>{round(aircraft.position.verticalSpeed, 2)}</div>
-                </td>
-                <td>
-                    <div className={"pfd-selected"}>{aircraft.autopilot.selectedFpa}</div>
-                    <div className={"pfd-measured"}>{round(aircraft.position.flightPathAngle, 2)}</div>
-                </td>
-                <td>{this.getFma(aircraft)}</td>
-                <td>{round(aircraft.position.pitch, 2)}</td>
-                <td>{round(aircraft.position.bank, 2)}</td>
-                <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
-                <td>{`${round(aircraft.position.altimeterSetting_hPa)}hPa`}</td>
-                <td>{`${round(aircraft.position.windDirection)} @ ${round(aircraft.position.windSpeed)}kts`}</td>
-                <td>{aircraft.fms.asString}</td>
-                <td><AircraftDetail aircraft={aircraft}/></td>
-            </tr>
-        })
+        return this.props.aircraftList.map((callsign) => <AircraftRow key={callsign} callsign={callsign} />);
     }
 
     render() {
@@ -261,3 +153,12 @@ export class AircraftPage extends Component {
         )
     }
 }
+
+function mapStateToProps({aircraftList, apiServer}){
+    return {
+        aircraftList,
+        apiServer
+    }
+}
+
+export const AircraftPage = connect(mapStateToProps, null)(AircraftPageComponent);

@@ -5,9 +5,7 @@ import {onConnectionEstablished, onConnectionLost, onSimStateChange} from "../re
 import {wait} from "./utilities";
 import {
     onAircraftCreated,
-    onAircraftDeleted, onAircraftPositionUpdate,
-    onAircraftSimStateChange,
-    onAircraftStatusChange
+    onAircraftDeleted,
 } from "../redux/slices/aircraftSlice";
 
 // Axios Sauna-API Settings
@@ -85,12 +83,12 @@ async function startWebSocket(){
                     break;
             }
         }
-        ws.onclose = (event) => {
-            handleWsClose();
-        }
-        ws.onerror = (event) => {
-            handleWsClose();
-        }
+    }
+    ws.onclose = (event) => {
+        handleWsClose();
+    }
+    ws.onerror = (event) => {
+        handleWsClose();
     }
 }
 
@@ -112,6 +110,7 @@ async function handleWsClose(){
 }
 
 function handleAircraftUpdate(data){
+    //reduxStore.dispatch(setAircraftList(data));
     switch (data.type){
         case "CREATED":
             reduxStore.dispatch(onAircraftCreated(data));
@@ -119,13 +118,13 @@ function handleAircraftUpdate(data){
         case "DELETED":
             reduxStore.dispatch(onAircraftDeleted(data.callsign));
             break;
-        case "FSD_CONNECTION_STATUS":
-            reduxStore.dispatch(onAircraftStatusChange(data));
-            break;
-        case "SIM_STATE":
-            reduxStore.dispatch(onAircraftSimStateChange(data));
-            break;
-        case "POSITION":
-            reduxStore.dispatch(onAircraftPositionUpdate(data));
+    //     case "FSD_CONNECTION_STATUS":
+    //         reduxStore.dispatch(onAircraftStatusChange(data));
+    //         break;
+    //     case "SIM_STATE":
+    //         reduxStore.dispatch(onAircraftSimStateChange(data));
+    //         break;
+    //     case "POSITION":
+    //         reduxStore.dispatch(onAircraftPositionUpdate(data));
     }
 }
