@@ -45,7 +45,7 @@ export class AircraftRow extends Component {
             this.ws.onopen = (event) => {
                 this.ws.send(JSON.stringify({
                     type: "AIRCRAFT_POS_RATE",
-                    data: 5
+                    data: 2
                 }));
                 this.ws.onmessage = (event) => {
                     const message = JSON.parse(event.data);
