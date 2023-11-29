@@ -1,6 +1,7 @@
 import {invoke} from "@tauri-apps/api";
 import {store as reduxStore} from '../redux/store';
 import {setNvgAuthenticated, setNvgIsCurrent, setNvgPackageInfo} from "../redux/slices/navigraphSlice";
+import {getSaunaApiConnectionDetails} from "./tauri_actions";
 
 export async function getStoreItem(key){
     // Invoke Rust command
@@ -47,11 +48,11 @@ export async function saveApiServerDetails(apiServerDetails){
 }
 
 export async function getApiHostname(){
-    return await getStoreItem("settings.apiServer.hostName");
+    return (await getSaunaApiConnectionDetails()).hostname;
 }
 
 export async function getApiPort(){
-    return await getStoreItem("settings.apiServer.port");
+    return (await getSaunaApiConnectionDetails()).port;
 }
 
 export async function getApiUrl(){

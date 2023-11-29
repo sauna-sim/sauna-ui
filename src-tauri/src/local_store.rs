@@ -1,66 +1,42 @@
 use std::fs::File;
 use std::ops::IndexMut;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use std::io::Write;
 
-static mut STORE:Mutex<Option<StoreContainer>> = Mutex::new(None);
-
-pub unsafe fn init_store(path: &Path) {
-    // Create file if it doesn't exist
-    if let Some(store) = std::fs::read_to_string(path).ok().and_then(|file_string| {
-        serde_json::from_str::<LocalStore>(&file_string).ok()
-    }) {
-        *STORE.lock().unwrap() = Some(StoreContainer {
-            store,
-            path: path.to_owned()
-        });
-    } else {
-        *STORE.lock().unwrap() = Some(StoreContainer {
-            store: LocalStore::default(),
-            path: path.to_owned()
-        });
-    }
+pub struct StoreContainer {
+    pub store: LocalStore,
+    pub path: PathBuf
 }
 
-#[tauri::command]
-pub fn store_save() -> Result<(), String> {
-    unsafe {
-        let lock = STORE.lock().map_err(|error| error.to_string())?;
-
-        // Serialize to string
-        let json_str = serde_json::to_string_pretty(&lock.as_ref().unwrap().store).map_err(|error| error.to_string())?;
-
-        // Save to file
-        let mut file = File::create(&lock.as_ref().unwrap().path).map_err(|error| error.to_string())?;
-
-        write!(file, "{}", json_str).map_err(|error| error.to_string())?;
-
-        Ok(())
+impl StoreContainer {
+    pub fn new(path: &Path) -> StoreContainer {
+        // Try to load store from path, otherwise generate default store
+        StoreContainer {
+            path: path.to_owned(),
+            store: std::fs::read_to_string(path).ok().and_then(|file_string| {
+                serde_json::from_str::<LocalStore>(&file_string).ok()
+            }).unwrap_or_default()
+        }
     }
-}
 
-#[tauri::command]
-pub fn store_get(key: &str) -> Result<serde_json::Value, String> {
-    unsafe {
-        let lock = STORE.lock().unwrap();
-        let json = serde_json::to_value(&lock.as_ref().unwrap().store).map_err(|error| error.to_string())?;
+    pub fn get(&self, key: &str) -> Option<serde_json::Value> {
+        let json = serde_json::to_value(&self.store).ok()?;
         let split_keys = key.split('.');
         let mut ret_val = &json;
         for key in split_keys {
-            ret_val = ret_val.get(key).ok_or("Failed to get JSON Value".to_string())?;
+            if let Some(val) = ret_val.get(key) {
+                ret_val = val;
+            } else {
+                return None;
+            }
         }
 
-        Ok(ret_val.clone())
+        Some(ret_val.clone())
     }
-}
 
-#[tauri::command]
-pub fn store_set(key: &str, value: serde_json::Value) -> Result<(), String> {
-    unsafe {
-        let mut lock = STORE.lock().unwrap();
-        let mut json = serde_json::to_value(&lock.as_ref().unwrap().store).map_err(|error| error.to_string())?;
+    pub fn set(&mut self, key: &str, value: serde_json::Value) -> Result<(), String> {
+        let mut json = serde_json::to_value(&self.store).map_err(|error| error.to_string())?;
         let split_keys = key.split('.');
         let mut ret_val = &mut json;
         for key in split_keys {
@@ -68,16 +44,24 @@ pub fn store_set(key: &str, value: serde_json::Value) -> Result<(), String> {
         }
 
         *ret_val = value.clone();
-        lock.as_mut().unwrap().store = serde_json::from_value::<LocalStore>(json).map_err(|error| error.to_string())?;
+        self.store = serde_json::from_value::<LocalStore>(json).map_err(|error| error.to_string())?;
+
+        Ok(())
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        // Serialize to string
+        let json_str = serde_json::to_string_pretty(&self.store).map_err(|error| error.to_string())?;
+
+        // Save to file
+        let mut file = File::create(&self.path).map_err(|error| error.to_string())?;
+
+        write!(file, "{}", json_str).map_err(|error| error.to_string())?;
 
         Ok(())
     }
 }
 
-pub struct StoreContainer {
-    store: LocalStore,
-    path: PathBuf
-}
 impl Drop for StoreContainer {
     fn drop(&mut self) {
         let json_str = match serde_json::to_string(&self.store) {
@@ -109,20 +93,20 @@ impl Drop for StoreContainer {
 #[derive(Serialize, Deserialize, Default)]
 pub struct LocalStore {
     #[serde(default)]
-    settings: Settings,
+    pub settings: Settings,
     #[serde(default)]
-    navigraph: NavigraphSettings
+    pub navigraph: NavigraphSettings
 }
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     #[serde(default)]
-    api_server: ApiServerSettings,
+    pub api_server: ApiServerSettings,
     #[serde(default)]
-    api_settings: ApiSettings,
+    pub api_settings: ApiSettings,
     #[serde(default)]
-    fsd_connection: FsdConnectionSettings
+    pub fsd_connection: FsdConnectionSettings
 }
 
 #[derive(Serialize, Deserialize)]
@@ -147,11 +131,11 @@ fn default_api_port() -> u16 {5000}
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ApiSettings {
+pub struct ApiSettings {
     #[serde(default = "default_api_pos_calc_rate")]
-    pos_calc_rate: u16,
+    pub pos_calc_rate: u16,
     #[serde(default = "default_api_command_freq")]
-    command_frequency: String
+    pub command_frequency: String
 }
 impl Default for ApiSettings {
     fn default() -> Self {
@@ -167,17 +151,17 @@ fn default_api_command_freq() -> String {"199.998".to_string()}
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct FsdConnectionSettings {
+pub struct FsdConnectionSettings {
     #[serde(default)]
-    network_id: String,
+    pub network_id: String,
     #[serde(default)]
-    password: String,
+    pub password: String,
     #[serde(default)]
-    hostname: String,
+    pub hostname: String,
     #[serde(default = "default_fsd_port")]
-    port: u16,
+    pub port: u16,
     #[serde(default = "default_fsd_protocol")]
-    protocol: String
+    pub protocol: String
 }
 impl Default for FsdConnectionSettings {
     fn default() -> Self {
@@ -195,25 +179,25 @@ fn default_fsd_protocol() -> String {"Classic".to_string()}
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-struct NavigraphSettings {
+pub struct NavigraphSettings {
     #[serde(default)]
-    authenticated: bool,
+    pub authenticated: bool,
     #[serde(default)]
-    refresh_token: String,
+    pub refresh_token: String,
     #[serde(default)]
-    package: NavigraphPackageSettings
+    pub package: NavigraphPackageSettings
 }
 
 #[derive(Serialize, Deserialize, Default)]
-struct NavigraphPackageSettings {
+pub struct NavigraphPackageSettings {
     #[serde(default)]
-    package_id: String,
+    pub package_id: String,
     #[serde(default)]
-    cycle: String,
+    pub cycle: String,
     #[serde(default)]
-    revision: String,
+    pub revision: String,
     #[serde(default)]
-    filename: String,
+    pub filename: String,
     #[serde(default)]
-    current: bool
+    pub current: bool
 }

@@ -9,7 +9,8 @@ export const apiServerSlice = createSlice({
         simState: {
             paused: true,
             simRate: 1.0
-        }
+        },
+        usingBuiltIn: true
     },
     reducers: {
         onConnectionEstablished: (state, action) => {
@@ -22,6 +23,9 @@ export const apiServerSlice = createSlice({
         },
         onSimStateChange: (state, action) => {
             state.simState = action.payload;
+        },
+        onBuiltInChange: (state, action) => {
+            state.usingBuiltIn = action.payload;
         }
     }
 });
@@ -30,6 +34,7 @@ export const {
     onConnectionEstablished,
     onConnectionLost,
     onSimStateChange,
+    onBuiltInChange
 } = apiServerSlice.actions;
 
 export const apiServerReducer = apiServerSlice.reducer;

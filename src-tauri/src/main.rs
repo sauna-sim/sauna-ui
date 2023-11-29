@@ -2,40 +2,74 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod local_store;
-mod sauna_api_container;
 mod child_guard;
+mod utils;
+mod tauri_app_state;
 
 use std::fs::File;
 use std::{io};
 use std::io::{BufReader, Cursor};
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
+use tauri::{Manager};
 use zip::ZipArchive;
-use crate::local_store::init_store;
-use local_store::*;
-use crate::sauna_api_container::{start_sauna_api, stop_sauna_api};
+use crate::tauri_app_state::{ApiConnectionPayload, AppState};
+
+pub struct AppStateWrapper(pub Mutex<AppState>);
 
 
 fn main() {
     let app = tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![extract_zip, store_set, store_get, store_save, download_file])
-        .setup(|app| unsafe {
+        .manage(AppStateWrapper(Mutex::new(AppState::new())))
+        .invoke_handler(tauri::generate_handler![extract_zip, store_set, store_get, store_save, download_file, get_sauna_api_builtin, get_sauna_api_conn_details])
+        .setup(|app| {
+            // Send Sauna API Built In event
+            app.emit_all("sauna-api-builtin", true).unwrap();
+
+            // Get app state
+            let binding = app.state::<AppStateWrapper>();
+            let mut app_state_guard = binding.0.lock().unwrap();
+
             // Initialize Store
-            init_store(&app.path_resolver().app_data_dir().unwrap().join("config.json"));
+            app_state_guard.init(&app.path_resolver().app_data_dir().unwrap().join("config.json"));
 
             // Start Sauna API
-            start_sauna_api(&app.path_resolver().resource_dir().unwrap().join("sauna-api"));
+            app_state_guard.start_sauna_api(&app.path_resolver().resource_dir().unwrap().join("sauna-api")).ok();
 
+            // Send Sauna API Built In event
+            app.emit_all("sauna-api-builtin", app_state_guard.api_builtin).unwrap();
             Ok(())
         })
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
     app.run(|_app_handle, event | match event {
-        tauri::RunEvent::Exit {..} | tauri::RunEvent::ExitRequested {..} => unsafe {
-            store_save().ok();
-            stop_sauna_api();
+        tauri::RunEvent::Exit {..} | tauri::RunEvent::ExitRequested {..} => {
+            // Get app state
+            let binding = _app_handle.state::<AppStateWrapper>();
+            let mut app_state_guard = binding.0.lock().unwrap();
+
+            // Save local store
+            if let Some(local_store) = app_state_guard.local_store.as_ref() {
+                local_store.save().ok();
+            }
+
+            // Stop sauna API
+            app_state_guard.stop_sauna_api();
         }
         _ => {}
     });
+}
+
+#[tauri::command]
+fn get_sauna_api_builtin(app_state: tauri::State<AppStateWrapper>) -> Result<bool, String> {
+    let app_state_guard = app_state.0.lock().unwrap();
+    return Ok(app_state_guard.api_builtin);
+}
+
+#[tauri::command]
+fn get_sauna_api_conn_details(app_state: tauri::State<AppStateWrapper>) -> Result<ApiConnectionPayload, String> {
+    let mut app_state_guard = app_state.0.lock().unwrap();
+    return Ok(app_state_guard.get_api_conn_details());
 }
 
 #[tauri::command]
@@ -67,4 +101,34 @@ fn extract_zip(dir: &str, zip_file_name: &str) -> Result<Vec<String>, String> {
     zip_archive.extract(dir).map_err(|error| error.to_string())?;
 
     return Ok(files_in_zip);
+}
+
+#[tauri::command]
+fn store_save(app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {
+    let mut app_state_guard = app_state.0.lock().unwrap();
+    if let Some(local_store) = app_state_guard.local_store.as_mut() {
+        local_store.save()
+    } else {
+        Err("Local Store is null".to_owned())
+    }
+}
+
+#[tauri::command]
+fn store_get(key: &str, app_state: tauri::State<AppStateWrapper>) -> Result<serde_json::Value, String> {
+    let mut app_state_guard = app_state.0.lock().unwrap();
+    if let Some(local_store) = app_state_guard.local_store.as_mut() {
+        local_store.get(key).ok_or("Error getting value from local store".to_owned())
+    } else {
+        Err("Local Store is null".to_owned())
+    }
+}
+
+#[tauri::command]
+fn store_set(key: &str, value: serde_json::Value, app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {
+    let mut app_state_guard = app_state.0.lock().unwrap();
+    if let Some(local_store) = app_state_guard.local_store.as_mut() {
+        local_store.set(key, value)
+    } else {
+        Err("Local Store is null".to_owned())
+    }
 }

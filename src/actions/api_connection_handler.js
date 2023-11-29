@@ -48,7 +48,7 @@ export async function establishApiConnection(){
     trying = true;
     while (!connected){
         try {
-            console.log("Trying");
+            console.log("Trying", `${await getApiUrl()}/server/info`);
             const serverInfo = (await axiosSaunaApi.get(`${await getApiUrl()}/server/info`)).data;
             reduxStore.dispatch(onConnectionEstablished(serverInfo));
             connected = true;

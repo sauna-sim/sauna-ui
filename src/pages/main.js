@@ -36,7 +36,7 @@ class MainAppComponent extends Component {
             <>
                 <Container fluid>
                     <Row>
-                        <ApiConnectionSettings />
+                        {!this.props.apiServer.usingBuiltIn && <ApiConnectionSettings /> }
                     </Row>
                     <Row>
                         <div style={{
