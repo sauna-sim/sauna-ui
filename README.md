@@ -1,8 +1,12 @@
-# Sauna UI
-
-## About
+# About
 This project is the UI for SaunaSim. It's built in React and runs on the Tauri framework.
 
+# Download
+[![Release](https://img.shields.io/github/v/release/Sauna-ATC-Training-Simulator/sauna-ui?include_prereleases&style=for-the-badge)][1]
+
+[1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/releases/latest
+
+# Details
 ### [Sauna API](https://github.com/Sauna-ATC-Training-Simulator/sauna-api)
 The API contains most of the core simulation code. For production, the UI will bundle the API.
 

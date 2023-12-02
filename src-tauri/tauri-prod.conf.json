@@ -4,6 +4,14 @@
       "resources": [
         "sauna-api/**/*"
       ]
+    },
+    "updater": {
+      "active": false,
+      "endpoints": [
+
+      ],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRBMEI5QTkyRDQ2Mzc2NEEKUldSS2RtUFVrcG9MU29xWDVMbUJ0M0dvbDNFYnphYkt1MTdoQktJMmZwQlpLOHlzNTM1ZXB2ZWEK"
     }
   }
 }

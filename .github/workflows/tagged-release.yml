@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-latest
             short-os: linux
             rust-os: unknown-linux-gnu
-            tauri-bundles: deb
+            tauri-bundles: AppImage
           - arch: x86
             rust-arch: i686
           - arch: x64
