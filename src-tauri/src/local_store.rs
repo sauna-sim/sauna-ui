@@ -55,8 +55,10 @@ impl StoreContainer {
         let json_str = serde_json::to_string_pretty(&self.store).map_err(|error| error.to_string())?;
 
         // Create directory
-        fs::create_dir_all(&self.path.parent()).map_err(|error| error.to_string())?;
-        
+        if let Some(parent_path) = self.path.parent() {
+            fs::create_dir_all(parent_path).map_err(|error| error.to_string())?;
+        }
+
         // Save to file
         let mut file = File::create(&self.path).map_err(|error| error.to_string())?;
 
