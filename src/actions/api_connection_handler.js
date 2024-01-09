@@ -5,7 +5,7 @@ import {onConnectionEstablished, onConnectionLost, onSimStateChange} from "../re
 import {wait} from "./utilities";
 import {
     onAircraftCreated,
-    onAircraftDeleted,
+    onAircraftDeleted, resetAircraftList,
 } from "../redux/slices/aircraftSlice";
 
 // Axios Sauna-API Settings
@@ -25,6 +25,7 @@ axiosSaunaApi.interceptors.response.use(
             } else {
                 // Connection has been lost
                 reduxStore.dispatch(onConnectionLost());
+                reduxStore.dispatch(resetAircraftList());
 
                 // Start retrying connection
                 establishApiConnection().then(() => {});
@@ -51,6 +52,7 @@ export async function establishApiConnection(){
             console.log("Trying", `${await getApiUrl()}/server/info`);
             const serverInfo = (await axiosSaunaApi.get(`${await getApiUrl()}/server/info`)).data;
             reduxStore.dispatch(onConnectionEstablished(serverInfo));
+            reduxStore.dispatch(resetAircraftList());
             connected = true;
         } catch (e){
             // Continue
@@ -97,7 +99,7 @@ async function handleWsClose(){
 
     // Check if api closed
     try {
-        await axiosSaunaApi.get("${await getApiUrl()}/server/info");
+        await axiosSaunaApi.get(`${await getApiUrl()}/server/info`);
     } catch (error){
         // Connection has been lost
         // interceptor will auto retry connection

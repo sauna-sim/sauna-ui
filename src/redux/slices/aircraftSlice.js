@@ -11,6 +11,9 @@ export const aircraftSlice = createSlice({
             const index = state.indexOf(action.payload.callsign);
             state.splice(index, 1);
         },
+        resetAircraftList: (state, action) => {
+            return [];
+        }
         // onAircraftStatusChange: (state, action) => {
         //     const foundAircraft = state[action.payload.callsign];
         //     if (foundAircraft) {
@@ -39,6 +42,7 @@ export const aircraftSlice = createSlice({
 export const {
     onAircraftCreated,
     onAircraftDeleted,
+    resetAircraftList
     // onAircraftStatusChange,
     // onAircraftSimStateChange,
     // onAircraftPositionUpdate,

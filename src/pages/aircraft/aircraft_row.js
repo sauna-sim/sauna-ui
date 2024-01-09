@@ -29,7 +29,11 @@ export class AircraftRow extends Component {
 
     componentWillUnmount() {
         if (this.ws) {
-            this.ws.close();
+            try {
+                this.ws.close();
+            } catch (e) {
+                this.ws = null;
+            }
         }
         this.setState({
             runWebSocket: false
