@@ -27,6 +27,8 @@ export class AircraftDetail extends Component {
         const {showModal} = this.state;
         const {aircraft} = this.props;
 
+        console.log(aircraft);
+
         return <>
             <Button variant="secondary" onClick={this.open}>Details</Button>
 
@@ -38,19 +40,32 @@ export class AircraftDetail extends Component {
                     <h5>Altitude Data</h5>
                     <Row>
                         <Col lg={3} md={2}><b>Indicated Alt (ft):</b></Col>
-                        <Col lg={1} md={2}>{round(aircraft.position.indicatedAltitude, 2)}</Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.indicatedAltitude.feet, 2)}</Col>
                         <Col lg={3} md={2}><b>Pressure Alt (ft):</b></Col>
-                        <Col lg={1} md={2}>{round(aircraft.position.pressureAltitude, 2)}</Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.pressureAltitude.feet, 2)}</Col>
                         <Col lg={3} md={2}><b>Density Alt (ft):</b></Col>
-                        <Col lg={1} md={2}>{round(aircraft.position.densityAltitude, 2)}</Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.densityAltitude.feet, 2)}</Col>
                     </Row>
                     <Row>
                         <Col lg={3} md={2}><b>True Alt (ft):</b></Col>
-                        <Col lg={1} md={2}>{round(aircraft.position.trueAltitude, 2)}</Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.trueAltitude.feet, 2)}</Col>
                         <Col lg={3} md={2}><b>Altimeter Setting (hPa):</b></Col>
-                        <Col lg={1} md={2}>{round(aircraft.position.altimeterSetting_hPa, 2)}</Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.altimeterSetting.hectopascals, 2)}</Col>
                         <Col lg={3} md={2}><b>Surface Pressure (hPa):</b></Col>
-                        <Col lg={1} md={2}>{round(aircraft.position.surfacePressure_hPa, 2)}</Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.surfacePressure.hectopascals, 2)}</Col>
+                    </Row>
+                    <h5>Speed Data</h5>
+                    <Row>
+                        <Col lg={3} md={2}><b>IAS (kts):</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.indicatedAirSpeed.knots, 2)}</Col>
+                        <Col lg={3} md={2}><b>TAS (kts):</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.trueAirSpeed.knots, 2)}</Col>
+                        <Col lg={3} md={2}><b>GS (kts):</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.groundSpeed.knots, 2)}</Col>
+                    </Row>
+                    <Row>
+                        <Col lg={3} md={2}><b>Mach:</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.machNumber, 2)}</Col>
                     </Row>
                 </Modal.Body>
             </Modal>

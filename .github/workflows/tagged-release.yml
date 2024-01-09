@@ -57,7 +57,7 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       rust-target-suffix: ${{ matrix.rust-target-suffix }}
       upload-bundle-artifacts: ${{ true }}
-      api-ref: 'v0.16.0'
+      api-ref: 'v0.17.0'
     secrets: inherit # Pass all secrets
 
   create-github-release:
