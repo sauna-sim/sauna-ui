@@ -27,8 +27,6 @@ export class AircraftDetail extends Component {
         const {showModal} = this.state;
         const {aircraft} = this.props;
 
-        console.log(aircraft);
-
         return <>
             <Button variant="secondary" onClick={this.open}>Details</Button>
 
