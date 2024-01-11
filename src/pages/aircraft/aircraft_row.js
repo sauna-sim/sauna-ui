@@ -12,16 +12,13 @@ export class AircraftRow extends Component {
         super(props);
 
         this.ws = null;
+        this.shouldRunWebSocket = false;
 
-        this.state = {
-            runWebSocket: false
-        }
+        this.state = {}
     }
 
     componentDidMount() {
-        this.setState({
-            runWebSocket: true
-        });
+        this.shouldRunWebSocket = true;
 
         this.runWebSocket().then(() => {
         });
@@ -35,9 +32,7 @@ export class AircraftRow extends Component {
                 this.ws = null;
             }
         }
-        this.setState({
-            runWebSocket: false
-        });
+        this.shouldRunWebSocket = false;
     }
 
     runWebSocket = async () => {
@@ -70,7 +65,7 @@ export class AircraftRow extends Component {
                 this.handleWsClose();
             }
         } catch (e) {
-            this.handleWsClose();
+            await this.handleWsClose();
         }
     }
 
@@ -108,7 +103,7 @@ export class AircraftRow extends Component {
         this.ws = null;
 
         // Otherwise retry the ws socket
-        if (this.state.runWebSocket) {
+        if (this.shouldRunWebSocket) {
             await wait(5000);
             this.runWebSocket().then(() => {
             });

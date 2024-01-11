@@ -35,6 +35,19 @@ export class AircraftDetail extends Component {
                     <Modal.Title>{aircraft.callsign} Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <h5>Heading Data</h5>
+                    <Row>
+                        <Col lg={3} md={2}><b>Magnetic Heading:</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.heading_Mag.degrees, 2)}</Col>
+                        <Col lg={3} md={2}><b>True Heading:</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.heading_True.degrees, 2)}</Col>
+                    </Row>
+                    <Row>
+                        <Col lg={3} md={2}><b>Magnetic Track:</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.track_Mag.degrees, 2)}</Col>
+                        <Col lg={3} md={2}><b>True Track:</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.position.track_True.degrees, 2)}</Col>
+                    </Row>
                     <h5>Altitude Data</h5>
                     <Row>
                         <Col lg={3} md={2}><b>Indicated Alt (ft):</b></Col>
