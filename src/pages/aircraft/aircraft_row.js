@@ -12,16 +12,13 @@ export class AircraftRow extends Component {
         super(props);
 
         this.ws = null;
+        this.shouldRunWebSocket = false;
 
-        this.state = {
-            runWebSocket: false
-        }
+        this.state = {}
     }
 
     componentDidMount() {
-        this.setState({
-            runWebSocket: true
-        });
+        this.shouldRunWebSocket = true;
 
         this.runWebSocket().then(() => {
         });
@@ -35,9 +32,7 @@ export class AircraftRow extends Component {
                 this.ws = null;
             }
         }
-        this.setState({
-            runWebSocket: false
-        });
+        this.shouldRunWebSocket = false;
     }
 
     runWebSocket = async () => {
@@ -70,7 +65,7 @@ export class AircraftRow extends Component {
                 this.handleWsClose();
             }
         } catch (e) {
-            this.handleWsClose();
+            await this.handleWsClose();
         }
     }
 
@@ -108,7 +103,7 @@ export class AircraftRow extends Component {
         this.ws = null;
 
         // Otherwise retry the ws socket
-        if (this.state.runWebSocket) {
+        if (this.shouldRunWebSocket) {
             await wait(5000);
             this.runWebSocket().then(() => {
             });
@@ -185,7 +180,6 @@ export class AircraftRow extends Component {
     }
 
     render() {
-        const {callsign} = this.props;
         const {aircraft} = this.state;
 
         if (!aircraft) {
@@ -201,7 +195,7 @@ export class AircraftRow extends Component {
             </td>
             <td>
                 <div className={"pfd-selected"}>{aircraft.autopilot.selectedHeading}</div>
-                <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag, 2)}</div>
+                <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag.degrees, 2)}</div>
             </td>
             <td>
                 <div className={aircraft.autopilot.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
@@ -209,26 +203,26 @@ export class AircraftRow extends Component {
                         aircraft.autopilot.selectedSpeed :
                         `M${round(aircraft.autopilot.selectedSpeed / 100.0, 2)}`}
                 </div>
-                <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed, 2)}</div>
+                <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed.knots, 2)}</div>
             </td>
             <td>
                 <div className={"pfd-selected"}>{aircraft.autopilot.selectedAltitude}</div>
-                <div className={"pfd-measured"}>{round(aircraft.position.indicatedAltitude, 2)}</div>
+                <div className={"pfd-measured"}>{round(aircraft.position.indicatedAltitude.feet, 2)}</div>
             </td>
             <td>
                 <div className={"pfd-selected"}>{aircraft.autopilot.selectedVerticalSpeed}</div>
-                <div className={"pfd-measured"}>{round(aircraft.position.verticalSpeed, 2)}</div>
+                <div className={"pfd-measured"}>{round(aircraft.position.verticalSpeed.feetPerMinute, 2)}</div>
             </td>
             <td>
                 <div className={"pfd-selected"}>{aircraft.autopilot.selectedFpa}</div>
-                <div className={"pfd-measured"}>{round(aircraft.position.flightPathAngle, 2)}</div>
+                <div className={"pfd-measured"}>{round(aircraft.position.flightPathAngle.degrees, 2)}</div>
             </td>
             <td>{this.getFma(aircraft)}</td>
-            <td>{round(aircraft.position.pitch, 2)}</td>
-            <td>{round(aircraft.position.bank, 2)}</td>
+            <td>{round(aircraft.position.pitch.degrees, 2)}</td>
+            <td>{round(aircraft.position.bank.degrees, 2)}</td>
             <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
-            <td>{`${round(aircraft.position.altimeterSetting_hPa)}hPa`}</td>
-            <td>{`${round(aircraft.position.windDirection)} @ ${round(aircraft.position.windSpeed)}kts`}</td>
+            <td>{`${round(aircraft.position.altimeterSetting.hectopascals)}hPa`}</td>
+            <td>{`${round(aircraft.position.windDirection.degrees)} @ ${round(aircraft.position.windSpeed.knots)}kts`}</td>
             <td>{aircraft.fms.asString}</td>
             <td><AircraftDetail aircraft={aircraft}/></td>
         </tr>

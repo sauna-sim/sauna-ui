@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-latest
             short-os: linux
             rust-os: unknown-linux-gnu
-            tauri-bundles: AppImage
+            tauri-bundles: appimage
           - arch: x86
             rust-arch: i686
           - arch: x64
@@ -57,7 +57,7 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       rust-target-suffix: ${{ matrix.rust-target-suffix }}
       upload-bundle-artifacts: ${{ true }}
-      api-ref: 'v0.16.0'
+      api-ref: 'v0.17.0'
     secrets: inherit # Pass all secrets
 
   create-github-release:
