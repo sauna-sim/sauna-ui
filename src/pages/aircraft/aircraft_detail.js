@@ -78,6 +78,15 @@ export class AircraftDetail extends Component {
                         <Col lg={3} md={2}><b>Mach:</b></Col>
                         <Col lg={1} md={2}>{round(aircraft.position.machNumber, 2)}</Col>
                     </Row>
+                    <h5>FMS Data</h5>
+                    <Row>
+                        <Col lg={3} md={2}><b>aTk (m):</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.fms.alongTrackDistance_m, 2)}</Col>
+                        <Col lg={3} md={2}><b>xTk (m):</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.fms.crossTrackDistance_m, 2)}</Col>
+                        <Col lg={3} md={2}><b>rTk (degs):</b></Col>
+                        <Col lg={1} md={2}>{round(aircraft.fms.requiredTrueCourse, 2)}</Col>
+                    </Row>
                 </Modal.Body>
             </Modal>
         </>
