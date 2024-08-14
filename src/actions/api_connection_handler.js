@@ -37,9 +37,9 @@ axiosSaunaApi.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-establishApiConnection().then(() => {})
 
-let trying = true;
+let trying = false;
+establishApiConnection().then(() => {})
 export async function establishApiConnection(){
     if (trying){
         return;
