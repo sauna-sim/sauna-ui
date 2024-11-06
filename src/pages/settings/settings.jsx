@@ -1,4 +1,5 @@
-import React, {Component} from "react";
+import React, {Component, useState} from "react";
+import {open} from '@tauri-apps/api/dialog';
 import {Formik, getIn} from "formik";
 import {
     getApiSettings,
@@ -24,6 +25,8 @@ export class SettingsModal extends Component {
         }
     }
 
+    
+
     open = async () => {
         this.setState({
             showModal: true,
@@ -33,9 +36,18 @@ export class SettingsModal extends Component {
         const revisions = await getFsdProtocolRevisions();
         const apiSettings = await getApiSettings();
         const fsdConnection = await getFsdSettings();
+        const radarSettings = {
+            sectorFilePath: "",
+            symbologyFilePath: "",
+            asrFilePath: "",
+            centerLat: 0.0,
+            centerLon: 0.0,
+            zoomLevelNMi: 50.0
+        }
         const uiSettings = {
             apiSettings,
-            fsdConnection
+            fsdConnection,
+            radarSettings
         }
 
         this.setState({
@@ -46,6 +58,21 @@ export class SettingsModal extends Component {
 
     close = () => {
         this.setState({showModal: false});
+    }
+
+    chooseFile = async (setFieldValue, caption, name, extensions, saveTarget) => {
+        const selected = await open({
+            title: caption,
+            multiple: false,
+            filters: [{
+                name: name,
+                extensions: extensions
+            }]
+        });
+
+        if (selected !== null) {
+            await setFieldValue(saveTarget, selected, false);
+        }
     }
 
     async componentDidMount() {
@@ -66,6 +93,7 @@ export class SettingsModal extends Component {
         await saveFsdSettings(values.fsdConnection);
         await updateServerSettings(await getStoreItem("settings.apiSettings"));
         await storeSave();
+        console.log(values.radarSettings);
         this.close();
     }
 
@@ -97,6 +125,17 @@ export class SettingsModal extends Component {
                     .required("Required"),
                 password: Yup.string()
                     .required("Required")
+            }),
+            radarSettings: Yup.object().shape({
+                centerLat: Yup.number()
+                    .min(-90, "-90 or more")
+                    .max(90, "90 or less"),
+                centerLon: Yup.number()
+                    .min(-180, "-180 or more")
+                    .max(180, "180 or less"),
+                screenCenterNMi: Yup.number()
+                    .min(5, "5 or more")
+                    .max(200, "200 or less")
             })
         })
         return (
@@ -120,6 +159,7 @@ export class SettingsModal extends Component {
                               handleBlur,
                               handleSubmit,
                               isSubmitting,
+                              setFieldValue
                           }) => (
                             <Form onSubmit={handleSubmit}>
                                 <Modal.Body>
@@ -228,6 +268,111 @@ export class SettingsModal extends Component {
                                                 {getIn(errors, "fsdConnection.password")}
                                             </Form.Control.Feedback>
                                         </Form.Group>
+                                    </Row>
+
+                                    <h5>Sauna Radar Settings</h5>
+                                    <Row className="mb-3">
+                                        <Form.Label>Sector File</Form.Label>
+                                        <InputGroup>
+                                        <Button variant = "secondary" onClick = {() => this.chooseFile(setFieldValue, "Select Sector File", "Sector File", ["sct"], "radarSettings.sectorFilePath")}>Choose File</Button>
+                                        <Form.Control
+                                                name="radarSettings.sectorFilePath"
+                                                type="text"
+                                                disabled={true}
+                                                value={values.radarSettings.sectorFilePath == "" ? "No file chosen" : values.radarSettings.sectorFilePath}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                            />
+                                        </InputGroup>
+                                    </Row>
+                                    <Row className="mb-3">
+                                            <Form.Label>Symbology File</Form.Label>
+                                            <InputGroup>
+                                            <Button variant = "secondary" onClick = {() => this.chooseFile(setFieldValue, "Select Symbology File", "Symbology File", ["txt"], "radarSettings.symbologyFilePath")}>Choose File</Button>
+                                            <Form.Control
+                                                    name="radarSettings.symbologyFilePath"
+                                                    type="text"
+                                                    disabled={true}
+                                                    value={values.radarSettings.symbologyFilePath == "" ? "No file chosen" : values.radarSettings.symbologyFilePath}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                                
+                                            </InputGroup>
+                                    </Row>
+                                    <Row className="mb-3">
+                                            <Form.Label>ASR File</Form.Label>
+                                            <InputGroup>
+                                            <Button variant = "secondary" onClick = {() => this.chooseFile(setFieldValue, "Select ASR File", "ASR File", ["asr"], "radarSettings.asrFilePath")}>Choose File</Button>
+                                            <Form.Control
+                                                    name="radarSettings.asrFilePath"
+                                                    type="text"
+                                                    disabled={true}
+                                                    value={values.radarSettings.asrFilePath == "" ? "No file chosen" : values.radarSettings.asrFilePath}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                                
+                                            </InputGroup>
+                                    </Row>
+
+                                    <Row className="mb-3">
+                                        <Col>
+                                            <Form.Label>Center Latitude</Form.Label>
+                                            <InputGroup hasValidation>
+                                                <Form.Control
+                                                    name="radarSettings.centerLat"
+                                                    type = "number"
+                                                    value={values.radarSettings.centerLat}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    isInvalid={getIn(touched, "radarSettings.centerLat") && getIn(errors, "radarSettings.centerLat")}
+                                                />
+                                                <InputGroup.Text>deg</InputGroup.Text>
+                                                <Form.Control.Feedback type="invalid">
+                                                    {getIn(errors, "radarSettings.centerLat")}
+                                                </Form.Control.Feedback>
+                                            </InputGroup>
+                                        </Col>
+
+                                        <Col>
+                                            <Form.Label>Center Longitude</Form.Label>
+                                            <InputGroup hasValidation>
+                                                <Form.Control
+                                                    name="radarSettings.centerLon"
+                                                    type = "number"
+                                                    value={values.radarSettings.centerLon}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    isInvalid={getIn(touched, "radarSettings.centerLon") && getIn(errors, "radarSettings.centerLon")}
+                                                />
+                                                <InputGroup.Text>deg</InputGroup.Text>
+                                                <Form.Control.Feedback type="invalid">
+                                                    {getIn(errors, "radarSettings.centerLon")}
+                                                </Form.Control.Feedback>
+                                            </InputGroup>
+                                        </Col>
+
+                                        <Col>
+                                            <Form.Label>Zoom Level</Form.Label>
+                                            <InputGroup hasValidation>
+                                                <Form.Control
+                                                    name="radarSettings.zoomLevelNMi"
+                                                    type = "number"
+                                                    value={values.radarSettings.zoomLevelNMi}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    isInvalid={getIn(touched, "radarSettings.zoomLevelNMi") && getIn(errors, "radarSettings.zoomLevelNMi")}
+                                                />
+                                                <InputGroup.Text>nmi</InputGroup.Text>
+                                                <Form.Control.Feedback type="invalid">
+                                                    {getIn(errors, "radarSettings.zoomLevelNMi")}
+                                                </Form.Control.Feedback>
+                                            </InputGroup>
+                                        </Col>
+
+
+                                        
                                     </Row>
                                 </Modal.Body>
                                 <Modal.Footer>

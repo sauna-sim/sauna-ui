@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component} from "react";
 import {open} from '@tauri-apps/api/dialog';
 import {loadEuroscopeScenario} from "../../actions/data_actions";
 import {Button, ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";

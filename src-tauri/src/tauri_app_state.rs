@@ -16,6 +16,7 @@ pub struct AppState {
     pub api_port: u16,
     pub api_builtin: bool,
     pub api_process: ChildGuard,
+    pub radar_process: ChildGuard,
     pub local_store: Option<StoreContainer>
 }
 
@@ -26,6 +27,7 @@ impl AppState {
             api_port: 5000,
             api_builtin: true,
             api_process: ChildGuard(None),
+            radar_process: ChildGuard(None),
             local_store: None
         }
     }
