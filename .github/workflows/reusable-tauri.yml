@@ -132,7 +132,8 @@ jobs:
       - name: npm install
         run: npm install
       - name: Build and Package
-        run: npm run package -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
+        shell: pwsh
+        run: npm run package --% -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
       - name: Copy Installers
         if: ${{ inputs.upload-bundle-artifacts }}
         shell: pwsh
