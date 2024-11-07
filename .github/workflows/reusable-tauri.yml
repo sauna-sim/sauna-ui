@@ -131,9 +131,14 @@ jobs:
           rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
       - name: npm install
         run: npm install
-      - name: Build and Package
+      - name: Build and Package (Windows)
         shell: pwsh
+        if: inputs.os == 'windows-latest'
         run: npm run package --% -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
+      - name: Build and Package (Others)
+        shell: pwsh
+        if: inputs.os != 'windows-latest'
+        run: npm run package -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
       - name: Copy Installers
         if: ${{ inputs.upload-bundle-artifacts }}
         shell: pwsh
