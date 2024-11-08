@@ -4,6 +4,8 @@ import {Formik, getIn} from "formik";
 import {
     getApiSettings,
     getFsdSettings,
+    getRadarSettings,
+    saveRadarSettings,
     getStoreItem,
     saveApiSettings, saveFsdSettings,
     storeSave
@@ -36,14 +38,7 @@ export class SettingsModal extends Component {
         const revisions = await getFsdProtocolRevisions();
         const apiSettings = await getApiSettings();
         const fsdConnection = await getFsdSettings();
-        const radarSettings = {
-            sectorFilePath: "",
-            symbologyFilePath: "",
-            asrFilePath: "",
-            centerLat: 0.0,
-            centerLon: 0.0,
-            zoomLevelNMi: 50.0
-        }
+        const radarSettings = await getRadarSettings();
         const uiSettings = {
             apiSettings,
             fsdConnection,
@@ -91,9 +86,9 @@ export class SettingsModal extends Component {
     onSubmit = async (values) => {
         await saveApiSettings(values.apiSettings);
         await saveFsdSettings(values.fsdConnection);
+        await saveRadarSettings(values.radarSettings);
         await updateServerSettings(await getStoreItem("settings.apiSettings"));
         await storeSave();
-        console.log(values.radarSettings);
         this.close();
     }
 
@@ -133,7 +128,7 @@ export class SettingsModal extends Component {
                 centerLon: Yup.number()
                     .min(-180, "-180 or more")
                     .max(180, "180 or less"),
-                screenCenterNMi: Yup.number()
+                screenCenter: Yup.number()
                     .min(5, "5 or more")
                     .max(200, "200 or less")
             })
@@ -323,7 +318,7 @@ export class SettingsModal extends Component {
                                                 <Form.Control
                                                     name="radarSettings.centerLat"
                                                     type = "number"
-                                                    value={values.radarSettings.centerLat}
+                                                    value={values.radarSettings.centerLat || ""}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     isInvalid={getIn(touched, "radarSettings.centerLat") && getIn(errors, "radarSettings.centerLat")}
@@ -341,7 +336,7 @@ export class SettingsModal extends Component {
                                                 <Form.Control
                                                     name="radarSettings.centerLon"
                                                     type = "number"
-                                                    value={values.radarSettings.centerLon}
+                                                    value={values.radarSettings.centerLon || ""}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     isInvalid={getIn(touched, "radarSettings.centerLon") && getIn(errors, "radarSettings.centerLon")}
@@ -357,16 +352,16 @@ export class SettingsModal extends Component {
                                             <Form.Label>Zoom Level</Form.Label>
                                             <InputGroup hasValidation>
                                                 <Form.Control
-                                                    name="radarSettings.zoomLevelNMi"
+                                                    name="radarSettings.zoomLevel"
                                                     type = "number"
-                                                    value={values.radarSettings.zoomLevelNMi}
+                                                    value={values.radarSettings.zoomLevel || ""}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    isInvalid={getIn(touched, "radarSettings.zoomLevelNMi") && getIn(errors, "radarSettings.zoomLevelNMi")}
+                                                    isInvalid={getIn(touched, "radarSettings.zoomLevel") && getIn(errors, "radarSettings.zoomLevel")}
                                                 />
                                                 <InputGroup.Text>nmi</InputGroup.Text>
                                                 <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, "radarSettings.zoomLevelNMi")}
+                                                    {getIn(errors, "radarSettings.zoomLevel")}
                                                 </Form.Control.Feedback>
                                             </InputGroup>
                                         </Col>

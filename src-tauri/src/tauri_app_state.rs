@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use crate::child_guard::ChildGuard;
 use crate::local_store::{StoreContainer};
 use crate::utils::port_finder::get_available_port;
@@ -43,8 +43,8 @@ impl AppState {
         self.api_builtin = true;
 
         self.api_process.start_child(
-            sauna_api_dir.join("SaunaApi").as_ref(),
-            sauna_api_dir,
+            sauna_api_dir.join("SaunaApi"),
+            Some(sauna_api_dir),
             &["-p".to_owned(), self.api_port.to_string()]
         );
 
@@ -59,6 +59,8 @@ impl AppState {
 
         Ok(())
     }
+
+
 
     pub fn stop_sauna_api(&mut self){
         if let Some(mut child) = self.api_process.0.take() {
