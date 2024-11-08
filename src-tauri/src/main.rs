@@ -44,6 +44,7 @@ fn main() {
         .expect("error while running tauri application");
     app.run(|_app_handle, event | match event {
         tauri::RunEvent::Exit {..} | tauri::RunEvent::ExitRequested {..} => {
+
             // Get app state
             let binding = _app_handle.state::<AppStateWrapper>();
             let mut app_state_guard = binding.0.lock().unwrap();
@@ -54,7 +55,11 @@ fn main() {
             }
 
             // Stop sauna API
+
             app_state_guard.stop_sauna_api();
+
+            // Stop Sauna Radar
+            app_state_guard.stop_sauna_radar();
         }
         _ => {}
     });
@@ -134,32 +139,9 @@ fn store_set(key: &str, value: serde_json::Value, app_state: tauri::State<AppSta
 }
 
 #[tauri::command]
-fn launch_radar(app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {
-    let sauna_radar_path= std::env::var("SAUNA_RADAR_PATH").map_err(|_| String::from("SAUNA_RADAR_PATH env var not defined."))?;
+fn launch_radar(app_state: tauri::State<AppStateWrapper>, app_handle: tauri::AppHandle) -> Result<(), String> {
+    let sauna_radar_dir = app_handle.path_resolver().resource_dir().unwrap().join("sauna-radar");
     let mut app_state_guard = app_state.0.lock().unwrap();
-    let settings = &app_state_guard.local_store.as_ref().ok_or_else(|| String::from("Radar settings not set"))?.store.settings;
-    // TODO: Remove env var
-    let args = [
-        "-h".to_string(),
-        settings.api_server.host_name.clone(),
-        "-p".to_string(),
-        settings.api_server.port.to_string(),
-        "-t".to_string(),
-        "-s".to_string(),
-        settings.radar_settings.sector_file_path.to_string_lossy().into_owned(),
-        "-c".to_string(),
-        settings.radar_settings.symbology_file_path.to_string_lossy().into_owned(),
-        "-a".to_string(),
-        settings.radar_settings.asr_file_path.to_string_lossy().into_owned(),
-        "-y".to_string(),
-        settings.radar_settings.center_lat.to_string(),
-        "-x".to_string(),
-        settings.radar_settings.center_lon.to_string(),
-        "-z".to_string(),
-        settings.radar_settings.zoom_level.to_string()
-    ];
-    app_state_guard.radar_process.start_child(&sauna_radar_path, None::<String>, &args);
-
-    Ok(())
+    app_state_guard.start_sauna_radar(sauna_radar_dir)
     
 }
