@@ -101,7 +101,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '18.x'
           cache: 'npm'
       - name: Use Stable Rust
         uses: dtolnay/rust-toolchain@stable
@@ -131,13 +131,8 @@ jobs:
           rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
       - name: npm install
         run: npm install
-      - name: Build and Package (Windows)
+      - name: Build and Package
         shell: pwsh
-        if: inputs.os == 'windows-latest'
-        run: tauri build -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
-      - name: Build and Package (Others)
-        shell: pwsh
-        if: inputs.os != 'windows-latest'
         run: npm run package -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
       - name: Copy Installers
         if: ${{ inputs.upload-bundle-artifacts }}
