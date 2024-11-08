@@ -134,7 +134,7 @@ jobs:
       - name: Build and Package (Windows)
         shell: pwsh
         if: inputs.os == 'windows-latest'
-        run: npm run package --% -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
+        run: tauri build -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
       - name: Build and Package (Others)
         shell: pwsh
         if: inputs.os != 'windows-latest'
