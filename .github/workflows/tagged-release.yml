@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64, x86] #arm, arm64
+        arch: [x64] #x86, arm, arm64
         os: [macos-latest, windows-latest, ubuntu-latest]
         include:
           - os: macos-latest
@@ -25,8 +25,8 @@ jobs:
             short-os: linux
             rust-os: unknown-linux-gnu
             tauri-bundles: deb
-          - arch: x86
-            rust-arch: i686
+#          - arch: x86
+#            rust-arch: i686
           - arch: x64
             rust-arch: x86_64
 #          - arch: arm
@@ -36,13 +36,13 @@ jobs:
 #          - os: ubuntu-latest
 #            arch: arm
 #            rust-target-suffix: eabihf
-        exclude:
+#        exclude:
 #          - os: windows-latest
 #            arch: arm
-          - os: ubuntu-latest
-            arch: x86
-          - os: macos-latest
-            arch: x86
+#          - os: ubuntu-latest
+#            arch: x86
+#          - os: macos-latest
+#            arch: x86
 #          - os: macos-latest
 #            arch: arm
 #          - os: ubuntu-latest
