@@ -169,7 +169,7 @@ jobs:
         with:
           name: SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}
           path: ${{ github.workspace }}/src-tauri/sauna-radar
-      - name: Extract Sauna-API
+      - name: Extract Sauna-Radar
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/src-tauri/sauna-radar
