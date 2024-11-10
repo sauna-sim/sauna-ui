@@ -112,7 +112,7 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/sauna-radar
-          cargo build --release
+          cargo build --release --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
       - name: Tar output folder
         shell: pwsh
         run: |
