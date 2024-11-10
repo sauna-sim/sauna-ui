@@ -137,7 +137,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '18.x'
           cache: 'npm'
       - name: Use Stable Rust
         uses: dtolnay/rust-toolchain@stable
@@ -179,6 +179,7 @@ jobs:
       - name: npm install
         run: npm install
       - name: Build and Package
+        shell: pwsh
         run: npm run package -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
       - name: Copy Installers
         if: ${{ inputs.upload-bundle-artifacts }}

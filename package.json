@@ -1,6 +1,6 @@
 {
   "name": "sauna-ui",
-  "version": "0.15.1-test-ci",
+  "version": "0.17.0",
   "description": "User Interface for Sauna ATC Training Simulator.",
   "type": "module",
   "main": "index.js",
