@@ -99,6 +99,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'caspianmerlin/sauna-radar'
+          path: 'sauna-radar'
       - name: Use Stable Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
@@ -126,7 +127,7 @@ jobs:
           
   
   build:
-    needs: build-api
+    needs: [build-api, build-radar]
     runs-on: ${{ inputs.os }}
     env:
       TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
