@@ -116,7 +116,7 @@ jobs:
       - name: Tar output folder
         shell: pwsh
         run: |
-          cd ${{ github.workspace }}/sauna-radar/target/release
+          cd ${{ github.workspace }}/sauna-radar/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}/release
           tar -cvzf ${{ github.workspace }}/SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz radar-viewer*
       - name: Archive binaries
         uses: actions/upload-artifact@v3
