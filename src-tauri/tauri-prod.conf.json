@@ -2,7 +2,8 @@
   "tauri": {
     "bundle": {
       "resources": [
-        "sauna-api/**/*"
+        "sauna-api/**/*",
+        "sauna-radar/**/*"
       ]
     },
     "updater": {

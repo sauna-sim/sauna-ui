@@ -117,6 +117,10 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/sauna-radar/target/release
+          mkdir radar
+          try { Copy-Item -ErrorAction Stop radar-viewer.exe radar/ } catch { continue }
+          try { Copy-Item -ErrorAction Stop radar-viewer radar/ } catch { continue }
+          cd radar
           tar -cvzf ${{ github.workspace }}/SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
       - name: Archive binaries
         uses: actions/upload-artifact@v3
