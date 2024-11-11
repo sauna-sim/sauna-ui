@@ -1,6 +1,6 @@
 [package]
 name = "sauna_sim"
-version = "0.17.3"
+version = "0.17.4"
 description = "Sauna ATC Training Simulator."
 authors = ["Sauna (ATC Training Simulator)"]
 license = "MIT"
@@ -15,6 +15,7 @@ rust-version = "1.60"
 tauri-build = { version = "1.5.0", features = [] }
 
 [dependencies]
+fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.5.2", features = [ "window-close", "window-create", "shell-open", "dialog-all", "path-all", "fs-all"] }

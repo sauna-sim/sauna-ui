@@ -19,6 +19,9 @@ pub struct AppStateWrapper(pub Mutex<AppState>);
 
 
 fn main() {
+    // Env path fix
+    let _ = fix_path_env::fix();
+
     let app = tauri::Builder::default()
         .manage(AppStateWrapper(Mutex::new(AppState::new())))
         .invoke_handler(tauri::generate_handler![extract_zip, store_set, store_get, store_save, download_file, get_sauna_api_builtin, get_sauna_api_conn_details, launch_radar])
