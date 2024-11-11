@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64] #x86, arm, arm64
+        arch: [x64, arm64] #x86, arm
         os: [macos-latest, windows-latest, ubuntu-latest]
         include:
           - os: macos-latest
@@ -31,12 +31,12 @@ jobs:
             rust-arch: x86_64
 #          - arch: arm
 #            rust-arch: armv7
-#          - arch: arm64
-#            rust-arch: aarch64
+          - arch: arm64
+            rust-arch: aarch64
 #          - os: ubuntu-latest
 #            arch: arm
 #            rust-target-suffix: eabihf
-#        exclude:
+        exclude:
 #          - os: windows-latest
 #            arch: arm
 #          - os: ubuntu-latest
@@ -45,8 +45,10 @@ jobs:
 #            arch: x86
 #          - os: macos-latest
 #            arch: arm
-#          - os: ubuntu-latest
-#            arch: arm64
+          - os: windows-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: arm64
     uses: ./.github/workflows/reusable-tauri.yml
     with:
       arch: ${{ matrix.arch }}
