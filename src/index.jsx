@@ -5,6 +5,7 @@ import MainApp from "./pages/main";
 import {store} from "./redux/store";
 import {Provider} from "react-redux";
 import {HashRouter, Route, Routes} from "react-router-dom";
+import { MapPage } from './pages/map/map';
 
 // React DOM Render
 const root = createRoot(document.getElementById('root'));
@@ -13,6 +14,7 @@ root.render(
         <HashRouter>
             <Routes>
                 <Route path="/" element={<MainApp />}/>
+                <Route path="/map" element={<MapPage />} />
             </Routes>
         </HashRouter>
     </Provider>

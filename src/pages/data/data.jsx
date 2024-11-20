@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
 import { launchRadar } from "../../actions/radar_actions";
+import { createMapWindow } from "../../actions/tauri_actions";
 
 export class DataPage extends Component {
     constructor(props) {
@@ -15,6 +16,10 @@ export class DataPage extends Component {
     }
 
     openMapPage = async () => {
+        await createMapWindow();
+    }
+    
+    openRadar = async () => {
         await launchRadar();
     }
 
@@ -52,6 +57,11 @@ export class DataPage extends Component {
                 Open Map Window
             </Tooltip>
         )
+        const renderRadarTooltip = (props) => (
+            <Tooltip id="radar-button-tooltip" {...props}>
+                Open Radar Window
+            </Tooltip>
+        )
 
         return (
             <>
@@ -62,7 +72,15 @@ export class DataPage extends Component {
                         overlay={renderMapTooltip}
                     >
                         <Button variant={"secondary"} onClick={this.openMapPage}
-                        ><FontAwesomeIcon icon={faMap}/></Button>
+                        ><FontAwesomeIcon icon={faMap}/> Map</Button>
+                    </OverlayTrigger>{' '}
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderRadarTooltip}
+                    >
+                        <Button variant={"secondary"} onClick={this.openRadar}
+                        ><FontAwesomeIcon icon={faMap}/> Radar</Button>
                     </OverlayTrigger>{' '}
                     <ButtonGroup>
                         <NavigraphAuthButton/>
