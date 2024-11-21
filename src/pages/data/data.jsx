@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
 import { launchRadar } from "../../actions/radar_actions";
+import { createSaunaScenarioMakerWindow } from "../../actions/tauri_actions";
 
 export class DataPage extends Component {
     constructor(props) {
@@ -52,10 +53,23 @@ export class DataPage extends Component {
                 Open Map Window
             </Tooltip>
         )
+        const renderSaunaTooltip = (props) => (
+            <Tooltip id="sauna-button-tooltip" {...props}>
+                Open Sauna Scenario Maker
+            </Tooltip>
+        );        
 
         return (
             <>
-                <div className={"mb-2 float-end"}>
+                <div className={"mb-2 float-end"}>                                        
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderSaunaTooltip}
+                    >
+                        <Button variant={"primary"} onClick={createSaunaScenarioMakerWindow}
+                        >Scenario Maker</Button>
+                    </OverlayTrigger>{' '}
                     <OverlayTrigger
                         placement="bottom"
                         delay={{show: 250, hide: 400}}
@@ -75,10 +89,12 @@ export class DataPage extends Component {
                     >
                         <Button variant={"primary"} onClick={this.chooseEsFile}
                         ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
-                    </OverlayTrigger>{' '}
+                    </OverlayTrigger>{' '}                    
                     <SettingsModal/>
                 </div>
             </>
         )
     }
 }
+
+//Implement on click

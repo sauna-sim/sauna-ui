@@ -6,6 +6,20 @@ import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
 
+//Create new window method tauri
+export async function createSaunaScenarioMakerWindow() {
+    new WebviewWindow("createStripWindowLabel", {
+        url: "#sauna_scenario_maker",
+        fullscreen: false,
+        height: 600,
+        resizable: false,
+        title: "Create Scenario Window",
+        width: 1000,
+        minimizable: false,
+        maximized: false,
+    });
+}
+
 // Register window close event for main window
 const webview = new WebviewWindow("main");
 webview.once("tauri://close-requested", async function (e) {
