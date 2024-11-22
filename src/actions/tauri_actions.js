@@ -12,10 +12,10 @@ export async function createSaunaScenarioMakerWindow() {
         url: "#sauna_scenario_maker",
         fullscreen: false,
         height: 600,
-        resizable: false,
+        resizable: true,
         title: "Create Scenario Window",
         width: 1000,
-        minimizable: false,
+        minimizable: true,
         maximized: false,
     });
 }
