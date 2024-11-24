@@ -3,7 +3,7 @@ import { Formik, getIn } from 'formik';
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
 
-export default function AircraftListModal({ onClose, onAircraftAdd }) {
+export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft }) {
     
     const formSchema = Yup.object().shape({
         callsign: Yup.string()
@@ -44,10 +44,8 @@ export default function AircraftListModal({ onClose, onAircraftAdd }) {
 
     })
     
-    const onSubmit = async (values) => {
-        console.log(values)
-        onAircraftAdd(values)
-        
+    const onSubmit = async (values) => {        
+        onAircraftSubmit(values)
         onClose();
     };
 
@@ -64,27 +62,27 @@ export default function AircraftListModal({ onClose, onAircraftAdd }) {
             centered 
         >
             <Modal.Header closeButton>
-                <Modal.Title>Add Aircraft</Modal.Title>
+                <Modal.Title>{aircraft ? "Edit Aircraft" : "Add Aircraft"}</Modal.Title>
             </Modal.Header>
             <Formik 
                 initialValues={{
-                    callsign: "",
+                    callsign: aircraft?.callsign || "",
                     pos: {
-                        lat: "",
-                        lon: "",
+                        lat: aircraft?.pos.lat || "",
+                        lon: aircraft?.pos.lon || "",
                     },
-                    alt: "",
-                    acftType: "",
-                    squawk: "",
-                    dep: "", 
-                    arr: "",
+                    alt: aircraft?.alt || "",
+                    acftType: aircraft?.acftType || "",
+                    squawk: aircraft?.squawk || "",
+                    dep: aircraft?.dep || "",
+                    arr: aircraft?.arr || "",
                     fp: {
-                        route: "",
-                        fpalt: "",
-                        tas: "",
-                        flightRules: "I",
+                        route: aircraft?.fp.route || "",
+                        fpalt: aircraft?.fp.fpalt || "",
+                        tas: aircraft?.fp.tas || "",
+                        flightRules: aircraft?.fp.flightRules || "I",
                     },
-                }}             
+                }}            
                 validationSchema={formSchema}                   
                 onSubmit={onSubmit}
                 >                
