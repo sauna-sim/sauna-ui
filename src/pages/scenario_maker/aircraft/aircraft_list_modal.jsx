@@ -1,9 +1,9 @@
 import React from "react";
-import { Formik } from 'formik';
+import { Formik, getIn } from 'formik';
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
 
-export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) {
+export default function AircraftListModal({ onClose, onAircraftAdd }) {
     
     const formSchema = Yup.object().shape({
         callsign: Yup.string()
@@ -21,13 +21,12 @@ export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) 
         }),
         alt: Yup.number()
             .required("Altitude is required")
-            .min(0, "The altitude has to be atleast 0")
             .max(99999, "The altitude cannot exceed 99,999ft"),
         squawk: Yup.string()
             .required("Squawk required")
-            .matches(/^[0-7][0-7][0-7][0-7]$/, "Squawk must be between 0000-7777"),
-        dest: Yup.string()
-            .required("Destination airport is required")
+            .matches(/^[0-7]{4}$/, "Squawk must be between 0000-7777"),
+        dep: Yup.string()
+            .required("Departure airport is required")
             .matches(/^[a-zA-Z0-9]{3,4}$/, "Alphanumeric characters only!"),
         arr: Yup.string()
         .required("Destination airport is required")
@@ -35,7 +34,7 @@ export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) 
         fp: Yup.object().shape({
             route: Yup.string()
                 .required("Flight Plan route is required"),
-            alt: Yup.number()
+            fpalt: Yup.number()
             .required("Altitude is required")
             .min(0, "The altitude has to be atleast 0")
             .max(99999, "The altitude cannot exceed 99,999ft"),
@@ -45,30 +44,19 @@ export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) 
 
     })
     
-    const handleSubmit = async (values) => {        
-        const newAircraft = {
-          callsign: values.callsign,
-          pos: {
-            lat: values.pos.lat,
-            lon: values.pos.lon,
-          },
-          alt: values.alt,
-          acftType: values.acftType,
-          squawk: values.squawk,
-          dest: values.dest,
-          arr: values.arr,
-          fp: {
-            route: values.fp.route,
-            alt: values.fp.alt,
-            tas: values.fp.tas,
-            flightRules: values.fp.flightRules,
-          },
-        };
-            
-        setAircrafts((prevAircrafts) => [...prevAircrafts, newAircraft]);
-            
+    const onSubmit = async (values) => {
+        console.log(values)
+        onAircraftAdd(values)
+        
         onClose();
-      };
+    };
+
+    const handleChangeUpperCase = (handleChangeFunction) => {
+        return (e) => {
+            e.target.value = e.target.value.toUpperCase()
+            handleChangeFunction(e)
+        }         
+    }
     return (
         <Modal 
             show onHide={onClose} 
@@ -88,17 +76,17 @@ export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) 
                     alt: "",
                     acftType: "",
                     squawk: "",
-                    dest: "", 
+                    dep: "", 
                     arr: "",
                     fp: {
                         route: "",
-                        alt: "",
+                        fpalt: "",
                         tas: "",
-                        flightRules: "",
+                        flightRules: "I",
                     },
-                }}                
-                validationSchema={formSchema}
-                onSubmit={handleSubmit}
+                }}             
+                validationSchema={formSchema}                   
+                onSubmit={onSubmit}
                 >                
                 {({
                     values,
@@ -109,22 +97,203 @@ export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) 
                     handleSubmit,
                 }) => (
                     <Form onSubmit={handleSubmit}>
-                        <Modal.Body>
-                            <h5>Aircraft Settings</h5>
+                        <Modal.Body>                            
                             <Row className="mb-3">
                                 <Col sm={6}>
                                     <Form.Label>Callsign</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
                                             name="callsign"
-                                            type="string"
-                                            value={values.callsign}
-                                            onChange={handleChange}
+                                            value={values.callsign}                                            
+                                            onChange={handleChangeUpperCase(handleChange)}
                                             onBlur={handleBlur}
                                             isInvalid={touched.callsign && !!errors.callsign}
                                         />
                                         <Form.Control.Feedback type="invalid">
                                             {errors.callsign}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                                <Col sm={6}>
+                                    <Form.Label>Aircraft Type</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="acftType"
+                                            value={values.acftType}
+                                            onChange={handleChangeUpperCase(handleChange)}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "acftType") && getIn(errors, "acftType")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "acftType")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="mb-3">
+                                <Col sm={6}>
+                                    <Form.Label>Latitude</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="pos.lat"
+                                            type="number"
+                                            value={values.pos.lat}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "pos.lat") && getIn(errors, "pos.lat")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "pos.lat")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                                <Col sm={6}>
+                                    <Form.Label>Latitude</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="pos.lon"
+                                            type="number"
+                                            value={values.pos.lon}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "pos.lon") && getIn(errors, "pos.lon")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "pos.lon")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="mb-3">
+                                <Col sm={6}>
+                                    <Form.Label>Altitude</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="alt"
+                                            type="number"
+                                            value={values.alt}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "alt") && getIn(errors, "alt")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "alt")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                                <Col sm={6}>
+                                    <Form.Label>Squawk</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="squawk"
+                                            value={values.squawk}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "squawk") && getIn(errors, "squawk")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "squawk")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="mb-3">
+                                <Col sm={6}>
+                                    <Form.Label>Departure</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="dep"
+                                            value={values.dep}
+                                            onChange={handleChangeUpperCase(handleChange)}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "dep") && getIn(errors, "dep")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "dep")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                                <Col sm={6}>
+                                    <Form.Label>Arrival</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="arr"
+                                            value={values.arr}
+                                            onChange={handleChangeUpperCase(handleChange)}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "arr") && getIn(errors, "arr")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "arr")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="mb-3">
+                                <Col>
+                                    <Form.Label>Flight Plan Route</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="fp.route"
+                                            value={values.fp.route}
+                                            onChange={handleChangeUpperCase(handleChange)}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "fp.route") && getIn(errors, "fp.route")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "fp.route")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="mb-3">
+                                <Col sm={4}>
+                                    <Form.Label>Cruise Altitude</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="fp.fpalt"
+                                            type="number"
+                                            value={values.fp.fpalt}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "fp.fpalt") && getIn(errors, "fp.fpalt")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "fp.fpalt")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                                <Col sm={4}>
+                                    <Form.Label>Cruise Speed</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Control
+                                            name="fp.tas"
+                                            type="number"
+                                            value={values.fp.tas}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "fp.tas") && getIn(errors, "fp.tas")}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "fp.tas")}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                                <Col sm={4}>
+                                    <Form.Label>Flight Rules</Form.Label>
+                                    <InputGroup hasValidation>
+                                        <Form.Select
+                                            name="fp.flightRules"
+                                            value={values.fp.flightRules}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={getIn(touched, "fp.flightRules") && getIn(errors, "fp.flightRules")}
+                                        >
+                                            <option value="I">IFR</option>
+                                            <option value="V">VFR</option>
+                                        </Form.Select>
+                                        <Form.Control.Feedback type="invalid">
+                                            {getIn(errors, "fp.flightRules")}
                                         </Form.Control.Feedback>
                                     </InputGroup>
                                 </Col>
@@ -134,16 +303,13 @@ export default function AircraftListModal({ onClose, aircrafts, setAircrafts }) 
                             <Button variant="secondary" onClick={onClose}>
                                 Close
                             </Button>
-                            <Button variant="primary" onClick={() => {
-                                // Logic for saving changes
-                                onClose();
-                            }}>
+                            <Button variant="primary" type="submit">
                                 Save Changes
                             </Button>
                         </Modal.Footer>
                     </Form>
-                )}                                                
-            </Formik>            
+                )}
+            </Formik>
         </Modal>
     );
 }

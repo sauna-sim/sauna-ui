@@ -7,6 +7,10 @@ import AircraftListModal from './aircraft_list_modal';
 export default function AircraftList({aircrafts, setAircrafts}) {
     const [showModal, setShowModal] = React.useState(false);
 
+    const onAircraftAdd = (aircraft) => {        
+        aircrafts.push(aircraft)        
+        setAircrafts(aircrafts)
+    }
     return (
         <div>
             <Button variant="secondary" onClick={() => setShowModal(true)}>
@@ -15,8 +19,7 @@ export default function AircraftList({aircrafts, setAircrafts}) {
             {showModal && (
                 <AircraftListModal
                     onClose={() => setShowModal(false)}
-                    aircrafts={aircrafts}
-                    setAircrafts={setAircrafts}
+                    onAircraftAdd = {onAircraftAdd}
                 />
             )}
                 
@@ -29,7 +32,7 @@ export default function AircraftList({aircrafts, setAircrafts}) {
                         <th>Altitude</th>
                         <th>Aircraft Type</th>
                         <th>Squawk</th>
-                        <th>Dest</th>
+                        <th>Dep</th>
                         <th>Arr</th>
                         <th>Route</th>
                         <th>Crz Alt</th>
@@ -46,10 +49,10 @@ export default function AircraftList({aircrafts, setAircrafts}) {
                             <td>{aircraft.alt}</td>
                             <td>{aircraft.acftType}</td>
                             <td>{aircraft.squawk}</td>
-                            <td>{aircraft.dest}</td>
+                            <td>{aircraft.dep}</td>
                             <td>{aircraft.arr}</td>
                             <td>{aircraft.fp.route}</td>
-                            <td>{aircraft.fp.alt}</td>
+                            <td>{aircraft.fp.fpalt}</td>
                             <td>{aircraft.fp.tas}</td>
                             <td>{aircraft.fp.flightRules}</td>
                         </tr>
