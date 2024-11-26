@@ -57,11 +57,11 @@ export class DataPage extends Component {
             <Tooltip id="sauna-button-tooltip" {...props}>
                 Open Sauna Scenario Maker
             </Tooltip>
-        );        
+        );
 
         return (
             <>
-                <div className={"mb-2 float-end"}>                                        
+                <div className={"mb-2 float-end"}>
                     <OverlayTrigger
                         placement="bottom"
                         delay={{show: 250, hide: 400}}
@@ -89,7 +89,7 @@ export class DataPage extends Component {
                     >
                         <Button variant={"primary"} onClick={this.chooseEsFile}
                         ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
-                    </OverlayTrigger>{' '}                    
+                    </OverlayTrigger>{' '}
                     <SettingsModal/>
                 </div>
             </>

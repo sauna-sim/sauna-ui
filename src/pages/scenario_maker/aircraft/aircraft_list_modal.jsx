@@ -2,13 +2,20 @@ import React from "react";
 import { Formik, getIn } from 'formik';
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
+import { aircraftSlice } from "../../../redux/slices/aircraftSlice";
 
-export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft }) {
-    
+export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft, aircrafts }) {
+
     const formSchema = Yup.object().shape({
         callsign: Yup.string()
             .required("Callsign is Required")
-            .matches(/^[a-zA-Z0-9]+$/, "Alphanumeric characters only!"),
+            .matches(/^[a-zA-Z0-9]+$/, "Alphanumeric characters only!")
+            .test("unique-callsign", "Callsign already exists!", function (value) {
+                const existingCallsigns = aircrafts
+                    .filter(a => a.callsign !== aircraft?.callsign)
+                    .map(a => a.callsign.toUpperCase());
+                return !existingCallsigns.includes(value?.toUpperCase());
+            }),
         pos: Yup.object().shape({
             lat: Yup.number()
                 .required("Latitude is required")
@@ -43,8 +50,8 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft 
         })
 
     })
-    
-    const onSubmit = async (values) => {        
+
+    const onSubmit = async (values) => {
         onAircraftSubmit(values)
         onClose();
     };
@@ -53,18 +60,18 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft 
         return (e) => {
             e.target.value = e.target.value.toUpperCase()
             handleChangeFunction(e)
-        }         
+        }
     }
     return (
-        <Modal 
-            show onHide={onClose} 
+        <Modal
+            show onHide={onClose}
             backdrop="static"
-            centered 
+            centered
         >
             <Modal.Header closeButton>
                 <Modal.Title>{aircraft ? "Edit Aircraft" : "Add Aircraft"}</Modal.Title>
             </Modal.Header>
-            <Formik 
+            <Formik
                 initialValues={{
                     callsign: aircraft?.callsign || "",
                     pos: {
@@ -82,10 +89,10 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft 
                         tas: aircraft?.fp.tas || "",
                         flightRules: aircraft?.fp.flightRules || "I",
                     },
-                }}            
-                validationSchema={formSchema}                   
+                }}
+                validationSchema={formSchema}
                 onSubmit={onSubmit}
-                >                
+                >
                 {({
                     values,
                     errors,
@@ -95,14 +102,14 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft 
                     handleSubmit,
                 }) => (
                     <Form onSubmit={handleSubmit}>
-                        <Modal.Body>                            
+                        <Modal.Body>
                             <Row className="mb-3">
                                 <Col sm={6}>
                                     <Form.Label>Callsign</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
                                             name="callsign"
-                                            value={values.callsign}                                            
+                                            value={values.callsign}
                                             onChange={handleChangeUpperCase(handleChange)}
                                             onBlur={handleBlur}
                                             isInvalid={touched.callsign && !!errors.callsign}

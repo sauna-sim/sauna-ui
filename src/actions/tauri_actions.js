@@ -6,6 +6,35 @@ import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
 
+import {open, save} from "@tauri-apps/api/dialog";
+import { writeTextFile } from "@tauri-apps/api/fs";
+
+export async function saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts}) {
+    try{
+        if(fileHandle) {
+            console.log(`File saved to: ${fileHandle}`);
+            await writeTextFile(fileHandle, JSON.stringify(aircrafts, null, 2));
+        }
+        else {
+            const filePath = await save({
+                title: "Save Aircraft Scenario File",
+                defaultPath: "aircraft_scenario.json"
+            });
+
+            if(filePath) {
+                setFileHandle(filePath);
+                await writeTextFile(filePath, JSON.stringify(aircrafts, null, 2));
+                console.log(`File saved to: ${filePath}`);
+            }
+            else {
+                console.log("Save operation was canceled");
+            }
+        }
+    } catch (error) {
+        console.error("Error saving file: ", error);
+    }
+}
+
 //Create new window method tauri
 export async function createSaunaScenarioMakerWindow() {
     new WebviewWindow("createStripWindowLabel", {

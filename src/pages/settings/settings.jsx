@@ -27,7 +27,7 @@ export class SettingsModal extends Component {
         }
     }
 
-    
+
 
     open = async () => {
         this.setState({
@@ -292,7 +292,7 @@ export class SettingsModal extends Component {
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                 />
-                                                
+
                                             </InputGroup>
                                     </Row>
                                     <Row className="mb-3">
@@ -307,7 +307,7 @@ export class SettingsModal extends Component {
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                 />
-                                                
+
                                             </InputGroup>
                                     </Row>
 
@@ -367,7 +367,7 @@ export class SettingsModal extends Component {
                                         </Col>
 
 
-                                        
+
                                     </Row>
                                 </Modal.Body>
                                 <Modal.Footer>
