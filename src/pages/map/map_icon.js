@@ -36,8 +36,6 @@ export const makeIcon = (iconDef, color, size = 1) => {
     canvas.width = 256;
     canvas.height = 256;
 
-    console.log("color", color);
-    console.log("iconDef")
     const ctx = canvas.getContext('2d');
 
     if (size < 0.1) {

@@ -32,8 +32,6 @@ const getMapFeatures = (scopePackage, facility, display) => {
                         new_feature.properties.defaultColor = getColor(defaults.color);
                         new_feature.properties.defaultLineWidth = defaults.line_weight >= 1 ? defaults.line_weight : 1;
                         new_feature.properties.defaultLineStyle = defaults.line_style;
-                    } else {
-                        console.log("a", smap.map_type);
                     }
                     features.push(new_feature);
                 }
