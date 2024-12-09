@@ -33,15 +33,6 @@ export async function saveApiSettings(apiSettings){
     await setStoreItem("settings.apiSettings", apiSettings);
 }
 
-export async function getRadarSettings(){
-    return await getStoreItem("settings.radarSettings");
-}
-
-export async function saveRadarSettings(radarSettings){
-    console.log(radarSettings);
-    await setStoreItem("settings.radarSettings", radarSettings);
-}
-
 export async function getFsdSettings(){
     return await getStoreItem("settings.fsdConnection");
 }

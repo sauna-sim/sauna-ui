@@ -12,7 +12,7 @@ export const MapLibre = ({features = []}) => {
     const zoom = 2;
     const [center, setCenter] = useState({lat: 0, lon: 0});
     const [aircrafts, setAircrafts] = useState([]);
-    let oldIcons = [];
+    const [oldIcons, setOldIcons] = useState([]);
 
     const mapStyle = {
         version: 8,
@@ -310,7 +310,7 @@ export const MapLibre = ({features = []}) => {
                 map.current.addImage(icon.id, icon);
             }
 
-            oldIcons = newIconIds;
+            setOldIcons(newIconIds);
 
             console.log(features);
         }

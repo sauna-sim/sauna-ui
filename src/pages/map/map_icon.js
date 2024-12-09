@@ -13,7 +13,6 @@ function cropImageFromCanvas(ctx, threshold = 0) {
         for (let x = 0; x < w; x++) {
             const index = (y * w + x) * 4;
             if (imageData.data[index+3] > threshold) {
-                console.log(imageData.data)
                 tlCorner.x = Math.min(x, tlCorner.x);
                 tlCorner.y = Math.min(y, tlCorner.y);
                 brCorner.x = Math.max(x, brCorner.x);
