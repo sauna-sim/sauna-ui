@@ -16,8 +16,7 @@ export const MapLibre = ({features = []}) => {
 
     const mapStyle = {
         version: 8,
-        sources: {
-        },
+        sources: {},
         glyphs: "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
         layers: [
             {
@@ -108,14 +107,14 @@ export const MapLibre = ({features = []}) => {
                     },
                 };
 
-                if (value[1]){
+                if (value[1]) {
                     layer.paint['line-dasharray'] = ["literal", value[1]];
                 }
 
-                if (i === 0){
+                if (i === 0) {
                     layer.filter = ['all', ['==', '$type', 'LineString'], ['any', ['!has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]]
                 } else {
-                    layer.filter = ['all', ['==', '$type', 'LineString'], ['has', 'defaultLineStyle'],  ['==', 'defaultLineStyle', value[0]]]
+                    layer.filter = ['all', ['==', '$type', 'LineString'], ['has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]
                 }
                 map.current.addLayer(layer);
             }
@@ -126,7 +125,7 @@ export const MapLibre = ({features = []}) => {
             const data = new Uint8Array(width * width * bytesPerPixel);
 
             for (let x = 0; x < width; x++) {
-                for (let y = 0; y < width; y++){
+                for (let y = 0; y < width; y++) {
                     const offset = (y * width + x) * bytesPerPixel;
                     data[offset + 0] = 255;
                     data[offset + 1] = 255;
@@ -142,22 +141,25 @@ export const MapLibre = ({features = []}) => {
                 'type': 'symbol',
                 'source': 'scope-package',
                 'layout': {
-                    'icon-image': ["coalesce",
-                        ["image", ["concat",
-                            ["get", "icon"],
-                            "-",
-                            ["coalesce", ["get", "size"], ["get", "defaultSize"], 1],
-                            "-",
-                            ["coalesce", ["get", "color"], ["get", "defaultColor"], "#ffffff"]
-                        ]],
-                        ["image", "temp-icon"]
+                    'icon-image': ['case', ['boolean', ["all", ["has", "showSymbol"], ['get', 'showSymbol']], true],
+                        ["coalesce",
+                            ["image", ["concat",
+                                ["get", "icon"],
+                                "-",
+                                ["coalesce", ["get", "size"], ["get", "defaultSize"], 1],
+                                "-",
+                                ["coalesce", ["get", "color"], ["get", "defaultColor"], "#ffffff"]
+                            ]],
+                            ["image", "temp-icon"]
+                        ],
+                        ""
                     ],
                     'icon-overlap': 'always',
                     'icon-ignore-placement': true,
                     'text-font': [
                         'Open Sans Semibold',
                     ],
-                    'text-field': ['case', ["boolean", ['get', 'showText'], true], ['get', 'text'], ""],
+                    'text-field': ['case', ["boolean", ["all", ["has", "showText"], ['get', 'showText']], true], ['get', 'text'], ""],
                     'text-size': ['+', 10, ['coalesce', ['get', 'textSize'], 0]],
                     'text-justify': 'auto',
                     'text-overlap': 'always',
@@ -294,18 +296,18 @@ export const MapLibre = ({features = []}) => {
     }, [aircrafts]);
 
     useEffect(() => {
-        if (map.current && map.current.getSource('scope-package')){
+        if (map.current && map.current.getSource('scope-package')) {
             map.current.getSource('scope-package').setData({
                 'type': 'FeatureCollection',
                 'features': features.features
             });
 
-            for (const icon of oldIcons){
+            for (const icon of oldIcons) {
                 map.current.removeImage(icon);
             }
 
             let newIconIds = [];
-            for (const icon of features.icons){
+            for (const icon of features.icons) {
                 newIconIds.push(icon.id);
                 map.current.addImage(icon.id, icon);
             }
