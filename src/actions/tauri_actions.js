@@ -41,6 +41,12 @@ export async function downloadFileFromUrl(url, location){
     });
 }
 
+export async function readTextFileLines(fileName) {
+    return await invoke('read_text_file', {
+        fileName: fileName
+    });
+}
+
 export async function extractZipFile(zipfile, dir){
     // Invoke Rust command
     return await invoke('extract_zip', {

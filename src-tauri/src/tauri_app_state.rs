@@ -24,7 +24,7 @@ impl AppState {
     pub fn new() -> AppState {
         AppState{
             api_hostname: "localhost".into(),
-            api_port: 5000,
+            api_port: 5052,
             api_builtin: true,
             api_process: ChildGuard(None),
             radar_process: ChildGuard(None),
