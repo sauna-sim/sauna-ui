@@ -1,22 +1,58 @@
 import React, {useEffect, useState} from "react";
 import {MapLibre} from "./map_libre";
-import {Button, Form} from "react-bootstrap";
-import { open } from '@tauri-apps/api/dialog';
+import {Button, DropdownButton, Form} from "react-bootstrap";
+import {open} from '@tauri-apps/api/dialog';
 import {readTextFileLines} from "../../actions/tauri_actions.js";
 import {getColor, makeIcon} from "./map_icon.js";
+import DropdownItem from "react-bootstrap/DropdownItem";
+import DropdownTreeSelect from "react-dropdown-tree-select";
+import 'react-dropdown-tree-select/dist/styles.css'
 
-const getMapFeatures = (scopePackage, facility, display) => {
-    if (!scopePackage){
+const getCurDisplay = (scopePackage, facilityIndex, displayIndex) => {
+    console.log(scopePackage, facilityIndex, displayIndex);
+    let cur_facility, display;
+    let name = "No Display Loaded";
+    if (scopePackage) {
+        const facility_split = facilityIndex.split(".");
+        name = "";
+
+        if (facility_split.length > 0) {
+            cur_facility = scopePackage.facilities[facility_split[0]];
+
+            for (let i = 1; i < facility_split.length; i++) {
+                if (!cur_facility.child_facilities || !cur_facility.child_facilities[facility_split[i]]) {
+                    cur_facility = null;
+                    name = "";
+                    break;
+                }
+                cur_facility = cur_facility.child_facilities[facility_split[i]];
+                name += cur_facility.name + " -> ";
+            }
+
+            if (cur_facility) {
+                display = cur_facility.displays[displayIndex];
+
+                if (display) {
+                    name += display.name;
+                }
+            }
+        }
+    }
+
+    return {
+        facility: cur_facility,
+        display: display,
+        fullName: name,
+        mapData: getMapFeatures(scopePackage, display)
+    };
+}
+
+const getMapFeatures = (scopePackage, cur_display) => {
+    if (!scopePackage || !cur_display) {
         return {features: [], icons: []};
     }
     let features = [];
     let icons = new Map();
-
-    const cur_display = scopePackage.facilities[facility].displays[display];
-
-    if (!cur_display){
-        return {features: [], icons: []};
-    }
 
     const display_type = scopePackage.display_types[cur_display.display_type];
 
@@ -31,7 +67,7 @@ const getMapFeatures = (scopePackage, facility, display) => {
     }
 
     for (const item of cur_display.display_items) {
-        if (item.Map){
+        if (item.Map) {
             const smap = scopePackage.maps[item.Map.id];
             if (smap) {
                 for (const feature of smap.features.features) {
@@ -76,11 +112,11 @@ const getMapFeatures = (scopePackage, facility, display) => {
                     }
                 }
 
-                if (!size){
+                if (!size) {
                     size = 1;
                 }
 
-                if (!color){
+                if (!color) {
                     color = "#ffffff"
                 }
                 features.push(symbol.feature);
@@ -102,11 +138,32 @@ const getMapFeatures = (scopePackage, facility, display) => {
     };
 }
 
+const getFacilityDropdownData = (facilityId, facility, pathString, selectedPath) => {
+    return {
+        label: facility.name,
+        value: pathString,
+        checked: pathString === selectedPath,
+        children: facility.child_facilities.map((child, index) => getFacilityDropdownData(index, child, `${pathString}.${index}`, selectedPath))
+    }
+}
+
+const getFacilitiesDropDownData = (scopePackage, facilityIndex) => {
+    return {
+        label: "Select Facility",
+        value: "null",
+        expanded: true,
+        children: scopePackage ? scopePackage.facilities.map((child, index) => getFacilityDropdownData(index, child, `${index}`, facilityIndex)) : []
+    }
+}
+
 export const MapPage = () => {
     const [scopePackage, setScopePackage] = useState();
-    const [facility, setFacility] = useState("0");
-    const [display, setDisplay] = useState(0);
-    const [mapFeatures, setMapFeatures] = useState({features: [], icons: []});
+    const [facilityIndex, setFacilityIndex] = useState("0");
+    const [displayIndex, setDisplayIndex] = useState(0);
+    const [curDisplay, setCurDisplay] = useState({data: {features: [], icons: []}});
+    const [facilityDropDownData, setFacilityDropDownData] = useState({});
+    const [mapCenter, setMapCenter] = useState({lat: 0, lon: 0});
+    const [mapZoom, setMapZoom] = useState(100000);
 
     const onLoadEsPrf = async () => {
         const selected = await open({
@@ -118,25 +175,42 @@ export const MapPage = () => {
             }],
         });
 
-        if (selected){
+        if (selected) {
             console.log("selected prf", selected);
             const fileLines = await readTextFileLines(selected);
             let jsonStr = "";
-            for (const line of fileLines){
+            for (const line of fileLines) {
                 jsonStr += line + "\n";
             }
             const json = JSON.parse(jsonStr);
-            setScopePackage(json);
             console.log(json);
-            setFacility("0");
-            setDisplay(0);
+            setScopePackage(json);
+            setFacilityIndex("0");
+            setDisplayIndex(0);
+        }
+    }
+
+    const onFacilityDropdownChange = (curNode, selNodes) => {
+        console.log(curNode, selNodes);
+        if (selNodes && selNodes[0]){
+            setFacilityIndex(selNodes[0].value);
+            setDisplayIndex(0);
         }
     }
 
     useEffect(() => {
-        setMapFeatures(getMapFeatures(scopePackage, facility, display));
-    }, [scopePackage, facility, display]);
+        setCurDisplay(getCurDisplay(scopePackage, facilityIndex, displayIndex));
+        setFacilityDropDownData(getFacilitiesDropDownData(scopePackage, facilityIndex));
+    }, [scopePackage, facilityIndex, displayIndex]);
 
+    useEffect(() => {
+        if (curDisplay && curDisplay.display && curDisplay.display.center) {
+            setMapCenter(curDisplay.display.center);
+            setMapZoom(curDisplay.display.screen_height);
+        }
+    }, [curDisplay])
+
+    console.log(curDisplay);
     return (
         <>
             <div style={{
@@ -145,18 +219,26 @@ export const MapPage = () => {
                 height: "100vh",
                 width: "100vw"
             }}>
-                <div>
-                    <h2>Map</h2>
-                    <Button variant="primary" onClick={onLoadEsPrf}>Load ES PRF</Button>
+                <div className="m-2"
+                     style={{
+                         display: "flex",
+                         flexDirection: "row"
+                     }}>
+                    <h4 style={{flexGrow: "1"}}>{curDisplay.fullName}</h4>
                     {scopePackage &&
-                    <Form.Select onChange={(e) => setDisplay(e.target.value)} value={display}>
-                        {Object.entries(scopePackage.facilities[facility].displays).map(([key, disp]) =>
-                            <option value={key} key={key}>{disp.name}</option>)}
-                    </Form.Select>
+                        <DropdownTreeSelect data={facilityDropDownData} mode="radioSelect" onChange={onFacilityDropdownChange}/>
                     }
+                    {scopePackage && curDisplay && curDisplay.facility &&
+                        <DropdownButton title="Select Display" variant="secondary" onSelect={(eventKey) => setDisplayIndex(eventKey)}>
+                            {curDisplay.facility.displays.map((disp, key) => {
+                                return <DropdownItem key={key} eventKey={key}>{disp.name}</DropdownItem>
+                            })}
+                        </DropdownButton>
+                    }
+                    <Button variant="primary" onClick={onLoadEsPrf}>Load ES PRF</Button>
                 </div>
                 <div style={{flexGrow: "1"}}>
-                    <MapLibre features={mapFeatures}/>
+                    <MapLibre features={curDisplay.mapData} zoom={mapZoom} center={mapCenter}/>
                 </div>
             </div>
         </>

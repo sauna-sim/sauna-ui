@@ -2,15 +2,13 @@ import React, {useEffect, useRef, useState} from "react";
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {getAircraftList} from "../../actions/aircraft_actions";
-import {wait} from "../../actions/utilities";
+import * as turf from "@turf/turf";
 import TargetMarkerPng from "../../assets/images/TargetMarker.png";
 
-export const MapLibre = ({features = []}) => {
+export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 100000}) => {
     const mapContainer = useRef(null);
     const map = useRef(null);
     const aircraftPoll = useRef(null);
-    const zoom = 2;
-    const [center, setCenter] = useState({lat: 0, lon: 0});
     const [aircrafts, setAircrafts] = useState([]);
     const [oldIcons, setOldIcons] = useState([]);
 
@@ -31,13 +29,13 @@ export const MapLibre = ({features = []}) => {
     }
 
     useEffect(() => {
+        console.log("Map Init")
         if (map.current) return; // stops map from initializing more than once
 
-        console.log(maplibregl.getWorkerUrl());
         map.current = new maplibregl.Map({
             container: mapContainer.current,
-            center: [center.lon, center.lat],
-            zoom: zoom,
+            center: [0, 0],
+            zoom: 2,
             style: mapStyle,
             maxPitch: 85
         });
@@ -244,20 +242,13 @@ export const MapLibre = ({features = []}) => {
         });
 
         return () => map.current = null;
-    }, [center, zoom]);
+    }, []);
 
     useEffect(() => {
         const pollFunc = async () => {
             aircraftPoll.current = setInterval(async () => {
                 try {
                     const aircraftList = await getAircraftList(true);
-
-                    if (center.lat === 0 && center.lon === 0 && aircraftList.length > 0) {
-                        setCenter({
-                            lat: aircraftList[0].position.latitude.degrees,
-                            lon: aircraftList[0].position.longitude.degrees
-                        });
-                    }
 
                     setAircrafts(aircraftList);
                 } catch (e) {
@@ -266,13 +257,14 @@ export const MapLibre = ({features = []}) => {
             }, 1000)
         };
 
+        console.log("Aircraft Poll Start");
         pollFunc();
 
         return () => clearInterval(aircraftPoll.current);
-    }, [center, setCenter, setAircrafts]);
+    }, []);
 
     useEffect(() => {
-        //console.log(aircrafts);
+        console.log("Aircraft Update")
         const acftPoints = aircrafts.map((acft) => {
             return {
                 'type': 'Feature',
@@ -296,10 +288,11 @@ export const MapLibre = ({features = []}) => {
     }, [aircrafts]);
 
     useEffect(() => {
+        console.log("Features Update")
         if (map.current && map.current.getSource('scope-package')) {
             map.current.getSource('scope-package').setData({
                 'type': 'FeatureCollection',
-                'features': features.features
+                'features': features ? features.features : []
             });
 
             for (const icon of oldIcons) {
@@ -307,7 +300,7 @@ export const MapLibre = ({features = []}) => {
             }
 
             let newIconIds = [];
-            for (const icon of features.icons) {
+            for (const icon of features ? features.icons : []) {
                 newIconIds.push(icon.id);
                 map.current.addImage(icon.id, icon);
             }
@@ -317,6 +310,16 @@ export const MapLibre = ({features = []}) => {
             console.log(features);
         }
     }, [features]);
+
+    useEffect(() => {
+        console.log("Center/Zoom update")
+        if (map.current) {
+            const top = turf.destination([center.lon, center.lat], zoom * 0.5, 360, {units: "meters"});
+            const bottom = turf.destination([center.lon, center.lat], zoom * 0.5, 180, {units: "meters"});
+            console.log(top, bottom, center);
+            map.current.fitBounds([top.geometry.coordinates, bottom.geometry.coordinates]);
+        }
+    }, [center, zoom])
 
     return (
         <div ref={mapContainer} style={{
