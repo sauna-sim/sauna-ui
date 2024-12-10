@@ -18,6 +18,7 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex) => {
 
         if (facility_split.length > 0) {
             cur_facility = scopePackage.facilities[facility_split[0]];
+            name += cur_facility.name + " -> ";
 
             for (let i = 1; i < facility_split.length; i++) {
                 if (!cur_facility.child_facilities || !cur_facility.child_facilities[facility_split[i]]) {
