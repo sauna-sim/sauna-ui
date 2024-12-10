@@ -6,7 +6,7 @@ import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
 
-import {open, save} from "@tauri-apps/api/dialog";
+import {save} from "@tauri-apps/api/dialog";
 import { writeTextFile } from "@tauri-apps/api/fs";
 
 export async function saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts}) {

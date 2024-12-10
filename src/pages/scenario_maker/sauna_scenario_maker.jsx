@@ -6,7 +6,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import AircraftList from "./aircraft/aircraft_list";
 
 export default function SaunaScenarioMaker() {
-    const [key, setKey] = useState('airport');
+    const [key, setKey] = useState('navdata');
 
     const [aircrafts, setAircrafts] = useState([]);
 
@@ -17,8 +17,8 @@ export default function SaunaScenarioMaker() {
             onSelect={(k) => setKey(k)}
             className="mb-3"
         >
-            <Tab eventKey="airport" title="Airports">
-                
+            <Tab eventKey="navdata" title="Navdata">
+
             </Tab>
             <Tab eventKey="aircraft" title="Aircraft">
                 <AircraftList

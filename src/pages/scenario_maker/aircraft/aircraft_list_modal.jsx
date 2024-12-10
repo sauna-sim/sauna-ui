@@ -34,10 +34,12 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
             .matches(/^[0-7]{4}$/, "Squawk must be between 0000-7777"),
         dep: Yup.string()
             .required("Departure airport is required")
-            .matches(/^[a-zA-Z0-9]{3,4}$/, "Alphanumeric characters only!"),
+            .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
+            .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
         arr: Yup.string()
         .required("Destination airport is required")
-        .matches(/^[a-zA-Z0-9]{3,4}$/, "Alphanumeric characters only!"),
+        .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
+        .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
         fp: Yup.object().shape({
             route: Yup.string()
                 .required("Flight Plan route is required"),
@@ -72,27 +74,28 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                 <Modal.Title>{aircraft ? "Edit Aircraft" : "Add Aircraft"}</Modal.Title>
             </Modal.Header>
             <Formik
-                initialValues={{
-                    callsign: aircraft?.callsign || "",
+                initialValues={aircraft? aircraft:{
+
+                    callsign: "",
                     pos: {
-                        lat: aircraft?.pos.lat || "",
-                        lon: aircraft?.pos.lon || "",
+                        lat: "",
+                        lon: "",
                     },
-                    alt: aircraft?.alt || "",
-                    acftType: aircraft?.acftType || "",
-                    squawk: aircraft?.squawk || "",
-                    dep: aircraft?.dep || "",
-                    arr: aircraft?.arr || "",
+                    alt: "",
+                    acftType: "",
+                    squawk: "",
+                    dep: "",
+                    arr: "",
                     fp: {
-                        route: aircraft?.fp.route || "",
-                        fpalt: aircraft?.fp.fpalt || "",
-                        tas: aircraft?.fp.tas || "",
-                        flightRules: aircraft?.fp.flightRules || "I",
+                        route: "",
+                        fpalt: "",
+                        tas: "",
+                        flightRules: "I",
                     },
                 }}
                 validationSchema={formSchema}
                 onSubmit={onSubmit}
-                >
+            >
                 {({
                     values,
                     errors,
@@ -153,7 +156,7 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                     </InputGroup>
                                 </Col>
                                 <Col sm={6}>
-                                    <Form.Label>Latitude</Form.Label>
+                                    <Form.Label>Longitude</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
                                             name="pos.lon"
