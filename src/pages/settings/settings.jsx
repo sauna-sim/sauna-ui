@@ -25,8 +25,6 @@ export class SettingsModal extends Component {
         }
     }
 
-    
-
     open = async () => {
         this.setState({
             showModal: true,

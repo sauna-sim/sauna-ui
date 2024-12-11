@@ -58,7 +58,24 @@ export const makeIcon = (iconDef, color, size = 1) => {
         } else if (def.Arc){
             ctx.beginPath();
             ctx.arc(def.Arc.center[0], def.Arc.center[1], def.Arc.radius, getAngle(def.Arc.start_angle), getAngle(def.Arc.end_angle));
+            if (def.Arc.inner_radius > 0){
+                ctx.arc(def.Arc.center[0], def.Arc.center[1], def.Arc.inner_radius, getAngle(def.Arc.start_angle), getAngle(def.Arc.end_angle), true);
+            }
             if (def.Arc.fill){
+                ctx.fillStyle = color;
+                ctx.fill();
+            } else {
+                ctx.strokeStyle = color;
+                ctx.stroke()
+            }
+            ctx.closePath();
+        } else if (def.Ellipse){
+            ctx.beginPath();
+            ctx.ellipse(def.Ellipse.center[0], def.Ellipse.center[1], def.Ellipse.radius[0], def.Ellipse.radius[1], getAngle(def.Ellipse.rotation), getAngle(def.Ellipse.start_angle), getAngle(def.Ellipse.end_angle));
+            if (def.Ellipse.inner_radius[0] > 0 && def.Ellipse.inner_radius[1] > 0){
+                ctx.ellipse(def.Ellipse.center[0], def.Ellipse.center[1], def.Ellipse.inner_radius[0], def.Ellipse.inner_radius[1], getAngle(def.Ellipse.rotation), getAngle(def.Ellipse.start_angle), getAngle(def.Ellipse.end_angle), true);
+            }
+            if (def.Ellipse.fill){
                 ctx.fillStyle = color;
                 ctx.fill();
             } else {

@@ -7,9 +7,10 @@ import {getColor, makeIcon} from "./map_icon.js";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownTreeSelect from "react-dropdown-tree-select";
 import 'react-dropdown-tree-select/dist/styles.css'
+import {FiltersModal} from "./filters_modal.jsx";
 
-const getCurDisplay = (scopePackage, facilityIndex, displayIndex) => {
-    console.log(scopePackage, facilityIndex, displayIndex);
+const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeatures) => {
+    console.log(scopePackage, facilityIndex, displayIndex, visibleFeatures);
     let cur_facility, display;
     let name = "No Display Loaded";
     if (scopePackage) {
@@ -44,18 +45,21 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex) => {
         facility: cur_facility,
         display: display,
         fullName: name,
-        mapData: getMapFeatures(scopePackage, display)
+        mapData: getMapFeatures(scopePackage, display, visibleFeatures)
     };
 }
 
-const getMapFeatures = (scopePackage, cur_display) => {
+const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     if (!scopePackage || !cur_display) {
-        return {features: [], icons: []};
+        return {features: [], icons: [], background: {Blank: true}};
     }
-    let features = [];
+    let features = {};
     let icons = new Map();
+    let background = {Blank: true};
 
     const display_type = scopePackage.display_types[cur_display.display_type];
+
+    console.log(display_type);
 
     if (display_type) {
         // Add default icons
@@ -65,23 +69,53 @@ const getMapFeatures = (scopePackage, cur_display) => {
                 ...makeIcon(display_type.symbol_icons["aircraft_corr_prim_s"].draw_items, "#ffffff", 1)
             });
         }
+
+        background = display_type.background;
     }
 
     for (const item of cur_display.display_items) {
         if (item.Map) {
             const smap = scopePackage.maps[item.Map.id];
             if (smap) {
-                for (const feature of smap.features.features) {
-                    let new_feature = {...feature};
-                    if (display_type) {
-                        const defaults = display_type.map_defaults[smap.map_type];
-                        if (defaults) {
-                            new_feature.properties.defaultColor = getColor(defaults.color);
-                            new_feature.properties.defaultLineWidth = defaults.line_weight >= 1 ? defaults.line_weight : 1;
-                            new_feature.properties.defaultLineStyle = defaults.line_style;
+                if (item.Map.visible || visibleFeatures.find((f) => f.type === "map" && f.id === item.Map.id)) {
+                    for (const feature of smap.features.features) {
+                        let new_feature = {...feature};
+                        if (display_type && feature.properties.itemType) {
+                            const defaults = display_type.map_defaults[feature.properties.itemType];
+                            if (defaults) {
+                                new_feature.properties.defaultColor = getColor(defaults.color);
+                                new_feature.properties.defaultLineWidth = defaults.line_weight >= 1 ? defaults.line_weight : 1;
+                                new_feature.properties.defaultLineStyle = defaults.line_style;
+                            }
                         }
+                        if (feature.geometry.type === "Point" && feature.properties.style) {
+                            new_feature.properties.icon = `icon-symbol-${feature.properties.style}`;
+                            let size = feature.properties.size;
+                            let color = feature.properties.color;
+                            if (!size) {
+                                size = 1;
+                            }
+
+                            if (!color) {
+                                color = "#ffffff"
+                            }
+
+                            // Check icon
+                            if (!icons.get(`icon-symbol-${feature.properties.style}-${size}-${color}`) && display_type && display_type.symbol_icons[feature.properties.style]) {
+                                icons.set(`icon-symbol-${feature.properties.style}-${size}-${color}`, {
+                                    id: `icon-symbol-${feature.properties.style}-${size}-${color}`,
+                                    ...makeIcon(display_type.symbol_icons[feature.properties.style].draw_items, color, size)
+                                });
+                            }
+                        }
+
+                        const zIndex = feature.properties.zIndex ? feature.properties.zIndex : 0;
+
+                        if (!features[zIndex]) {
+                            features[zIndex] = [];
+                        }
+                        features[zIndex].push(new_feature);
                     }
-                    features.push(new_feature);
                 }
             }
         } else if (item.Symbol) {
@@ -120,7 +154,12 @@ const getMapFeatures = (scopePackage, cur_display) => {
                 if (!color) {
                     color = "#ffffff"
                 }
-                features.push(symbol.feature);
+                const zIndex = symbol.feature.properties.zIndex ? symbol.feature.properties.zIndex : 0;
+
+                if (!features[zIndex]) {
+                    features[zIndex] = [];
+                }
+                features[zIndex].push(symbol.feature);
 
                 // Check icon
                 if (!icons.get(`icon-symbol-${symbol.symbol_type}-${size}-${color}`) && display_type && display_type.symbol_icons[symbol.symbol_type]) {
@@ -133,9 +172,16 @@ const getMapFeatures = (scopePackage, cur_display) => {
         }
     }
 
+    let featuresList = [];
+
+    for (const key of Object.keys(features).toSorted()){
+        featuresList.push(...features[key]);
+    }
+
     return {
-        features,
-        icons: Array.from(icons.values())
+        features: featuresList,
+        icons: Array.from(icons.values()),
+        background
     };
 }
 
@@ -163,6 +209,7 @@ export const MapPage = () => {
     const [displayIndex, setDisplayIndex] = useState(0);
     const [curDisplay, setCurDisplay] = useState({data: {features: [], icons: []}});
     const [facilityDropDownData, setFacilityDropDownData] = useState({});
+    const [visibleFeatures, setVisibleFeatures] = useState([]);
     const [mapCenter, setMapCenter] = useState({lat: 0, lon: 0});
     const [mapZoom, setMapZoom] = useState(100000);
 
@@ -200,9 +247,16 @@ export const MapPage = () => {
     }
 
     useEffect(() => {
-        setCurDisplay(getCurDisplay(scopePackage, facilityIndex, displayIndex));
         setFacilityDropDownData(getFacilitiesDropDownData(scopePackage, facilityIndex));
+    }, [scopePackage, facilityIndex]);
+
+    useEffect(() => {
+        setVisibleFeatures([]);
     }, [scopePackage, facilityIndex, displayIndex]);
+
+    useEffect(() => {
+        setCurDisplay(getCurDisplay(scopePackage, facilityIndex, displayIndex, visibleFeatures));
+    },[scopePackage, facilityIndex, displayIndex, visibleFeatures])
 
     useEffect(() => {
         if (curDisplay && curDisplay.display && curDisplay.display.center) {
@@ -235,6 +289,13 @@ export const MapPage = () => {
                                 return <DropdownItem key={key} eventKey={key}>{disp.name}</DropdownItem>
                             })}
                         </DropdownButton>
+                    }
+                    {scopePackage && curDisplay &&
+                        <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay} scopePackage={scopePackage}>
+                            {({handleShow}) => (
+                                <Button variant="secondary" onClick={handleShow}>Filters</Button>
+                            )}
+                        </FiltersModal>
                     }
                     <Button variant="primary" onClick={onLoadEsPrf}>Load ES PRF</Button>
                 </div>

@@ -18,7 +18,7 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
         glyphs: "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
         layers: [
             {
-                id: 'empty',
+                id: 'background',
                 type: 'background',
                 paint: {
                     "background-color": "rgba(0,0,0,1)"
@@ -306,6 +306,15 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
             }
 
             setOldIcons(newIconIds);
+
+            // Background
+            if (features.background === "Satellite"){
+                map.current.setPaintProperty("background", "background-color", "#333333");
+            } else if (features.background.Color){
+                map.current.setPaintProperty("background", "background-color", features.background.Color);
+            } else {
+                map.current.setPaintProperty("background", "background-color", "#000000");
+            }
 
             console.log(features);
         }
