@@ -11,6 +11,7 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
     const aircraftPoll = useRef(null);
     const [aircrafts, setAircrafts] = useState([]);
     const [oldIcons, setOldIcons] = useState([]);
+    const [oldLineLayers, setOldLineLayers] = useState([]);
 
     const mapStyle = {
         version: 8,
@@ -78,44 +79,6 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
                 },
                 'filter': ['==', '$type', 'Polygon']
             });
-
-            const lineStyles = [
-                ["Solid", null],
-                ["Dash", [12, 4]],
-                ["Dot", [4, 4]]
-            ];
-
-            for (const [i, value] of lineStyles.entries()) {
-                const layer = {
-                    'id': `scope-package-lines-${i}`,
-                    'type': 'line',
-                    'source': 'scope-package',
-                    'paint': {
-                        'line-color': [
-                            'coalesce',
-                            ['get', 'color'],
-                            ['get', 'defaultColor'],
-                            '#ffffff'
-                        ],
-                        'line-width': [
-                            'coalesce',
-                            ['get', 'defaultLineWidth'],
-                            1
-                        ],
-                    },
-                };
-
-                if (value[1]) {
-                    layer.paint['line-dasharray'] = ["literal", value[1]];
-                }
-
-                if (i === 0) {
-                    layer.filter = ['all', ['==', '$type', 'LineString'], ['any', ['!has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]]
-                } else {
-                    layer.filter = ['all', ['==', '$type', 'LineString'], ['has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]
-                }
-                map.current.addLayer(layer);
-            }
 
             // Temp Icon
             const width = 4;
@@ -306,6 +269,50 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
             }
 
             setOldIcons(newIconIds);
+
+            // Line Layers
+            for (const oldLayer of oldLineLayers) {
+                map.current.removeLayer(oldLayer);
+            }
+
+            console.log(features.lineTypes)
+
+            let newLayerIds = [];
+            for (const [i, key] of Object.keys(features.lineTypes).entries()) {
+                const value = [key, features.lineTypes[key]];
+                const layer = {
+                    'id': `scope-package-lines-${i}`,
+                    'type': 'line',
+                    'source': 'scope-package',
+                    'paint': {
+                        'line-color': [
+                            'coalesce',
+                            ['get', 'color'],
+                            ['get', 'defaultColor'],
+                            '#ffffff'
+                        ],
+                        'line-width': [
+                            'coalesce',
+                            ['get', 'defaultLineWidth'],
+                            1
+                        ],
+                    },
+                };
+
+                if (value[1]) {
+                    layer.paint['line-dasharray'] = ["literal", value[1]];
+                }
+
+                if (i === 0) {
+                    layer.filter = ['all', ['==', '$type', 'LineString'], ['any', ['!has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]]
+                } else {
+                    layer.filter = ['all', ['==', '$type', 'LineString'], ['has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]
+                }
+                map.current.addLayer(layer);
+                newLayerIds.push(`scope-package-lines-${i}`);
+            }
+
+            setOldLineLayers(newLayerIds);
 
             // Background
             if (features.background === "Satellite"){

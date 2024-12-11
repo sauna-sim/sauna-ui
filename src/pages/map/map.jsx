@@ -51,11 +51,12 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeature
 
 const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     if (!scopePackage || !cur_display) {
-        return {features: [], icons: [], background: {Blank: true}};
+        return {features: [], icons: [], background: {Blank: true}, lineTypes: {solid: [1]}};
     }
     let features = {};
     let icons = new Map();
     let background = {Blank: true};
+    let lineTypes = {solid: [1]};
 
     const display_type = scopePackage.display_types[cur_display.display_type];
 
@@ -71,6 +72,7 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
         }
 
         background = display_type.background;
+        lineTypes = display_type.line_types;
     }
 
     for (const item of cur_display.display_items) {
@@ -181,7 +183,8 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     return {
         features: featuresList,
         icons: Array.from(icons.values()),
-        background
+        background,
+        lineTypes
     };
 }
 
