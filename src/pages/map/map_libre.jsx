@@ -5,7 +5,7 @@ import {getAircraftList} from "../../actions/aircraft_actions";
 import * as turf from "@turf/turf";
 import TargetMarkerPng from "../../assets/images/TargetMarker.png";
 
-export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 100000}) => {
+export const MapLibre = ({features, center, zoom, rotation}) => {
     const mapContainer = useRef(null);
     const map = useRef(null);
     const aircraftPoll = useRef(null);
@@ -368,10 +368,23 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
         if (map.current) {
             const top = turf.destination([center.lon, center.lat], zoom * 0.5, 360, {units: "meters"});
             const bottom = turf.destination([center.lon, center.lat], zoom * 0.5, 180, {units: "meters"});
-            console.log(top, bottom, center);
+            console.log(top, bottom, center, rotation);
             map.current.fitBounds([top.geometry.coordinates, bottom.geometry.coordinates]);
         }
     }, [center, zoom])
+
+    useEffect(() => {
+         console.log("Rotation update");
+         if (map.current && rotation){
+             if (map.current.isMoving()) {
+                 map.current.on('moveend', () => {
+                     map.current.rotateTo(rotation);
+                 })
+             } else {
+                 map.current.rotateTo(rotation);
+             }
+         }
+    }, [rotation]);
 
     return (
         <div ref={mapContainer} style={{

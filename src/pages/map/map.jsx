@@ -222,6 +222,7 @@ export const MapPage = () => {
     const [visibleFeatures, setVisibleFeatures] = useState([]);
     const [mapCenter, setMapCenter] = useState({lat: 0, lon: 0});
     const [mapZoom, setMapZoom] = useState(100000);
+    const [mapRotation, setMapRotation] = useState(0);
 
     const onLoadEsPrf = async () => {
         const selected = await open({
@@ -272,6 +273,7 @@ export const MapPage = () => {
         if (curDisplay && curDisplay.display && curDisplay.display.center) {
             setMapCenter(curDisplay.display.center);
             setMapZoom(curDisplay.display.screen_height);
+            setMapRotation(curDisplay.display.rotation);
         }
     }, [curDisplay])
 
@@ -310,7 +312,7 @@ export const MapPage = () => {
                     <Button variant="primary" onClick={onLoadEsPrf}>Load ES PRF</Button>
                 </div>
                 <div style={{flexGrow: "1"}}>
-                    <MapLibre features={curDisplay.mapData} zoom={mapZoom} center={mapCenter}/>
+                    <MapLibre features={curDisplay.mapData} zoom={mapZoom} center={mapCenter} rotation={mapRotation}/>
                 </div>
             </div>
         </>
