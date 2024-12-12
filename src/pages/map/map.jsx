@@ -19,7 +19,7 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeature
 
         if (facility_split.length > 0) {
             cur_facility = scopePackage.facilities[facility_split[0]];
-            
+
             if (cur_facility) {
                 name += cur_facility.name + " -> ";
 
@@ -67,7 +67,7 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
 
     if (display_type) {
         // Add default icons
-        if (display_type.symbol_icons["aircraft_corr_prim_s"]) {
+        if (display_type.symbol_icons["aircraft_corr_prim_s"] && display_type.symbol_icons["aircraft_corr_prim_s"].draw_items.length > 0) {
             icons.set("icon-aircraft_corr_prim_s", {
                 id: `icon-symbol-aircraft_corr_prim_s`,
                 ...makeIcon(display_type.symbol_icons["aircraft_corr_prim_s"].draw_items, "#ffffff", 1)
