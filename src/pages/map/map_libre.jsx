@@ -278,8 +278,10 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
             console.log(features.lineTypes)
 
             let newLayerIds = [];
+            let defaultLayerFilters = [];
             for (const [i, key] of Object.keys(features.lineTypes).entries()) {
                 const value = [key, features.lineTypes[key]];
+                defaultLayerFilters.push(['!=', 'style', value[0]]);
                 const layer = {
                     'id': `scope-package-lines-${i}`,
                     'type': 'line',
@@ -303,14 +305,48 @@ export const MapLibre = ({features = [], center = {lat: 0, lon: 0}, zoom = 10000
                     layer.paint['line-dasharray'] = ["literal", value[1]];
                 }
 
-                if (i === 0) {
-                    layer.filter = ['all', ['==', '$type', 'LineString'], ['any', ['!has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]]
-                } else {
-                    layer.filter = ['all', ['==', '$type', 'LineString'], ['has', 'defaultLineStyle'], ['==', 'defaultLineStyle', value[0]]]
-                }
+                layer.filter = [
+                    'all',
+                    ['==', '$type', 'LineString'],
+                    ['has', 'style'],
+                    ['==', 'style', value[0]]
+                ];
+
                 map.current.addLayer(layer);
                 newLayerIds.push(`scope-package-lines-${i}`);
             }
+
+            // Default line
+            const defaultLineLayer = {
+                'id': `scope-package-linesdefault`,
+                'type': 'line',
+                'source': 'scope-package',
+                'paint': {
+                    'line-color': [
+                        'coalesce',
+                        ['get', 'color'],
+                        ['get', 'defaultColor'],
+                        '#ffffff'
+                    ],
+                    'line-width': [
+                        'coalesce',
+                        ['get', 'defaultLineWidth'],
+                        1
+                    ],
+                },
+                filter: [
+                    'all',
+                    ['==', '$type', 'LineString'],
+                    [
+                        'any',
+                        ['!has', 'style'],
+                        ['all', ...defaultLayerFilters]
+                    ]
+                ]
+            };
+
+            map.current.addLayer(defaultLineLayer);
+            newLayerIds.push(`scope-package-linesdefault`);
 
             setOldLineLayers(newLayerIds);
 

@@ -19,16 +19,19 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeature
 
         if (facility_split.length > 0) {
             cur_facility = scopePackage.facilities[facility_split[0]];
-            name += cur_facility.name + " -> ";
-
-            for (let i = 1; i < facility_split.length; i++) {
-                if (!cur_facility.child_facilities || !cur_facility.child_facilities[facility_split[i]]) {
-                    cur_facility = null;
-                    name = "";
-                    break;
-                }
-                cur_facility = cur_facility.child_facilities[facility_split[i]];
+            
+            if (cur_facility) {
                 name += cur_facility.name + " -> ";
+
+                for (let i = 1; i < facility_split.length; i++) {
+                    if (!cur_facility.child_facilities || !cur_facility.child_facilities[facility_split[i]]) {
+                        cur_facility = null;
+                        name = "";
+                        break;
+                    }
+                    cur_facility = cur_facility.child_facilities[facility_split[i]];
+                    name += cur_facility.name + " -> ";
+                }
             }
 
             if (cur_facility) {
@@ -51,12 +54,12 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeature
 
 const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     if (!scopePackage || !cur_display) {
-        return {features: [], icons: [], background: {Blank: true}, lineTypes: {solid: [1]}};
+        return {features: [], icons: [], background: {Blank: true}, lineTypes: {}};
     }
     let features = {};
     let icons = new Map();
     let background = {Blank: true};
-    let lineTypes = {solid: [1]};
+    let lineTypes = {};
 
     const display_type = scopePackage.display_types[cur_display.display_type];
 
@@ -87,7 +90,9 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
                             if (defaults) {
                                 new_feature.properties.defaultColor = getColor(defaults.color);
                                 new_feature.properties.defaultLineWidth = defaults.line_weight >= 1 ? defaults.line_weight : 1;
-                                new_feature.properties.defaultLineStyle = defaults.line_style;
+                                if (feature.geometry.type === "LineString" && !new_feature.properties.style) {
+                                    new_feature.properties.style = defaults.line_style;
+                                }
                             }
                         }
                         if (feature.geometry.type === "Point" && feature.properties.style) {
