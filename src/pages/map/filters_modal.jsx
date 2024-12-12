@@ -75,6 +75,11 @@ export const FiltersModal = ({scopePackage, display, visibleFeatures, setVisible
                       }) => (
                         <Form onSubmit={handleSubmit}>
                             <Modal.Body>
+                                <Button variant="info" onClick={() => {
+                                    for (const key of Object.keys(availValues)) {
+                                        setFieldValue(key, true);
+                                    }
+                                }}>Select All</Button>
                                 {Object.keys(availValues).map((key) => (
                                     <Form.Group>
                                         <Form.Check

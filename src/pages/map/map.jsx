@@ -182,7 +182,9 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     let featuresList = [];
 
     for (const key of Object.keys(features).toSorted()){
-        featuresList.push(...features[key]);
+        for (const feature of features[key]) {
+            featuresList.push(feature);
+        }
     }
 
     return {

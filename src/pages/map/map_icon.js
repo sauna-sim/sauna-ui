@@ -47,19 +47,19 @@ export const makeIcon = (iconDef, color, size = 1) => {
     for (const def of iconDef) {
         if (def.SetPixel) {
             ctx.fillStyle = color;
-            ctx.fillRect(def.SetPixel[0], def.SetPixel[1], 1, 1);
+            ctx.fillRect(def.SetPixel[0], -def.SetPixel[1], 1, 1);
         } else if (def.Line) {
             ctx.beginPath();
-            ctx.moveTo(def.Line.start[0], def.Line.start[1]);
-            ctx.lineTo(def.Line.end[0], def.Line.end[1]);
+            ctx.moveTo(def.Line.start[0], -def.Line.start[1]);
+            ctx.lineTo(def.Line.end[0], -def.Line.end[1]);
             ctx.strokeStyle = color;
             ctx.stroke();
             ctx.closePath();
         } else if (def.Arc){
             ctx.beginPath();
-            ctx.arc(def.Arc.center[0], def.Arc.center[1], def.Arc.radius, getAngle(def.Arc.start_angle), getAngle(def.Arc.end_angle));
+            ctx.arc(def.Arc.center[0], -def.Arc.center[1], def.Arc.radius, getAngle(def.Arc.start_angle), getAngle(def.Arc.end_angle));
             if (def.Arc.inner_radius > 0){
-                ctx.arc(def.Arc.center[0], def.Arc.center[1], def.Arc.inner_radius, getAngle(def.Arc.start_angle), getAngle(def.Arc.end_angle), true);
+                ctx.arc(def.Arc.center[0], -def.Arc.center[1], def.Arc.inner_radius, getAngle(def.Arc.start_angle), getAngle(def.Arc.end_angle), true);
             }
             if (def.Arc.fill){
                 ctx.fillStyle = color;
@@ -71,9 +71,9 @@ export const makeIcon = (iconDef, color, size = 1) => {
             ctx.closePath();
         } else if (def.Ellipse){
             ctx.beginPath();
-            ctx.ellipse(def.Ellipse.center[0], def.Ellipse.center[1], def.Ellipse.radius[0], def.Ellipse.radius[1], getAngle(def.Ellipse.rotation), getAngle(def.Ellipse.start_angle), getAngle(def.Ellipse.end_angle));
+            ctx.ellipse(def.Ellipse.center[0], -def.Ellipse.center[1], def.Ellipse.radius[0], def.Ellipse.radius[1], getAngle(def.Ellipse.rotation), getAngle(def.Ellipse.start_angle), getAngle(def.Ellipse.end_angle));
             if (def.Ellipse.inner_radius[0] > 0 && def.Ellipse.inner_radius[1] > 0){
-                ctx.ellipse(def.Ellipse.center[0], def.Ellipse.center[1], def.Ellipse.inner_radius[0], def.Ellipse.inner_radius[1], getAngle(def.Ellipse.rotation), getAngle(def.Ellipse.start_angle), getAngle(def.Ellipse.end_angle), true);
+                ctx.ellipse(def.Ellipse.center[0], -def.Ellipse.center[1], def.Ellipse.inner_radius[0], def.Ellipse.inner_radius[1], getAngle(def.Ellipse.rotation), getAngle(def.Ellipse.start_angle), getAngle(def.Ellipse.end_angle), true);
             }
             if (def.Ellipse.fill){
                 ctx.fillStyle = color;
@@ -86,7 +86,7 @@ export const makeIcon = (iconDef, color, size = 1) => {
         } else if (def.Polygon) {
             ctx.beginPath();
             if (def.Polygon[0]) {
-                ctx.moveTo(def.Polygon[0][0], def.Polygon[0][1]);
+                ctx.moveTo(def.Polygon[0][0], -def.Polygon[0][1]);
             }
 
             for (const coord of def.Polygon) {
@@ -94,7 +94,7 @@ export const makeIcon = (iconDef, color, size = 1) => {
             }
 
             if (def.Polygon[0]) {
-                ctx.lineTo(def.Polygon[0][0], def.Polygon[0][1]);
+                ctx.lineTo(def.Polygon[0][0], -def.Polygon[0][1]);
             }
 
             ctx.fillStyle = color;
