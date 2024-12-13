@@ -76,6 +76,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                         '#ffffff'
                     ],
                     'fill-opacity': 1.0,
+                    'fill-outline-color': "rgba(0, 0, 0, 0)"
                 },
                 'filter': ['==', '$type', 'Polygon']
             });
