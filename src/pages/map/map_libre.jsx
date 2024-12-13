@@ -15,7 +15,16 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
 
     const mapStyle = {
         version: 8,
-        sources: {},
+        sources: {
+            'background-satellite': {
+                'type': 'raster',
+                tiles: [
+                    'https://services.arcgisonline.com/ArcGis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            }
+        },
         glyphs: "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
         layers: [
             {
@@ -24,6 +33,19 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                 paint: {
                     "background-color": "rgba(0,0,0,1)"
                 },
+                layout:  {
+                    "visibility": "visible"
+                }
+            },
+            {
+                id: 'background-satellite',
+                type: 'raster',
+                source: 'background-satellite',
+                minzoom: 0,
+                maxzoom: 22,
+                layout: {
+                    "visibility": "none"
+                }
             }
         ],
         sky: {}
@@ -353,10 +375,15 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
 
             // Background
             if (features.background === "Satellite"){
-                map.current.setPaintProperty("background", "background-color", "#333333");
+                map.current.setLayoutProperty("background", "visibility", "none");
+                map.current.setLayoutProperty("background-satellite", "visibility", "visible");
             } else if (features.background.Color){
+                map.current.setLayoutProperty("background", "visibility", "visible");
+                map.current.setLayoutProperty("background-satellite", "visibility", "none");
                 map.current.setPaintProperty("background", "background-color", features.background.Color);
             } else {
+                map.current.setLayoutProperty("background", "visibility", "visible");
+                map.current.setLayoutProperty("background-satellite", "visibility", "none");
                 map.current.setPaintProperty("background", "background-color", "#000000");
             }
 
