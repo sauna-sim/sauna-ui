@@ -75,7 +75,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                         ['get', 'defaultColor'],
                         '#ffffff'
                     ],
-                    'fill-opacity': 1.0
+                    'fill-opacity': 1.0,
                 },
                 'filter': ['==', '$type', 'Polygon']
             });
@@ -377,7 +377,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
          console.log("Rotation update");
          if (map.current && rotation){
              if (map.current.isMoving()) {
-                 map.current.on('moveend', () => {
+                 map.current.once('moveend', () => {
                      map.current.rotateTo(rotation);
                  })
              } else {
