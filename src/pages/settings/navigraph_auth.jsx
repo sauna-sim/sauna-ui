@@ -1,101 +1,78 @@
-import React, {Component} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Image, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
-import {
-    checkNavigraphPackage,
-    navigraphAuthFlow
-} from "../../actions/navigraph_actions";
+import {checkNavigraphPackage, navigraphAuthFlow} from "../../actions/navigraph_actions";
 import NavigraphLogoPng from "../../assets/images/NavigraphLogo.png";
-import {connect} from "react-redux";
+import {useSelector} from "react-redux";
 
-class NavigraphAuthButtonComponent extends Component {
-    constructor(props) {
-        super(props);
+export const NavigraphAuthButton = ({}) => {
+    const [showVerificationModal, setShowVerificationModal] = useState(false);
+    const [verificationUrl, setVerificationUrl] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [failed, setFailed] = useState(false);
+    const navigraphState = useSelector((state) => state.navigraph);
 
-        this.state = {
-            showVerificationModal: false,
-            verificationUrl: "",
-            loading: false,
-            failed: false
-        }
-    }
+    useEffect(() => {
+        void refreshPackage();
+    }, []);
 
-    async componentDidMount() {
-        await this.refreshPackage();
-    }
-
-    refreshPackage = async () => {
+    const refreshPackage = async () => {
         // Verify/Update NavData file
-        this.setState({
-            loading: true,
-            failed: false
-        });
+        setLoading(true);
+        setFailed(false);
         try {
             await checkNavigraphPackage();
-            this.setState({
-                loading: false,
-                failed: false
-            });
+            setLoading(false);
+            setFailed(false);
         } catch (e) {
             console.error(e);
             if (e === "NAVIGRAPH_AUTH_EXPIRED"){
-                this.setState({
-                    failed: false,
-                    loading: false
-                });
+                setLoading(false);
+                setFailed(false);
             } else {
-                this.setState({
-                    failed: true,
-                    loading: false
-                });
+                setLoading(false);
+                setFailed(true);
             }
         }
     }
 
-    attemptAuth = async () => {
-        this.setState({
-            loading: true,
-            failed: false
-        });
+    const attemptAuth = async () => {
+        setLoading(true);
+        setFailed(false);
+
         // Perform navigraph auth
         try {
             await navigraphAuthFlow((deviceAuthResp) => {
                 // Get verification urls to display
                 console.log(deviceAuthResp);
 
-                this.openVerification(deviceAuthResp.verification_uri_complete);
+                openVerification(deviceAuthResp.verification_uri_complete);
             });
-            this.closeVerification();
+            closeVerification();
             await checkNavigraphPackage();
-            this.setState({
-                loading: false,
-                failed: false
-            });
+            setLoading(false);
+            setFailed(false);
         } catch (e){
-            this.closeVerification();
-            this.setState({
-                loading: false,
-                failed: true
-            });
+            closeVerification();
+            setLoading(false);
+            setFailed(true);
             console.error(e);
         }
     }
 
-    openVerification = (verifyUrl) => {
-        this.setState({showVerificationModal: true, verificationUrl: verifyUrl});
+    const openVerification = (verifyUrl) => {
+        setShowVerificationModal(true);
+        setVerificationUrl(verifyUrl);
     }
 
-    closeVerification = () => {
-        this.setState({showVerificationModal: false});
+    const closeVerification = () => {
+        setShowVerificationModal(false);
     }
 
-    getNavigraphButton = () => {
-        const {navigraphState} = this.props;
-        const {loading, failed} = this.state;
-
+    const getNavigraphButton = () => {
         if (!navigraphState.authenticated) {
             return <Button
                 variant={failed ? "danger" : "secondary"}
-                onClick={this.attemptAuth}
+                onClick={attemptAuth}
                 disabled={loading}
             ><Image src={NavigraphLogoPng} width={20} height={20}/> {failed ? "Failed" : "Log In"}</Button>
         }
@@ -111,7 +88,7 @@ class NavigraphAuthButtonComponent extends Component {
             </Tooltip>
         );
 
-        let buttonVariant = "success";
+        let buttonVariant;
 
         if (failed){
             buttonVariant = "danger";
@@ -130,7 +107,7 @@ class NavigraphAuthButtonComponent extends Component {
                 >
                     <Button
                         variant={buttonVariant}
-                        onClick={async () => await this.refreshPackage()}
+                        onClick={refreshPackage}
                         disabled={loading}
                     ><Image src={NavigraphLogoPng} width={20} height={20}/> {failed ? "Failed" : packageVersion}</Button>
                 </OverlayTrigger>
@@ -138,43 +115,33 @@ class NavigraphAuthButtonComponent extends Component {
         )
     }
 
-    render() {
-        const {showVerificationModal, verificationUrl} = this.state;
-        const {navigraphState} = this.props;
+    console.log(navigraphState);
 
-        console.log(navigraphState);
-        return (
-            <>
-                {this.getNavigraphButton()}
+    return (
+        <>
+            {getNavigraphButton()}
 
-                <Modal show={showVerificationModal} onHide={this.closeVerification}>
-                    <Modal.Header>
-                        <Modal.Title>Navigraph Authentication</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <a
-                            href={verificationUrl}
-                            className="text-blue-600 bg-gray-500/10 p-3 rounded-lg"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            Open sign in page
-                        </a>
-                        <span className="opacity-50">or scan this QR code:</span>
-                        <div className="p-2 rounded-lg bg-white mt-1">
-                            <img
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${verificationUrl}`}
-                                alt="Navigraph Verification QR Qode"/>
-                        </div>
-                    </Modal.Body>
-                </Modal>
-            </>
-        )
-    }
+            <Modal show={showVerificationModal} onHide={closeVerification}>
+                <Modal.Header>
+                    <Modal.Title>Navigraph Authentication</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <a
+                        href={verificationUrl}
+                        className="text-blue-600 bg-gray-500/10 p-3 rounded-lg"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Open sign in page
+                    </a>
+                    <span className="opacity-50">or scan this QR code:</span>
+                    <div className="p-2 rounded-lg bg-white mt-1">
+                        <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${verificationUrl}`}
+                            alt="Navigraph Verification QR Qode"/>
+                    </div>
+                </Modal.Body>
+            </Modal>
+        </>
+    )
 }
-
-const mapStateToProps = (state) => ({
-    navigraphState: state.navigraph
-});
-
-export const NavigraphAuthButton = connect(mapStateToProps, null)(NavigraphAuthButtonComponent);

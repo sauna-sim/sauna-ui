@@ -10,8 +10,6 @@ export async function getStoreItem(key){
     });
 }
 
-
-
 export async function setStoreItem(key, value){
     // Invoke Rust command
     return await invoke('store_set', {
