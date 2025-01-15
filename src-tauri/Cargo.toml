@@ -1,6 +1,6 @@
 [package]
 name = "sauna_sim"
-version = "0.17.5"
+version = "0.18.0"
 description = "Sauna ATC Training Simulator."
 authors = ["Sauna (ATC Training Simulator)"]
 license = "MIT"
