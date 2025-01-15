@@ -11,6 +11,7 @@ export const AircraftRow = ({callsign}) => {
     const ws = useRef(null);
     const shouldRunWebSocket = useRef(false);
     const [aircraft, setAircraft] = useState(null);
+    const [simState, setSimState] = useState(null);
 
     useEffect(() => {
         shouldRunWebSocket.current = true;
@@ -80,12 +81,10 @@ export const AircraftRow = ({callsign}) => {
                 }
                 break;
             case "SIM_STATE":
-                if (aircraft) {
-                    aircraft.simState = data.data;
-                    setAircraft(aircraft);
-                }
+                setSimState(data.data);
                 break;
             case "POSITION":
+                setSimState(data.data.simState);
                 setAircraft(data.data);
                 break;
         }
@@ -105,22 +104,26 @@ export const AircraftRow = ({callsign}) => {
     }
 
     const getAircraftActions = () => {
-        let pauseButton;
-        if (aircraft.simState.paused) {
-            pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={() => unpauseAircraft(aircraft.callsign)}
-            ><FontAwesomeIcon icon={faPlay}/></Button>;
-        } else {
-            pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={() => pauseAircraft(aircraft.callsign)}
-            ><FontAwesomeIcon icon={faPause}/></Button>
+        if (simState) {
+            let pauseButton;
+            if (simState.paused) {
+                pauseButton = <Button variant="outline-success" className="me-2"
+                                      onClick={() => unpauseAircraft(aircraft.callsign)}
+                ><FontAwesomeIcon icon={faPlay}/></Button>;
+            } else {
+                pauseButton = <Button variant="outline-danger" className="me-2"
+                                      onClick={() => pauseAircraft(aircraft.callsign)}
+                ><FontAwesomeIcon icon={faPause}/></Button>
+            }
+            return (
+                <>
+                    {pauseButton}
+                    {simState.simRate}x
+                </>
+            )
         }
-        return (
-            <>
-                {pauseButton}
-                {aircraft.simState.simRate}x
-            </>
-        )
+
+        return <></>;
     }
 
     const getArmedModes = (armedModes) => {
