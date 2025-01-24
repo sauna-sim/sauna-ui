@@ -48,6 +48,8 @@ export const SectorFilesButton = ({}) => {
         </Tooltip>
     );
 
+    console.log(sectorFilesLoaded);
+
     return (
         <>
             <OverlayTrigger

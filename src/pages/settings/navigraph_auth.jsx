@@ -43,8 +43,6 @@ export const NavigraphAuthButton = ({}) => {
         try {
             await navigraphAuthFlow((deviceAuthResp) => {
                 // Get verification urls to display
-                console.log(deviceAuthResp);
-
                 openVerification(deviceAuthResp.verification_uri_complete);
             });
             closeVerification();
@@ -114,8 +112,6 @@ export const NavigraphAuthButton = ({}) => {
             </>
         )
     }
-
-    console.log(navigraphState);
 
     return (
         <>

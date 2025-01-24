@@ -1,4 +1,4 @@
-import React, {Component, useState} from "react";
+import React, {useState} from "react";
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import {round} from "../../actions/utilities";
 

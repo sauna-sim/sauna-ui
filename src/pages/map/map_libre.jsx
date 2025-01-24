@@ -52,7 +52,6 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
     }
 
     useEffect(() => {
-        console.log("Map Init")
         if (map.current) return; // stops map from initializing more than once
 
         map.current = new maplibregl.Map({

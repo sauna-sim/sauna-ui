@@ -8,8 +8,6 @@ export const FiltersModal = ({scopePackage, display, visibleFeatures, setVisible
     const [availValues, setAvailValues] = useState({});
 
     useEffect(() => {
-        console.log(scopePackage, display, visibleFeatures);
-
         if (!display || !display.display || !display.display.display_items || !scopePackage.maps) {
             setInitValues({});
             setAvailValues({});
@@ -22,8 +20,7 @@ export const FiltersModal = ({scopePackage, display, visibleFeatures, setVisible
                     availValues[item.Map.id] = scopePackage.maps[item.Map.id].name;
                 }
             }
-            console.log(values);
-            console.log(availValues);
+
             setInitValues(values);
             setAvailValues(availValues);
         }

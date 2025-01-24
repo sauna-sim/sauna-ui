@@ -1,18 +1,11 @@
-import React, {Component, useEffect, useState} from "react";
-import {open} from '@tauri-apps/api/dialog';
+import React, {useEffect, useState} from "react";
 import {Formik, getIn} from "formik";
-import {
-    getApiSettings,
-    getFsdSettings,
-    getStoreItem,
-    saveApiSettings, saveFsdSettings,
-    storeSave
-} from "../../actions/local_store_actions";
+import {getApiSettings, getFsdSettings, getStoreItem, saveApiSettings, saveFsdSettings, storeSave} from "../../actions/local_store_actions";
 import {getFsdProtocolRevisions} from "../../actions/enum_actions";
 import {updateServerSettings} from "../../actions/data_actions";
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGear} from "@fortawesome/free-solid-svg-icons";
 
 export const SettingsModal = ({}) => {
@@ -95,8 +88,8 @@ export const SettingsModal = ({}) => {
         <>
             {getButton()}
 
-            <Modal show={showModal} onHide={close}>
-                <Modal.Header closeButton>
+            <Modal show={showModal}>
+                <Modal.Header>
                     <Modal.Title>Settings</Modal.Title>
                 </Modal.Header>
 

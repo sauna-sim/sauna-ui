@@ -34,8 +34,6 @@ export const AircraftPage = ({}) => {
                         value={simState.simRate}
                         onChange={async (e) => {
                             let num = Number(e.target.value);
-                            console.log(e.target.value);
-                            console.log(num);
                             if (!isNaN(num) && num >= 0.1) {
                                 await setAllSimRate(Number(e.target.value));
                             }

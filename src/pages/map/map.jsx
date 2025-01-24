@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {MapLibre} from "./map_libre";
-import {Button, DropdownButton, Form} from "react-bootstrap";
+import {Button, DropdownButton} from "react-bootstrap";
 import {open} from '@tauri-apps/api/dialog';
 import {readTextFileLines} from "../../actions/tauri_actions.js";
 import {getColor, makeIcon} from "./map_icon.js";
@@ -10,7 +10,6 @@ import 'react-dropdown-tree-select/dist/styles.css'
 import {FiltersModal} from "./filters_modal.jsx";
 
 const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeatures) => {
-    console.log(scopePackage, facilityIndex, displayIndex, visibleFeatures);
     let cur_facility, display;
     let name = "No Display Loaded";
     if (scopePackage) {
@@ -62,8 +61,6 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     let lineTypes = {};
 
     const display_type = scopePackage.display_types[cur_display.display_type];
-
-    console.log(display_type);
 
     if (display_type) {
         // Add default icons
@@ -235,14 +232,12 @@ export const MapPage = () => {
         });
 
         if (selected) {
-            console.log("selected prf", selected);
             const fileLines = await readTextFileLines(selected);
             let jsonStr = "";
             for (const line of fileLines) {
                 jsonStr += line + "\n";
             }
             const json = JSON.parse(jsonStr);
-            console.log(json);
             setScopePackage(json);
             setFacilityIndex("0");
             setDisplayIndex(0);
@@ -250,7 +245,6 @@ export const MapPage = () => {
     }
 
     const onFacilityDropdownChange = (curNode, selNodes) => {
-        console.log(curNode, selNodes);
         if (selNodes && selNodes[0]){
             setFacilityIndex(selNodes[0].value);
             setDisplayIndex(0);
@@ -277,7 +271,6 @@ export const MapPage = () => {
         }
     }, [curDisplay])
 
-    console.log(curDisplay);
     return (
         <>
             <div style={{

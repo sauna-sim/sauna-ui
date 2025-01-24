@@ -19,7 +19,6 @@ webview.once("tauri://close-requested", async function (e) {
 updateSaunaApiBuiltIn().then(() => {})
 listen("sauna-api-builtin", (event) => {
     reduxStore.dispatch(onBuiltInChange(event.payload));
-    console.log(event);
 }).then(() => {});
 
 export async function updateSaunaApiBuiltIn(){
