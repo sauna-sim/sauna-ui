@@ -81,7 +81,10 @@ async function startWebSocket(){
                     reduxStore.dispatch(onSimStateChange(message.data));
                     break;
                 case "COMMAND_MSG":
-                    reduxStore.dispatch(onMessageReceive(message.data));
+                    reduxStore.dispatch(onMessageReceive({
+                        received: true,
+                        msg: message.data
+                    }));
                     break;
                 case "AIRCRAFT_UPDATE":
                     handleAircraftUpdate(message.data);
