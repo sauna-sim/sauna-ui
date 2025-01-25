@@ -54,6 +54,20 @@ export async function extractZipFile(zipfile, dir){
     });
 }
 
+export async function loadScopePackage(file) {
+    return await invoke('load_scope_package', {
+        path: file
+    });
+}
+
+export async function convertSectorFile(sctType, path, outFile) {
+    return await invoke('convert_sector_file', {
+        sctType,
+        path,
+        outFile
+    });
+}
+
 export const TauriWindowEnum = {
     MAP_PAGE: "mapPageLabel",
     COMMAND_WINDOW: "commandWindowLabel"

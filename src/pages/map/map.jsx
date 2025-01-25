@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {MapLibre} from "./map_libre";
-import {Button, DropdownButton} from "react-bootstrap";
-import {open} from '@tauri-apps/api/dialog';
-import {readTextFileLines} from "../../actions/tauri_actions.js";
+import {Button, Dropdown, DropdownButton} from "react-bootstrap";
+import {open, save} from '@tauri-apps/api/dialog';
+import {convertSectorFile, loadScopePackage, readTextFileLines} from "../../actions/tauri_actions.js";
 import {getColor, makeIcon} from "./map_icon.js";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownTreeSelect from "react-dropdown-tree-select";
@@ -178,7 +178,7 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
 
     let featuresList = [];
 
-    for (const key of Object.keys(features).toSorted()){
+    for (const key of Object.keys(features).toSorted()) {
         for (const feature of features[key]) {
             featuresList.push(feature);
         }
@@ -221,36 +221,6 @@ export const MapPage = () => {
     const [mapZoom, setMapZoom] = useState(100000);
     const [mapRotation, setMapRotation] = useState(0);
 
-    const onLoadEsPrf = async () => {
-        const selected = await open({
-            multiple: false,
-            title: "Select EuroScope Profile File",
-            filters: [{
-                name: "Euroscope Profile",
-                extensions: ["json"]
-            }],
-        });
-
-        if (selected) {
-            const fileLines = await readTextFileLines(selected);
-            let jsonStr = "";
-            for (const line of fileLines) {
-                jsonStr += line + "\n";
-            }
-            const json = JSON.parse(jsonStr);
-            setScopePackage(json);
-            setFacilityIndex("0");
-            setDisplayIndex(0);
-        }
-    }
-
-    const onFacilityDropdownChange = (curNode, selNodes) => {
-        if (selNodes && selNodes[0]){
-            setFacilityIndex(selNodes[0].value);
-            setDisplayIndex(0);
-        }
-    }
-
     useEffect(() => {
         setFacilityDropDownData(getFacilitiesDropDownData(scopePackage, facilityIndex));
     }, [scopePackage, facilityIndex]);
@@ -261,7 +231,7 @@ export const MapPage = () => {
 
     useEffect(() => {
         setCurDisplay(getCurDisplay(scopePackage, facilityIndex, displayIndex, visibleFeatures));
-    },[scopePackage, facilityIndex, displayIndex, visibleFeatures])
+    }, [scopePackage, facilityIndex, displayIndex, visibleFeatures])
 
     useEffect(() => {
         if (curDisplay && curDisplay.display && curDisplay.display.center) {
@@ -270,6 +240,100 @@ export const MapPage = () => {
             setMapRotation(curDisplay.display.rotation);
         }
     }, [curDisplay])
+
+    const loadOptions = {
+        0: {
+            name: "ATC Scope Package (*.atcjson)",
+            openOptions: {
+                multiple: false,
+                title: "Select ATC Scope Package",
+                filters: [{
+                    name: "ATC Scope Package",
+                    extensions: ["atcjson"]
+                }],
+            }
+        },
+        1: {
+            name: "CRC Facility (*.json)",
+            sctType: "CRC",
+            openOptions: {
+                multiple: false,
+                title: "Select CRC Facility",
+                filters: [{
+                    name: "CRC Facility",
+                    extensions: ["json"]
+                }],
+            }
+        },
+        2: {
+            name: "EuroScope Profile (*.prf)",
+            sctType: "ES_PRF",
+            openOptions: {
+                multiple: false,
+                title: "Select EuroScope Profile",
+                filters: [{
+                    name: "EuroScope Profile",
+                    extensions: ["prf"]
+                }],
+            }
+        },
+        3: {
+            name: "EuroScope Package (Folder)",
+            sctType: "ES_DIR",
+            openOptions: {
+                multiple: false,
+                title: "Select EuroScope Package Folder",
+                directory: true
+            }
+        }
+    }
+
+    const handleLoadPackage = async (eventKey) => {
+        const pkgType = loadOptions[eventKey];
+        if (pkgType){
+            const selected = await open(pkgType.openOptions);
+
+            if (selected) {
+                let pkg;
+                if (eventKey === 0) {
+                    try {
+                        pkg = await loadScopePackage(selected);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                } else {
+                    const saveFile = await save({
+                        title: "Save ATC Scope Package",
+                        filters: [{
+                            name: "ATC Scope Package",
+                            extensions: ["atcjson"]
+                        }]
+                    });
+
+                    if (saveFile){
+                        try {
+                            pkg = await convertSectorFile(pkgType.sctType, selected, saveFile);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                }
+
+                if (pkg) {
+                    setScopePackage(pkg);
+                    setFacilityIndex("0");
+                    setDisplayIndex(0);
+                }
+            }
+        }
+    };
+
+    const onFacilityDropdownChange = (curNode, selNodes) => {
+        if (selNodes && selNodes[0]) {
+            setFacilityIndex(selNodes[0].value);
+            setDisplayIndex(0);
+        }
+    }
 
     return (
         <>
@@ -296,13 +360,18 @@ export const MapPage = () => {
                         </DropdownButton>
                     }
                     {scopePackage && curDisplay &&
-                        <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay} scopePackage={scopePackage}>
+                        <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay}
+                                      scopePackage={scopePackage}>
                             {({handleShow}) => (
                                 <Button variant="secondary" onClick={handleShow}>Filters</Button>
                             )}
                         </FiltersModal>
                     }
-                    <Button variant="primary" onClick={onLoadEsPrf}>Load ES PRF</Button>
+                    <DropdownButton title="Load" variant="primary" onSelect={handleLoadPackage}>
+                        {Object.entries(loadOptions).map(([key, value]) =>
+                            <DropdownItem key={key} eventKey={key}>{value.name}</DropdownItem>
+                        )}
+                    </DropdownButton>
                 </div>
                 <div style={{flexGrow: "1"}}>
                     <MapLibre features={curDisplay.mapData} zoom={mapZoom} center={mapCenter} rotation={mapRotation}/>

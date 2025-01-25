@@ -8,9 +8,13 @@ mod tauri_app_state;
 
 use std::fs::File;
 use std::{io};
-use std::io::{BufRead, BufReader, Cursor};
+use std::io::{BufRead, BufReader, BufWriter, Cursor};
 use std::path::{Path, PathBuf};
+use std::string::ToString;
 use std::sync::Mutex;
+use sct_reader::loaders::euroscope::loader::{EuroScopeLoader, EuroScopeLoaderPrf};
+use sct_reader::loaders::vnas_crc::CrcPackage;
+use sct_reader::package::AtcScopePackage;
 use tauri::{Manager};
 use zip::ZipArchive;
 use crate::tauri_app_state::{ApiConnectionPayload, AppState};
@@ -24,7 +28,18 @@ fn main() {
 
     let app = tauri::Builder::default()
         .manage(AppStateWrapper(Mutex::new(AppState::new())))
-        .invoke_handler(tauri::generate_handler![extract_zip, store_set, store_get, store_save, download_file, get_sauna_api_builtin, get_sauna_api_conn_details, read_text_file])
+        .invoke_handler(tauri::generate_handler![
+            extract_zip,
+            store_set,
+            store_get,
+            store_save,
+            download_file,
+            get_sauna_api_builtin,
+            get_sauna_api_conn_details,
+            read_text_file,
+            convert_sector_file,
+            load_scope_package
+        ])
         .setup(|app| {
             // Send Sauna API Built In event
             app.emit_all("sauna-api-builtin", true).unwrap();
@@ -149,4 +164,46 @@ fn store_set(key: &str, value: serde_json::Value, app_state: tauri::State<AppSta
     } else {
         Err("Local Store is null".to_owned())
     }
+}
+
+#[tauri::command]
+fn load_scope_package(path: &str) -> Result<AtcScopePackage, String> {
+    serde_json::from_reader::<File, AtcScopePackage>(
+        File::open(&path).map_err(|e| e.to_string())?
+    ).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn convert_sector_file(sct_type: &str, path: &str, out_file: &str) -> Result<AtcScopePackage, String> {
+    let package = match sct_type {
+        "ES_PRF" => {
+            let es_prf = EuroScopeLoaderPrf::try_new_from_prf(path).map_err(|e| e.to_string())?;
+
+            let mut es = EuroScopeLoader {
+                prfs: vec![es_prf]
+            };
+
+            let result = es.try_read().map_err(|e| e.to_string())?;
+            Ok(AtcScopePackage::try_from(result).map_err(|e| e.to_string())?)
+        },
+        "ES_DIR" => {
+            let mut es = EuroScopeLoader::try_new_from_dir(path).map_err(|e| e.to_string())?;
+            let result = es.try_read().map_err(|e| e.to_string())?;
+
+            Ok(AtcScopePackage::try_from(result).map_err(|e| e.to_string())?)
+        },
+        "CRC" => {
+            let crc_package = CrcPackage::try_new_from_file(path).map_err(|e| e.to_string())?;
+
+            Ok(AtcScopePackage::try_from(&crc_package).map_err(|e| e.to_string())?)
+        },
+        _ => Err("Invalid Sector File Type!".to_string())
+    };
+
+    if let Ok(pkg) = &package {
+        serde_json::to_writer(BufWriter::new(File::create(&out_file).map_err(|e| e.to_string())?), &pkg)
+            .map_err(|e| e.to_string())?;
+    }
+
+    package
 }
