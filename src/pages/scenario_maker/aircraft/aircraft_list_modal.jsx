@@ -2,7 +2,6 @@ import React from "react";
 import { Formik, getIn } from 'formik';
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
-import { aircraftSlice } from "../../../redux/slices/aircraftSlice";
 
 export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft, aircrafts }) {
 

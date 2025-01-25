@@ -41,22 +41,11 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
         for (let i = 0; i < prevAircrafts.length; i++) {
             const prevAircraft = prevAircrafts[i];
             const aircraft = aircrafts[i];
-
-            if (
-                prevAircraft.callsign !== aircraft.callsign ||
-                prevAircraft.pos.lat !== aircraft.pos.lat ||
-                prevAircraft.pos.lon !== aircraft.pos.lon ||
-                prevAircraft.alt !== aircraft.alt ||
-                prevAircraft.acftType !== aircraft.acftType ||
-                prevAircraft.squawk !== aircraft.squawk ||
-                prevAircraft.dep !== aircraft.dep ||
-                prevAircraft.arr !== aircraft.arr ||
-                prevAircraft.fp.route !== aircraft.fp.route ||
-                prevAircraft.fp.fpalt !== aircraft.fp.fpalt ||
-                prevAircraft.fp.tas !== aircraft.fp.tas ||
-                prevAircraft.fp.flightRules !== aircraft.fp.flightRules
-            ) {
-                return false;
+            for(const key of Object.keys(prevAircraft)) {
+                if(prevAircraft[key] !== aircraft[key])
+                {
+                    return false;
+                }
             }
         }
 
