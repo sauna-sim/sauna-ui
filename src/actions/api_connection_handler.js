@@ -28,6 +28,8 @@ axiosSaunaApi.interceptors.response.use(
                 reduxStore.dispatch(onConnectionLost());
                 reduxStore.dispatch(resetAircraftList());
 
+                // Close other windows
+
                 // Start retrying connection
                 establishApiConnection().then(() => {});
 

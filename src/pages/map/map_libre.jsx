@@ -277,7 +277,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
         if (map.current && map.current.getSource('scope-package')) {
             map.current.getSource('scope-package').setData({
                 'type': 'FeatureCollection',
-                'features': features ? features.features : []
+                'features': features?.features ?? []
             });
 
             for (const icon of oldIcons) {
@@ -285,7 +285,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
             }
 
             let newIconIds = [];
-            for (const icon of features ? features.icons : []) {
+            for (const icon of features?.icons ?? []) {
                 newIconIds.push(icon.id);
                 map.current.addImage(icon.id, icon);
             }
@@ -301,7 +301,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
 
             let newLayerIds = [];
             let defaultLayerFilters = [];
-            for (const [i, key] of Object.keys(features.lineTypes).entries()) {
+            for (const [i, key] of Object.keys(features?.lineTypes ?? []).entries()) {
                 const value = [key, features.lineTypes[key]];
                 defaultLayerFilters.push(['!=', 'style', value[0]]);
                 const layer = {
@@ -373,10 +373,10 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
             setOldLineLayers(newLayerIds);
 
             // Background
-            if (features.background === "Satellite"){
+            if (features?.background === "Satellite"){
                 map.current.setLayoutProperty("background", "visibility", "none");
                 map.current.setLayoutProperty("background-satellite", "visibility", "visible");
-            } else if (features.background.Color){
+            } else if (features?.background?.Color){
                 map.current.setLayoutProperty("background", "visibility", "visible");
                 map.current.setLayoutProperty("background-satellite", "visibility", "none");
                 map.current.setPaintProperty("background", "background-color", features.background.Color);
