@@ -90,44 +90,9 @@ jobs:
           name: SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}
           path: |
             ${{ github.workspace }}/SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
-
-
-  build-radar:
-    runs-on: ${{ inputs.os }}
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@v4
-        with:
-          repository: 'caspianmerlin/sauna-radar'
-          path: 'sauna-radar'
-      - name: Use Stable Rust
-        uses: dtolnay/rust-toolchain@stable
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-      - name: Install Rust Target
-        shell: pwsh
-        run: |
-          rustup target add ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
-      - name: Build
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}/sauna-radar
-          cargo build --release --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
-      - name: Tar output folder
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}/sauna-radar/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}/release
-          tar -cvzf ${{ github.workspace }}/SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz radar-viewer*
-      - name: Archive binaries
-        uses: actions/upload-artifact@v3
-        with:
-          name: SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}
-          path: |
-            ${{ github.workspace }}/SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
-          
   
   build:
-    needs: [build-api, build-radar]
+    needs: build-api
     runs-on: ${{ inputs.os }}
     env:
       TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -165,17 +130,6 @@ jobs:
           cd ${{ github.workspace }}/src-tauri/sauna-api
           tar -xvf SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
           rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
-      - name: Download Sauna Radar
-        uses: actions/download-artifact@v3
-        with:
-          name: SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}
-          path: ${{ github.workspace }}/src-tauri/sauna-radar
-      - name: Extract Sauna-Radar
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}/src-tauri/sauna-radar
-          tar -xvf SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
-          rm SaunaRadar-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
       - name: npm install
         run: npm install
       - name: Build and Package
