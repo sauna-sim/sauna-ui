@@ -16,7 +16,6 @@ pub struct AppState {
     pub api_port: u16,
     pub api_builtin: bool,
     pub api_process: ChildGuard,
-    pub radar_process: ChildGuard,
     pub local_store: Option<StoreContainer>
 }
 
@@ -24,10 +23,9 @@ impl AppState {
     pub fn new() -> AppState {
         AppState{
             api_hostname: "localhost".into(),
-            api_port: 5000,
+            api_port: 5052,
             api_builtin: true,
             api_process: ChildGuard(None),
-            radar_process: ChildGuard(None),
             local_store: None
         }
     }
@@ -60,8 +58,6 @@ impl AppState {
         Ok(())
     }
 
-
-
     pub fn stop_sauna_api(&mut self){
         if let Some(mut child) = self.api_process.0.take() {
 
@@ -76,49 +72,6 @@ impl AppState {
             self.api_process = ChildGuard(None);
         }
     }
-
-    pub fn start_sauna_radar(&mut self, sauna_radar_dir: impl AsRef<Path>) -> Result<(), String> {
-        let local_store = self.local_store.as_ref().ok_or_else(|| String::from("Local store not yet initialised"))?;
-        
-        let args = [
-            "-h".to_string(),
-            self.api_hostname.clone(),
-            "-p".to_string(),
-            self.api_port.to_string(),
-            "-t".to_string(),
-            "-s".to_string(),
-            local_store.store.settings.radar_settings.sector_file_path.to_string_lossy().into_owned(),
-            "-c".to_string(),
-            local_store.store.settings.radar_settings.symbology_file_path.to_string_lossy().into_owned(),
-            "-a".to_string(),
-            local_store.store.settings.radar_settings.asr_file_path.to_string_lossy().into_owned(),
-            "-y".to_string(),
-            local_store.store.settings.radar_settings.center_lat.to_string(),
-            "-x".to_string(),
-            local_store.store.settings.radar_settings.center_lon.to_string(),
-            "-z".to_string(),
-            local_store.store.settings.radar_settings.zoom_level.to_string()
-        ];
-
-        if let Some(radar_process) = &mut self.radar_process.0 {
-            match radar_process.try_wait() {
-                Ok(None) => return Err(String::from("Radar is already running")),
-                _ => radar_process.wait().ok(),
-            };
-        }
-
-        self.radar_process.start_child(&sauna_radar_dir.as_ref().join("radar-viewer"), Some(sauna_radar_dir.as_ref()), &args);
-
-        Ok(())
-    }
-
-    pub fn stop_sauna_radar(&mut self) {
-        if let Some(sauna_radar_process) = &mut self.radar_process.0 {
-            sauna_radar_process.wait().ok();
-        }
-        self.radar_process = ChildGuard(None);
-    }
-    
 
     pub fn get_api_conn_details(&mut self) -> ApiConnectionPayload {
         if self.api_builtin {

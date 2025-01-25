@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, arm64] #x86, arm
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-22.04]
         include:
           - os: macos-latest
             short-os: osx
@@ -21,7 +21,7 @@ jobs:
             short-os: win
             rust-os: pc-windows-msvc
             tauri-bundles: nsis
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             short-os: linux
             rust-os: unknown-linux-gnu
             tauri-bundles: deb
@@ -47,7 +47,7 @@ jobs:
 #            arch: arm
           - os: windows-latest
             arch: arm64
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             arch: arm64
     uses: ./.github/workflows/reusable-tauri.yml
     with:
@@ -59,12 +59,12 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       rust-target-suffix: ${{ matrix.rust-target-suffix }}
       upload-bundle-artifacts: ${{ true }}
-      api-ref: 'v0.18.2'
+      api-ref: 'v0.19.0'
     secrets: inherit # Pass all secrets
 
   create-github-release:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build
     steps:
       - name: Download Installers

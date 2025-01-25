@@ -12,14 +12,11 @@ If the binary for your operating system is not provided, it must be compiled fro
 ### [Sauna API](https://github.com/Sauna-ATC-Training-Simulator/sauna-api)
 The API contains most of the core simulation code. For production, the UI will bundle the API.
 
-### [Sauna Radar](https://github.com/caspianmerlin/sauna-radar)
-A Radar screen for Sauna.
-
 ## Dependencies
 This project depends on the following frameworks and packages:
 - **[NodeJS 18+](https://nodejs.org/en/)**
 - **[Rust 1.73+](https://www.rust-lang.org/)**
-- **[Tauri](https://tauri.app/v1/guides/getting-started/prerequisites)**
+- **[Tauri 1](https://tauri.app/v1/guides/getting-started/prerequisites)**
   - Note: All Tauri pre-requisites must be installed to develop the Tauri app.
 
 ## Building
@@ -34,7 +31,7 @@ This will start the webpack dev server to serve the web content and will compile
 
 ### Production Build
 To build a bundle for production:
-- Ensure `sauna-api` and `sauna-radar` binaries are in `src-tauri/sauna-api` and `src-tauri/sauna-radar` respectively.
+- Ensure `sauna-api` binaries are in `src-tauri/sauna-api`.
   - This will allow Tauri to bundle them into the application for production.
 - Run `npm run package`
 

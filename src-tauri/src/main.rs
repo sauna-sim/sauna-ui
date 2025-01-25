@@ -8,9 +8,13 @@ mod tauri_app_state;
 
 use std::fs::File;
 use std::{io};
-use std::io::{BufReader, Cursor};
+use std::io::{BufRead, BufReader, BufWriter, Cursor};
 use std::path::{Path, PathBuf};
+use std::string::ToString;
 use std::sync::Mutex;
+use sct_reader::loaders::euroscope::loader::{EuroScopeLoader, EuroScopeLoaderPrf};
+use sct_reader::loaders::vnas_crc::CrcPackage;
+use sct_reader::package::AtcScopePackage;
 use tauri::{Manager};
 use zip::ZipArchive;
 use crate::tauri_app_state::{ApiConnectionPayload, AppState};
@@ -24,7 +28,18 @@ fn main() {
 
     let app = tauri::Builder::default()
         .manage(AppStateWrapper(Mutex::new(AppState::new())))
-        .invoke_handler(tauri::generate_handler![extract_zip, store_set, store_get, store_save, download_file, get_sauna_api_builtin, get_sauna_api_conn_details, launch_radar])
+        .invoke_handler(tauri::generate_handler![
+            extract_zip,
+            store_set,
+            store_get,
+            store_save,
+            download_file,
+            get_sauna_api_builtin,
+            get_sauna_api_conn_details,
+            read_text_file,
+            convert_sector_file,
+            load_scope_package
+        ])
         .setup(|app| {
             // Send Sauna API Built In event
             app.emit_all("sauna-api-builtin", true).unwrap();
@@ -58,11 +73,7 @@ fn main() {
             }
 
             // Stop sauna API
-
             app_state_guard.stop_sauna_api();
-
-            // Stop Sauna Radar
-            app_state_guard.stop_sauna_radar();
         }
         _ => {}
     });
@@ -93,6 +104,20 @@ fn download_file(url: &str, dir: &str) -> Result<String, String> {
     io::copy(&mut content, &mut out).map_err(|error| error.to_string())?;
 
     Ok(filename.file_name().ok_or("Failed to get file name".to_string())?.to_str().ok_or("Failed to get file name".to_string())?.to_string())
+}
+
+#[tauri::command]
+fn read_text_file(file_name: &str) -> Result<Vec<String>, String> {
+    let file_reader = BufReader::new(File::open(file_name).map_err(|err| err.to_string())?);
+    let mut lines: Vec<String> = Vec::new();
+
+    for line in file_reader.lines() {
+        if line.is_ok() {
+            lines.push(line.unwrap().to_string());
+        }
+    }
+
+    Ok(lines)
 }
 
 #[tauri::command]
@@ -142,9 +167,43 @@ fn store_set(key: &str, value: serde_json::Value, app_state: tauri::State<AppSta
 }
 
 #[tauri::command]
-fn launch_radar(app_state: tauri::State<AppStateWrapper>, app_handle: tauri::AppHandle) -> Result<(), String> {
-    let sauna_radar_dir = app_handle.path_resolver().resource_dir().unwrap().join("sauna-radar");
-    let mut app_state_guard = app_state.0.lock().unwrap();
-    app_state_guard.start_sauna_radar(sauna_radar_dir)
-    
+fn load_scope_package(path: &str) -> Result<AtcScopePackage, String> {
+    serde_json::from_reader::<File, AtcScopePackage>(
+        File::open(&path).map_err(|e| e.to_string())?
+    ).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn convert_sector_file(sct_type: &str, path: &str, out_file: &str) -> Result<AtcScopePackage, String> {
+    let package = match sct_type {
+        "ES_PRF" => {
+            let es_prf = EuroScopeLoaderPrf::try_new_from_prf(path).map_err(|e| e.to_string())?;
+
+            let mut es = EuroScopeLoader {
+                prfs: vec![es_prf]
+            };
+
+            let result = es.try_read().map_err(|e| e.to_string())?;
+            Ok(AtcScopePackage::try_from(result).map_err(|e| e.to_string())?)
+        },
+        "ES_DIR" => {
+            let mut es = EuroScopeLoader::try_new_from_dir(path).map_err(|e| e.to_string())?;
+            let result = es.try_read().map_err(|e| e.to_string())?;
+
+            Ok(AtcScopePackage::try_from(result).map_err(|e| e.to_string())?)
+        },
+        "CRC" => {
+            let crc_package = CrcPackage::try_new_from_file(path).map_err(|e| e.to_string())?;
+
+            Ok(AtcScopePackage::try_from(&crc_package).map_err(|e| e.to_string())?)
+        },
+        _ => Err("Invalid Sector File Type!".to_string())
+    };
+
+    if let Ok(pkg) = &package {
+        serde_json::to_writer(BufWriter::new(File::create(&out_file).map_err(|e| e.to_string())?), &pkg)
+            .map_err(|e| e.to_string())?;
+    }
+
+    package
 }

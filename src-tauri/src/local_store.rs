@@ -113,8 +113,6 @@ pub struct Settings {
     pub api_settings: ApiSettings,
     #[serde(default)]
     pub fsd_connection: FsdConnectionSettings,
-    #[serde(default)]
-    pub radar_settings: RadarSettings
 }
 
 #[derive(Serialize, Deserialize)]
