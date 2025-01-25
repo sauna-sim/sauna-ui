@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
-    clearNavigraphRefreshToken, getApiUrl,
+    clearNavigraphRefreshToken,
+    getApiUrl,
     getNavigraphPackageInfo,
     getNavigraphRefreshToken,
     setNavigraphPackageInfo,
@@ -9,12 +10,7 @@ import {
     storeSave
 } from "./local_store_actions";
 import pkce from "@navigraph/pkce";
-import {
-    getNavigraphFullToken,
-    NAVIGRAPH_ACCESS_TOKEN,
-    NAVIGRAPH_TOKEN_EXPIRATION,
-    NAVIGRAPH_TOKEN_TYPE
-} from "./session_storage_actions";
+import {getNavigraphFullToken, SessionStorageKeys} from "./session_storage_actions";
 import qs from "qs";
 import {loadDFDFile} from "./data_actions";
 import {appDataDir, join} from "@tauri-apps/api/path";
@@ -100,9 +96,9 @@ export async function navigraphAuthFlow(onDeviceAuthResp) {
 
 export async function storeToken(tokenResponse) {
     // Session Storage
-    sessionStorage.setItem(NAVIGRAPH_ACCESS_TOKEN, tokenResponse.access_token);
-    sessionStorage.setItem(NAVIGRAPH_TOKEN_TYPE, tokenResponse.token_type);
-    sessionStorage.setItem(NAVIGRAPH_TOKEN_EXPIRATION, tokenResponse.expires_in);
+    sessionStorage.setItem(SessionStorageKeys.NAVIGRAPH_ACCESS_TOKEN, tokenResponse.access_token);
+    sessionStorage.setItem(SessionStorageKeys.NAVIGRAPH_TOKEN_TYPE, tokenResponse.token_type);
+    sessionStorage.setItem(SessionStorageKeys.NAVIGRAPH_TOKEN_EXPIRATION, tokenResponse.expires_in);
 
     // Electron Store
     await setNavigraphRefreshToken(tokenResponse.refresh_token);

@@ -54,8 +54,13 @@ export async function extractZipFile(zipfile, dir){
     });
 }
 
+export const TauriWindowEnum = {
+    MAP_PAGE: "mapPageLabel",
+    COMMAND_WINDOW: "commandWindowLabel"
+};
+
 export async function createMapWindow(){
-    new WebviewWindow("mapPageLabel", {
+    new WebviewWindow(TauriWindowEnum.MAP_PAGE, {
         url: "#map",
         fullscreen: false,
         height: 600,
@@ -65,4 +70,17 @@ export async function createMapWindow(){
         minHeight: 400,
         minWidth: 400
     });
+}
+
+export async function createCommandWindow() {
+    new WebviewWindow(TauriWindowEnum.COMMAND_WINDOW, {
+        url: "#commands",
+        fullscreen: false,
+        height: 600,
+        resizable: true,
+        title: "Sauna Command Window",
+        width: 300,
+        minHeight: 200,
+        minWidth: 200
+    })
 }

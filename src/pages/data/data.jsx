@@ -5,9 +5,9 @@ import {Button, ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 import {NavigraphAuthButton} from "../settings/navigraph_auth";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faFileCirclePlus, faMap, faPlane} from "@fortawesome/free-solid-svg-icons";
+import {faFileCirclePlus, faMap, faMessage, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
-import {createMapWindow} from "../../actions/tauri_actions";
+import {createCommandWindow, createMapWindow} from "../../actions/tauri_actions";
 
 export const DataPage = ({}) => {
     const openMapPage = async () => {
@@ -46,11 +46,25 @@ export const DataPage = ({}) => {
         <Tooltip id="map-button-tooltip" {...props}>
             Open Map Window
         </Tooltip>
+    );
+
+    const renderCommandTooltip = (props) => (
+        <Tooltip id="command-button-tooltip" {...props}>
+            Open Command Window
+        </Tooltip>
     )
 
     return (
         <>
             <div className={"mb-2 float-end"}>
+                <OverlayTrigger overlay={renderCommandTooltip}
+                                placement={"bottom"}
+                                delay={{show: 250, hide: 400}}>
+                    <Button variant={"secondary"} onClick={createCommandWindow}>
+                        <FontAwesomeIcon icon={faMessage} />
+                    </Button>
+                </OverlayTrigger>{' '}
+
                 <OverlayTrigger
                     placement="bottom"
                     delay={{show: 250, hide: 400}}

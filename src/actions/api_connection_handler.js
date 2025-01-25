@@ -7,6 +7,7 @@ import {
     onAircraftCreated,
     onAircraftDeleted, resetAircraftList,
 } from "../redux/slices/aircraftSlice";
+import {onMessageReceive} from "../redux/slices/messagesSlice.js";
 
 // Axios Sauna-API Settings
 export const axiosSaunaApi = axios.create();
@@ -78,6 +79,9 @@ async function startWebSocket(){
             switch (message.type){
                 case "SIM_STATE_UPDATE":
                     reduxStore.dispatch(onSimStateChange(message.data));
+                    break;
+                case "COMMAND_MSG":
+                    reduxStore.dispatch(onMessageReceive(message.data));
                     break;
                 case "AIRCRAFT_UPDATE":
                     handleAircraftUpdate(message.data);

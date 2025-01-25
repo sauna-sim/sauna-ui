@@ -6,6 +6,7 @@ import {store} from "./redux/store";
 import {Provider} from "react-redux";
 import {HashRouter, Route, Routes} from "react-router-dom";
 import { MapPage } from './pages/map/map';
+import {CommandWindow} from "./pages/command_window/command_window.jsx";
 
 // React DOM Render
 const root = createRoot(document.getElementById('root'));
@@ -15,6 +16,7 @@ root.render(
             <Routes>
                 <Route path="/" element={<MainApp />}/>
                 <Route path="/map" element={<MapPage />} />
+                <Route path="/commands" element={<CommandWindow />} />
             </Routes>
         </HashRouter>
     </Provider>
