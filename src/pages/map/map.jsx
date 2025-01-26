@@ -2,22 +2,28 @@ import React, {useEffect, useState} from "react";
 import {MapLibre} from "./map_libre";
 import {Button, Dropdown, DropdownButton} from "react-bootstrap";
 import {open, save} from '@tauri-apps/api/dialog';
-import {convertSectorFile, loadScopePackage, readTextFileLines} from "../../actions/tauri_actions.js";
 import {getColor, makeIcon} from "./map_icon.js";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownTreeSelect from "react-dropdown-tree-select";
 import 'react-dropdown-tree-select/dist/styles.css'
 import {FiltersModal} from "./filters_modal.jsx";
+import {
+    getScopePackageDisplayType,
+    getScopePackageFacilities,
+    getScopePackageMap, getScopePackageSymbol,
+    isScopePackageLoaded,
+    loadScopePackage
+} from "../../actions/scope_package_actions.js";
 
-const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeatures) => {
+const getCurDisplay = async (facilities, facilityIndex, displayIndex, visibleFeatures) => {
     let cur_facility, display;
     let name = "No Display Loaded";
-    if (scopePackage) {
+    if (facilities) {
         const facility_split = facilityIndex.split(".");
         name = "";
 
         if (facility_split.length > 0) {
-            cur_facility = scopePackage.facilities[facility_split[0]];
+            cur_facility = facilities[facility_split[0]];
 
             if (cur_facility) {
                 name += cur_facility.name + " -> ";
@@ -47,12 +53,12 @@ const getCurDisplay = (scopePackage, facilityIndex, displayIndex, visibleFeature
         facility: cur_facility,
         display: display,
         fullName: name,
-        mapData: getMapFeatures(scopePackage, display, visibleFeatures)
+        mapData: await getMapFeatures(facilities, display, visibleFeatures)
     };
 }
 
-const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
-    if (!scopePackage || !cur_display) {
+const getMapFeatures = async (facilities, cur_display, visibleFeatures) => {
+    if (!facilities || !cur_display || !await isScopePackageLoaded()) {
         return {features: [], icons: [], background: {Blank: true}, lineTypes: {}};
     }
     let features = {};
@@ -60,7 +66,7 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
     let background = {Blank: true};
     let lineTypes = {};
 
-    const display_type = scopePackage.display_types[cur_display.display_type];
+    const display_type = await getScopePackageDisplayType(cur_display.display_type);
 
     if (display_type) {
         // Add default icons
@@ -77,7 +83,7 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
 
     for (const item of cur_display.display_items) {
         if (item.Map) {
-            const smap = scopePackage.maps[item.Map.id];
+            const smap = await getScopePackageMap(item.Map.id);
             if (smap) {
                 if (item.Map.visible || visibleFeatures.find((f) => f.type === "map" && f.id === item.Map.id)) {
                     for (const feature of smap.features.features) {
@@ -123,7 +129,7 @@ const getMapFeatures = (scopePackage, cur_display, visibleFeatures) => {
                 }
             }
         } else if (item.Symbol) {
-            const symbol = scopePackage.symbols[item.Symbol.id];
+            const symbol = await getScopePackageSymbol(item.Symbol.id);
             if (symbol) {
                 let feature = {...symbol.feature};
                 let size = feature.properties.size;
@@ -201,17 +207,17 @@ const getFacilityDropdownData = (facilityId, facility, pathString, selectedPath)
     }
 }
 
-const getFacilitiesDropDownData = (scopePackage, facilityIndex) => {
+const getFacilitiesDropDownData = (facilities, facilityIndex) => {
     return {
         label: "Select Facility",
         value: "null",
         expanded: true,
-        children: scopePackage ? scopePackage.facilities.map((child, index) => getFacilityDropdownData(index, child, `${index}`, facilityIndex)) : []
+        children: facilities ? facilities.map((child, index) => getFacilityDropdownData(index, child, `${index}`, facilityIndex)) : []
     }
 }
 
 export const MapPage = () => {
-    const [scopePackage, setScopePackage] = useState();
+    const [facilities, setFacilities] = useState();
     const [facilityIndex, setFacilityIndex] = useState("0");
     const [displayIndex, setDisplayIndex] = useState(0);
     const [curDisplay, setCurDisplay] = useState({data: {features: [], icons: []}});
@@ -222,16 +228,18 @@ export const MapPage = () => {
     const [mapRotation, setMapRotation] = useState(0);
 
     useEffect(() => {
-        setFacilityDropDownData(getFacilitiesDropDownData(scopePackage, facilityIndex));
-    }, [scopePackage, facilityIndex]);
+        setFacilityDropDownData(getFacilitiesDropDownData(facilities, facilityIndex));
+    }, [facilities, facilityIndex]);
 
     useEffect(() => {
         setVisibleFeatures([]);
-    }, [scopePackage, facilityIndex, displayIndex]);
+    }, [facilities, facilityIndex, displayIndex]);
 
     useEffect(() => {
-        setCurDisplay(getCurDisplay(scopePackage, facilityIndex, displayIndex, visibleFeatures));
-    }, [scopePackage, facilityIndex, displayIndex, visibleFeatures])
+        (async () => {
+            setCurDisplay(await getCurDisplay(facilities, facilityIndex, displayIndex, visibleFeatures));
+        })();
+    }, [facilities, facilityIndex, displayIndex, visibleFeatures])
 
     useEffect(() => {
         if (curDisplay && curDisplay.display && curDisplay.display.center) {
@@ -244,6 +252,7 @@ export const MapPage = () => {
     const loadOptions = {
         0: {
             name: "ATC Scope Package (*.atcjson)",
+            sctType: "AtcScopePackage",
             openOptions: {
                 multiple: false,
                 title: "Select ATC Scope Package",
@@ -255,7 +264,7 @@ export const MapPage = () => {
         },
         1: {
             name: "CRC Facility (*.json)",
-            sctType: "CRC",
+            sctType: "Crc",
             openOptions: {
                 multiple: false,
                 title: "Select CRC Facility",
@@ -267,9 +276,9 @@ export const MapPage = () => {
         },
         2: {
             name: "EuroScope Profile (*.prf)",
-            sctType: "ES_PRF",
+            sctType: "EuroScopeProfile",
             openOptions: {
-                multiple: false,
+                multiple: true,
                 title: "Select EuroScope Profile",
                 filters: [{
                     name: "EuroScope Profile",
@@ -279,7 +288,7 @@ export const MapPage = () => {
         },
         3: {
             name: "EuroScope Package (Folder)",
-            sctType: "ES_DIR",
+            sctType: "EuroScopeDirectory",
             openOptions: {
                 multiple: false,
                 title: "Select EuroScope Package Folder",
@@ -294,33 +303,21 @@ export const MapPage = () => {
             const selected = await open(pkgType.openOptions);
 
             if (selected) {
-                let pkg;
-                if (eventKey === 0) {
-                    try {
-                        pkg = await loadScopePackage(selected);
-                    } catch (e) {
-                        console.error(e);
-                    }
+                const sendObj = {};
+                if (eventKey === "2") {
+                    sendObj[pkgType.sctType] = {
+                        paths: selected
+                    };
                 } else {
-                    const saveFile = await save({
-                        title: "Save ATC Scope Package",
-                        filters: [{
-                            name: "ATC Scope Package",
-                            extensions: ["atcjson"]
-                        }]
-                    });
-
-                    if (saveFile){
-                        try {
-                            pkg = await convertSectorFile(pkgType.sctType, selected, saveFile);
-                        } catch (e) {
-                            console.error(e);
-                        }
+                    sendObj[pkgType.sctType] = {
+                        path: selected
                     }
                 }
 
-                if (pkg) {
-                    setScopePackage(pkg);
+                await loadScopePackage(sendObj);
+
+                if (await isScopePackageLoaded()) {
+                    setFacilities(await getScopePackageFacilities());
                     setFacilityIndex("0");
                     setDisplayIndex(0);
                 }
@@ -349,19 +346,18 @@ export const MapPage = () => {
                          flexDirection: "row"
                      }}>
                     <h4 style={{flexGrow: "1"}}>{curDisplay.fullName}</h4>
-                    {scopePackage &&
+                    {facilities &&
                         <DropdownTreeSelect data={facilityDropDownData} mode="radioSelect" onChange={onFacilityDropdownChange}/>
                     }
-                    {scopePackage && curDisplay && curDisplay.facility &&
+                    {facilities && curDisplay && curDisplay.facility &&
                         <DropdownButton title="Select Display" variant="secondary" onSelect={(eventKey) => setDisplayIndex(eventKey)}>
                             {curDisplay.facility.displays.map((disp, key) => {
                                 return <DropdownItem key={key} eventKey={key}>{disp.name}</DropdownItem>
                             })}
                         </DropdownButton>
                     }
-                    {scopePackage && curDisplay &&
-                        <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay}
-                                      scopePackage={scopePackage}>
+                    {facilities && curDisplay &&
+                        <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay}>
                             {({handleShow}) => (
                                 <Button variant="secondary" onClick={handleShow}>Filters</Button>
                             )}

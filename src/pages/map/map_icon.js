@@ -44,6 +44,7 @@ export const makeIcon = (iconDef, color, size = 1) => {
     ctx.scale(size, size);
     ctx.translate(127, 127);
 
+    console.log(iconDef);
     for (const def of iconDef) {
         if (def.SetPixel) {
             ctx.fillStyle = color;
@@ -90,7 +91,7 @@ export const makeIcon = (iconDef, color, size = 1) => {
             }
 
             for (const coord of def.Polygon) {
-                ctx.lineTo(coord[0], coord[1]);
+                ctx.lineTo(coord[0], -coord[1]);
             }
 
             if (def.Polygon[0]) {

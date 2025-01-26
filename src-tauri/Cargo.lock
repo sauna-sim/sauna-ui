@@ -2882,9 +2882,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "sct-reader"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79d1adc13025f182ed566b35d954b964159794e5506d3c66f75c5d5f4a7d542b"
+checksum = "4a83855fd076d1cfd242b59ac65b1fc25083eca6af3ca7f9930ed17237dea16f"
 dependencies = [
  "anyhow",
  "aviation_calc_util",

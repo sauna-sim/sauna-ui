@@ -3,9 +3,9 @@ use std::process::{Child, Command};
 
 pub struct ChildGuard(pub Option<Child>);
 impl ChildGuard {
-    pub fn new() -> ChildGuard {
-        ChildGuard(None)
-    }
+    //pub fn new() -> ChildGuard {
+    //    ChildGuard(None)
+    //}
 
     pub fn start_child(&mut self, program_path: impl AsRef<Path>, exec_dir: Option<impl AsRef<Path>>, args: &[String]) {
         let mut command = Command::new(program_path.as_ref());

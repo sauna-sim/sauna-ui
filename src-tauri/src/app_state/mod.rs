@@ -1,8 +1,14 @@
 use std::path::Path;
-use crate::child_guard::ChildGuard;
-use crate::local_store::StoreContainer;
+use std::sync::Mutex;
+use sct_reader::package::AtcScopePackage;
+use crate::app_state::local_store::StoreContainer;
+use crate::utils::child_guard::ChildGuard;
 use crate::utils::port_finder::get_available_port;
 
+pub mod local_store;
+pub mod atc_scope_package;
+
+pub struct AppStateWrapper(pub Mutex<AppState>);
 
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -16,7 +22,8 @@ pub struct AppState {
     pub api_port: u16,
     pub api_builtin: bool,
     pub api_process: ChildGuard,
-    pub local_store: Option<StoreContainer>
+    pub local_store: Option<StoreContainer>,
+    pub map_scope_package: Option<AtcScopePackage>
 }
 
 impl AppState {
@@ -26,7 +33,8 @@ impl AppState {
             api_port: 5052,
             api_builtin: true,
             api_process: ChildGuard(None),
-            local_store: None
+            local_store: None,
+            map_scope_package: None
         }
     }
 
@@ -68,7 +76,7 @@ impl AppState {
                 .send()
                 .ok();
             child.wait().ok();
-            
+
             self.api_process = ChildGuard(None);
         }
     }
@@ -88,9 +96,21 @@ impl AppState {
             }
         }
 
-        return ApiConnectionPayload {
+        ApiConnectionPayload {
             hostname: "localhost".to_string(),
             port: 5000
         }
     }
+}
+
+#[tauri::command]
+pub fn get_sauna_api_builtin(app_state: tauri::State<AppStateWrapper>) -> Result<bool, String> {
+    let app_state_guard = app_state.0.lock().unwrap();
+    Ok(app_state_guard.api_builtin)
+}
+
+#[tauri::command]
+pub fn get_sauna_api_conn_details(app_state: tauri::State<AppStateWrapper>) -> Result<ApiConnectionPayload, String> {
+    let mut app_state_guard = app_state.0.lock().unwrap();
+    Ok(app_state_guard.get_api_conn_details())
 }
