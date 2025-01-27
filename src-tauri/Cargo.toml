@@ -7,21 +7,24 @@ license = "MIT"
 repository = "git+https://github.com/Sauna-ATC-Training-Simulator/sauna-ui.git"
 #default-run = "app"
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.80"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5.0", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
 fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.5.2", features = [ "window-close", "window-create", "shell-open", "dialog-all", "path-all", "fs-all"] }
+tauri = { version = "2", features = [] }
 zip = "0.6.6"
 reqwest = { version = "0.11.22", features = ["blocking"] }
 sct-reader = "0.5.0"
+tauri-plugin-dialog = "2"
+tauri-plugin-shell = "2"
+tauri-plugin-fs = "2"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {MapLibre} from "./map_libre";
 import {Button, Dropdown, DropdownButton} from "react-bootstrap";
-import {open, save} from '@tauri-apps/api/dialog';
+import {open, save} from '@tauri-apps/plugin-dialog';
 import {getColor, makeIcon} from "./map_icon.js";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownTreeSelect from "react-dropdown-tree-select";

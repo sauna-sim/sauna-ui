@@ -15,7 +15,7 @@ import qs from "qs";
 import {loadDFDFile} from "./data_actions";
 import {appDataDir, join} from "@tauri-apps/api/path";
 import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
-import {exists} from "@tauri-apps/api/fs";
+import {exists} from "@tauri-apps/plugin-fs";
 import {axiosSaunaApi} from "./api_connection_handler";
 
 const navigraphApiAuthUrl = "https://identity.api.navigraph.com";

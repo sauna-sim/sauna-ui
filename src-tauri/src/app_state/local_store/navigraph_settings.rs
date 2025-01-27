@@ -8,7 +8,7 @@ pub struct NavigraphSettings {
     #[serde(default)]
     pub refresh_token: String,
     #[serde(default)]
-    pub package: NavigraphPackageSettings
+    pub package: NavigraphPackageSettings,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -22,5 +22,5 @@ pub struct NavigraphPackageSettings {
     #[serde(default)]
     pub filename: String,
     #[serde(default)]
-    pub current: bool
+    pub current: bool,
 }

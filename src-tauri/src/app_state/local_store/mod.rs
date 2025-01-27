@@ -1,19 +1,19 @@
-use std::fs;
-use std::fs::File;
-use std::ops::IndexMut;
-use std::path::{Path, PathBuf};
-use serde::{Deserialize, Serialize};
-use std::io::Write;
 use crate::app_state::local_store::app_settings::Settings;
 use crate::app_state::local_store::navigraph_settings::NavigraphSettings;
 use crate::AppStateWrapper;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::fs::File;
+use std::io::Write;
+use std::ops::IndexMut;
+use std::path::{Path, PathBuf};
 
 pub mod app_settings;
 pub mod navigraph_settings;
 
 pub struct StoreContainer {
     pub store: LocalStore,
-    pub path: PathBuf
+    pub path: PathBuf,
 }
 
 impl StoreContainer {
@@ -21,9 +21,10 @@ impl StoreContainer {
         // Try to load store from path, otherwise generate default store
         StoreContainer {
             path: path.to_owned(),
-            store: std::fs::read_to_string(path).ok().and_then(|file_string| {
-                serde_json::from_str::<LocalStore>(&file_string).ok()
-            }).unwrap_or_default()
+            store: std::fs::read_to_string(path)
+                .ok()
+                .and_then(|file_string| serde_json::from_str::<LocalStore>(&file_string).ok())
+                .unwrap_or_default(),
         }
     }
 
@@ -51,14 +52,16 @@ impl StoreContainer {
         }
 
         *ret_val = value.clone();
-        self.store = serde_json::from_value::<LocalStore>(json).map_err(|error| error.to_string())?;
+        self.store =
+            serde_json::from_value::<LocalStore>(json).map_err(|error| error.to_string())?;
 
         Ok(())
     }
 
     pub fn save(&self) -> Result<(), String> {
         // Serialize to string
-        let json_str = serde_json::to_string_pretty(&self.store).map_err(|error| error.to_string())?;
+        let json_str =
+            serde_json::to_string_pretty(&self.store).map_err(|error| error.to_string())?;
 
         // Create directory
         if let Some(parent_path) = self.path.parent() {
@@ -110,17 +113,26 @@ pub fn store_save(app_state: tauri::State<AppStateWrapper>) -> Result<(), String
 }
 
 #[tauri::command(async)]
-pub fn store_get(key: &str, app_state: tauri::State<AppStateWrapper>) -> Result<serde_json::Value, String> {
+pub fn store_get(
+    key: &str,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<serde_json::Value, String> {
     let mut app_state_guard = app_state.0.lock().unwrap();
     if let Some(local_store) = app_state_guard.local_store.as_mut() {
-        local_store.get(key).ok_or("Error getting value from local store".to_owned())
+        local_store
+            .get(key)
+            .ok_or("Error getting value from local store".to_owned())
     } else {
         Err("Local Store is null".to_owned())
     }
 }
 
 #[tauri::command(async)]
-pub fn store_set(key: &str, value: serde_json::Value, app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {
+pub fn store_set(
+    key: &str,
+    value: serde_json::Value,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<(), String> {
     let mut app_state_guard = app_state.0.lock().unwrap();
     if let Some(local_store) = app_state_guard.local_store.as_mut() {
         local_store.set(key, value)
@@ -134,6 +146,5 @@ pub struct LocalStore {
     #[serde(default)]
     pub settings: Settings,
     #[serde(default)]
-    pub navigraph: NavigraphSettings
+    pub navigraph: NavigraphSettings,
 }
-
