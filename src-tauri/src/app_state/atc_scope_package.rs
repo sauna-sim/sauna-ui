@@ -1,14 +1,14 @@
-use std::clone::Clone;use std::fs::File;
-use std::io::BufWriter;
+use crate::utils::stringify_error;
+use crate::AppStateWrapper;
 use sct_reader::loaders::euroscope::loader::{EuroScopeLoader, EuroScopeLoaderPrf};
 use sct_reader::loaders::vnas_crc::CrcPackage;
-use sct_reader::package::{AtcFacility, AtcScopePackage};
 use sct_reader::package::display::AtcDisplayType;
 use sct_reader::package::map::AtcMap;
 use sct_reader::package::symbol::AtcMapSymbol;
+use sct_reader::package::{AtcFacility, AtcScopePackage};
 use serde::{Deserialize, Serialize};
-use crate::AppStateWrapper;
-use crate::utils::stringify_error;
+use std::clone::Clone;
+use std::env;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum LoadSectorFileType {
@@ -45,9 +45,8 @@ pub fn load_scope_package(package_to_load: LoadSectorFileType, app_state: tauri:
             Some(AtcScopePackage::try_from(result).map_err(stringify_error)?)
         }
         LoadSectorFileType::AtcScopePackage { path } => {
-            Some(serde_json::from_reader::<File, AtcScopePackage>(
-                File::open(&path).map_err(stringify_error)?)
-                .map_err(stringify_error)?)
+            let out_dir = env::temp_dir().join("sauna-ui").join("atc-scope-package");
+            Some(AtcScopePackage::import_from_gzip(&path, out_dir).map_err(stringify_error)?)
         }
     };
 
@@ -62,8 +61,8 @@ pub fn save_scope_package(path: &str, app_state: tauri::State<AppStateWrapper>) 
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {
-        serde_json::to_writer(BufWriter::new(File::create(&path).map_err(stringify_error)?), &pkg)
-            .map_err(stringify_error)?;
+        let out_dir = env::temp_dir().join("sauna-ui").join("atc-scope-package");
+        pkg.export_to_gzip(&path, out_dir.join("maps")).map_err(stringify_error)?;
     }
 
     Ok(())
@@ -100,10 +99,14 @@ pub fn get_scope_package_display_type(display_type: &str, app_state: tauri::Stat
 
 #[tauri::command(async)]
 pub fn get_scope_package_map(map_id: &str, app_state: tauri::State<AppStateWrapper>) -> Result<Option<AtcMap>, String> {
-    let app_state_guard = app_state.0.lock().unwrap();
+    let mut app_state_guard = app_state.0.lock().unwrap();
 
-    if let Some(pkg) = &app_state_guard.map_scope_package {
-        Ok(pkg.maps.get(map_id).map(|d| d.clone()))
+    if let Some(pkg) = &mut app_state_guard.map_scope_package {
+        let out_dir = env::temp_dir().join("sauna-ui").join("atc-scope-package");
+        Ok(pkg
+            .try_load_map_data(&map_id, out_dir.join("maps"))
+            .map(|map| map.cloned())
+            .map_err(stringify_error)?)
     } else {
         Err("No ATC Scope Package Loaded!".to_string())
     }

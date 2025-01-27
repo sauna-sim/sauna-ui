@@ -17,10 +17,12 @@ export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, chil
                 let values = {};
                 let availValues = {};
                 for (const item of display.display.display_items) {
-                    const mapName = await getScopePackageMapName(item.Map.id);
-                    if (item.Map && !item.Map.visible && mapName) {
-                        values[item.Map.id] = visibleFeatures.some((f) => f.type === "map" && f.id === item.Map.id);
-                        availValues[item.Map.id] = mapName;
+                    if (item.Map && !item.Map.visible) {
+                        const mapName = await getScopePackageMapName(item.Map.id);
+                        if (mapName) {
+                            values[item.Map.id] = visibleFeatures.some((f) => f.type === "map" && f.id === item.Map.id);
+                            availValues[item.Map.id] = mapName;
+                        }
                     }
                 }
 

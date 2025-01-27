@@ -12,7 +12,7 @@ import {
     getScopePackageFacilities,
     getScopePackageMap, getScopePackageSymbol,
     isScopePackageLoaded,
-    loadScopePackage
+    loadScopePackage, saveScopePackage
 } from "../../actions/scope_package_actions.js";
 
 const getCurDisplay = async (facilities, facilityIndex, displayIndex, visibleFeatures) => {
@@ -84,9 +84,10 @@ const getMapFeatures = async (facilities, cur_display, visibleFeatures) => {
     for (const item of cur_display.display_items) {
         if (item.Map) {
             const smap = await getScopePackageMap(item.Map.id);
+            //console.log(smap);
             if (smap) {
                 if (item.Map.visible || visibleFeatures.find((f) => f.type === "map" && f.id === item.Map.id)) {
-                    for (const feature of smap.features.features) {
+                    for (const feature of smap.data.Embedded.features.features) {
                         let new_feature = {...feature};
                         if (display_type && feature.properties.itemType) {
                             const defaults = display_type.map_defaults[feature.properties.itemType];
@@ -251,14 +252,14 @@ export const MapPage = () => {
 
     const loadOptions = {
         0: {
-            name: "ATC Scope Package (*.atcjson)",
+            name: "ATC Scope Package (*.atcpkg)",
             sctType: "AtcScopePackage",
             openOptions: {
                 multiple: false,
                 title: "Select ATC Scope Package",
                 filters: [{
                     name: "ATC Scope Package",
-                    extensions: ["atcjson"]
+                    extensions: ["atcpkg"]
                 }],
             }
         },
@@ -325,6 +326,19 @@ export const MapPage = () => {
         }
     };
 
+    const handleSavePackage = async () => {
+        const selected = await save({
+            filters: [{
+                name: "ATC Scope Package",
+                extensions: ["atcpkg"]
+            }]
+        });
+
+        if (selected) {
+            await saveScopePackage(selected);
+        }
+    }
+
     const onFacilityDropdownChange = (curNode, selNodes) => {
         if (selNodes && selNodes[0]) {
             setFacilityIndex(selNodes[0].value);
@@ -362,6 +376,9 @@ export const MapPage = () => {
                                 <Button variant="secondary" onClick={handleShow}>Filters</Button>
                             )}
                         </FiltersModal>
+                    }
+                    {facilities &&
+                        <Button variant={"primary"} onClick={handleSavePackage}>Save</Button>
                     }
                     <DropdownButton title="Load" variant="primary" onSelect={handleLoadPackage}>
                         {Object.entries(loadOptions).map(([key, value]) =>
