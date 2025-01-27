@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect} from "react";
-import {open} from '@tauri-apps/api/dialog';
+import {open} from '@tauri-apps/plugin-dialog';
 import {getLoadedSectorFiles, loadSectorFile} from "../../actions/data_actions";
 import {useSelector} from "react-redux";
 import {Badge, Button, OverlayTrigger, Tooltip} from "react-bootstrap";

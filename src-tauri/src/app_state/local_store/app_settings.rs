@@ -17,19 +17,23 @@ pub struct ApiServerSettings {
     #[serde(default = "default_api_host_name")]
     pub host_name: String,
     #[serde(default = "default_api_port")]
-    pub port: u16
+    pub port: u16,
 }
 impl Default for ApiServerSettings {
     fn default() -> Self {
         ApiServerSettings {
             host_name: default_api_host_name(),
-            port: default_api_port()
+            port: default_api_port(),
         }
     }
 }
 
-fn default_api_host_name() -> String {"localhost".to_string()}
-fn default_api_port() -> u16 {5000}
+fn default_api_host_name() -> String {
+    "localhost".to_string()
+}
+fn default_api_port() -> u16 {
+    5000
+}
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -37,19 +41,23 @@ pub struct ApiSettings {
     #[serde(default = "default_api_pos_calc_rate")]
     pub pos_calc_rate: u16,
     #[serde(default = "default_api_command_freq")]
-    pub command_frequency: String
+    pub command_frequency: String,
 }
 impl Default for ApiSettings {
     fn default() -> Self {
         ApiSettings {
             pos_calc_rate: default_api_pos_calc_rate(),
-            command_frequency: default_api_command_freq()
+            command_frequency: default_api_command_freq(),
         }
     }
 }
 
-fn default_api_pos_calc_rate() -> u16 {100}
-fn default_api_command_freq() -> String {"199.998".to_string()}
+fn default_api_pos_calc_rate() -> u16 {
+    100
+}
+fn default_api_command_freq() -> String {
+    "199.998".to_string()
+}
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -63,7 +71,7 @@ pub struct FsdConnectionSettings {
     #[serde(default = "default_fsd_port")]
     pub port: u16,
     #[serde(default = "default_fsd_protocol")]
-    pub protocol: String
+    pub protocol: String,
 }
 impl Default for FsdConnectionSettings {
     fn default() -> Self {
@@ -72,9 +80,13 @@ impl Default for FsdConnectionSettings {
             password: "".to_string(),
             hostname: "".to_string(),
             port: default_fsd_port(),
-            protocol: default_fsd_protocol()
+            protocol: default_fsd_protocol(),
         }
     }
 }
-fn default_fsd_port() -> u16 {6809}
-fn default_fsd_protocol() -> String {"Classic".to_string()}
+fn default_fsd_port() -> u16 {
+    6809
+}
+fn default_fsd_protocol() -> String {
+    "Classic".to_string()
+}

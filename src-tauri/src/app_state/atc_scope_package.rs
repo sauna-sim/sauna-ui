@@ -12,14 +12,17 @@ use std::env;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum LoadSectorFileType {
-    AtcScopePackage {path: String},
-    Crc {path: String},
-    EuroScopeDirectory {path: String},
-    EuroScopeProfile {paths: Vec<String>}
+    AtcScopePackage { path: String },
+    Crc { path: String },
+    EuroScopeDirectory { path: String },
+    EuroScopeProfile { paths: Vec<String> },
 }
 
 #[tauri::command(async)]
-pub fn load_scope_package(package_to_load: LoadSectorFileType, app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {
+pub fn load_scope_package(
+    package_to_load: LoadSectorFileType,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<(), String> {
     let package = match package_to_load {
         LoadSectorFileType::Crc { path } => {
             let crc_package = CrcPackage::try_new_from_file(path).map_err(stringify_error)?;
@@ -33,13 +36,12 @@ pub fn load_scope_package(package_to_load: LoadSectorFileType, app_state: tauri:
             Some(AtcScopePackage::try_from(result).map_err(stringify_error)?)
         }
         LoadSectorFileType::EuroScopeProfile { paths } => {
-            let es_prfs = paths.iter().map(|path|
-                EuroScopeLoaderPrf::try_new_from_prf(path).map_err(stringify_error))
+            let es_prfs = paths
+                .iter()
+                .map(|path| EuroScopeLoaderPrf::try_new_from_prf(path).map_err(stringify_error))
                 .collect::<Result<Vec<EuroScopeLoaderPrf>, String>>()?;
 
-            let mut es = EuroScopeLoader {
-                prfs: es_prfs
-            };
+            let mut es = EuroScopeLoader { prfs: es_prfs };
 
             let result = es.try_read().map_err(stringify_error)?;
             Some(AtcScopePackage::try_from(result).map_err(stringify_error)?)
@@ -57,12 +59,20 @@ pub fn load_scope_package(package_to_load: LoadSectorFileType, app_state: tauri:
 }
 
 #[tauri::command(async)]
-pub fn save_scope_package(path: &str, app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {
-    let app_state_guard = app_state.0.lock().unwrap();
+pub fn save_scope_package(
+    path: &str,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<(), String> {
+    let package = {
+        let app_state_guard = app_state.0.lock().unwrap();
 
-    if let Some(pkg) = &app_state_guard.map_scope_package {
+        &app_state_guard.map_scope_package.clone()
+    };
+
+    if let Some(pkg) = package {
         let out_dir = env::temp_dir().join("sauna-ui").join("atc-scope-package");
-        pkg.export_to_gzip(&path, out_dir.join("maps")).map_err(stringify_error)?;
+        pkg.export_to_gzip(&path, out_dir.join("maps"))
+            .map_err(stringify_error)?;
     }
 
     Ok(())
@@ -76,7 +86,9 @@ pub fn is_scope_package_loaded(app_state: tauri::State<AppStateWrapper>) -> bool
 }
 
 #[tauri::command(async)]
-pub fn get_scope_package_facilities(app_state: tauri::State<AppStateWrapper>) -> Result<Vec<AtcFacility>, String> {
+pub fn get_scope_package_facilities(
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<Vec<AtcFacility>, String> {
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {
@@ -87,7 +99,10 @@ pub fn get_scope_package_facilities(app_state: tauri::State<AppStateWrapper>) ->
 }
 
 #[tauri::command(async)]
-pub fn get_scope_package_display_type(display_type: &str, app_state: tauri::State<AppStateWrapper>) -> Result<Option<AtcDisplayType>, String> {
+pub fn get_scope_package_display_type(
+    display_type: &str,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<Option<AtcDisplayType>, String> {
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {
@@ -98,7 +113,10 @@ pub fn get_scope_package_display_type(display_type: &str, app_state: tauri::Stat
 }
 
 #[tauri::command(async)]
-pub fn get_scope_package_map(map_id: &str, app_state: tauri::State<AppStateWrapper>) -> Result<Option<AtcMap>, String> {
+pub fn get_scope_package_map(
+    map_id: &str,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<Option<AtcMap>, String> {
     let mut app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &mut app_state_guard.map_scope_package {
@@ -113,7 +131,10 @@ pub fn get_scope_package_map(map_id: &str, app_state: tauri::State<AppStateWrapp
 }
 
 #[tauri::command(async)]
-pub fn get_scope_package_map_name(map_id: &str, app_state: tauri::State<AppStateWrapper>) -> Result<Option<String>, String> {
+pub fn get_scope_package_map_name(
+    map_id: &str,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<Option<String>, String> {
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {
@@ -124,7 +145,10 @@ pub fn get_scope_package_map_name(map_id: &str, app_state: tauri::State<AppState
 }
 
 #[tauri::command(async)]
-pub fn get_scope_package_symbol(symbol_id: &str, app_state: tauri::State<AppStateWrapper>) -> Result<Option<AtcMapSymbol>, String> {
+pub fn get_scope_package_symbol(
+    symbol_id: &str,
+    app_state: tauri::State<AppStateWrapper>,
+) -> Result<Option<AtcMapSymbol>, String> {
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {

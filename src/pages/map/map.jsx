@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {MapLibre} from "./map_libre";
 import {Button, Dropdown, DropdownButton} from "react-bootstrap";
-import {open, save} from '@tauri-apps/api/dialog';
+import {open, save} from '@tauri-apps/plugin-dialog';
 import {getColor, makeIcon} from "./map_icon.js";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownTreeSelect from "react-dropdown-tree-select";
@@ -83,10 +83,9 @@ const getMapFeatures = async (facilities, cur_display, visibleFeatures) => {
 
     for (const item of cur_display.display_items) {
         if (item.Map) {
-            const smap = await getScopePackageMap(item.Map.id);
-            //console.log(smap);
-            if (smap) {
-                if (item.Map.visible || visibleFeatures.find((f) => f.type === "map" && f.id === item.Map.id)) {
+            if (item.Map.visible || visibleFeatures.find((f) => f.type === "map" && f.id === item.Map.id)) {
+                const smap = await getScopePackageMap(item.Map.id);
+                if (smap) {
                     for (const feature of smap.data.Embedded.features.features) {
                         let new_feature = {...feature};
                         if (display_type && feature.properties.itemType) {
@@ -300,7 +299,7 @@ export const MapPage = () => {
 
     const handleLoadPackage = async (eventKey) => {
         const pkgType = loadOptions[eventKey];
-        if (pkgType){
+        if (pkgType) {
             const selected = await open(pkgType.openOptions);
 
             if (selected) {
