@@ -11,7 +11,11 @@ const webview = new WebviewWindow("main");
 webview.once("tauri://close-requested", async function (e) {
     await storeSave();
     for (const window of await getAllWebviewWindows()){
-        void window.close();
+        try {
+            await window.close();
+        } finally {
+            console.log(window.label);
+        }
     }
 });
 
