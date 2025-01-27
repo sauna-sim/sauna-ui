@@ -63,9 +63,13 @@ pub fn save_scope_package(
     path: &str,
     app_state: tauri::State<AppStateWrapper>,
 ) -> Result<(), String> {
-    let app_state_guard = app_state.0.lock().unwrap();
+    let package = {
+        let app_state_guard = app_state.0.lock().unwrap();
 
-    if let Some(pkg) = &app_state_guard.map_scope_package {
+        &app_state_guard.map_scope_package.clone()
+    };
+
+    if let Some(pkg) = package {
         let out_dir = env::temp_dir().join("sauna-ui").join("atc-scope-package");
         pkg.export_to_gzip(&path, out_dir.join("maps"))
             .map_err(stringify_error)?;
