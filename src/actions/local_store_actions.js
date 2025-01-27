@@ -1,4 +1,4 @@
-import {invoke} from "@tauri-apps/api";
+import {invoke} from "@tauri-apps/api/core";
 import {store as reduxStore} from '../redux/store';
 import {setNvgAuthenticated, setNvgIsCurrent, setNvgPackageInfo} from "../redux/slices/navigraphSlice";
 import {getSaunaApiConnectionDetails} from "./tauri_actions";

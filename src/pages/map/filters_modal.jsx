@@ -1,30 +1,36 @@
 import React, {useEffect, useState} from "react";
 import {Button, Form, Modal} from "react-bootstrap";
 import {Formik} from "formik";
+import {getScopePackageMapName, isScopePackageLoaded} from "../../actions/scope_package_actions.js";
 
-export const FiltersModal = ({scopePackage, display, visibleFeatures, setVisibleFeatures, children}) => {
+export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, children}) => {
     const [show, setShow] = useState(false);
     const [initValues, setInitValues] = useState({});
     const [availValues, setAvailValues] = useState({});
 
     useEffect(() => {
-        if (!display || !display.display || !display.display.display_items || !scopePackage.maps) {
-            setInitValues({});
-            setAvailValues({});
-        } else {
-            let values = {};
-            let availValues = {};
-            for (const item of display.display.display_items) {
-                if (item.Map && !item.Map.visible && scopePackage.maps[item.Map.id]) {
-                    values[item.Map.id] = visibleFeatures.some((f) => f.type === "map" && f.id === item.Map.id);
-                    availValues[item.Map.id] = scopePackage.maps[item.Map.id].name;
+        (async () => {
+            if (!display || !display.display || !display.display.display_items || !await isScopePackageLoaded()) {
+                setInitValues({});
+                setAvailValues({});
+            } else {
+                let values = {};
+                let availValues = {};
+                for (const item of display.display.display_items) {
+                    if (item.Map && !item.Map.visible) {
+                        const mapName = await getScopePackageMapName(item.Map.id);
+                        if (mapName) {
+                            values[item.Map.id] = visibleFeatures.some((f) => f.type === "map" && f.id === item.Map.id);
+                            availValues[item.Map.id] = mapName;
+                        }
+                    }
                 }
-            }
 
-            setInitValues(values);
-            setAvailValues(availValues);
-        }
-    }, [scopePackage, display, visibleFeatures]);
+                setInitValues(values);
+                setAvailValues(availValues);
+            }
+        })();
+    }, [display, visibleFeatures]);
 
     const handleShow = () => {
         setShow(true);

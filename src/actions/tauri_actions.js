@@ -1,10 +1,10 @@
-import {createDir} from "@tauri-apps/api/fs";
-import {invoke} from "@tauri-apps/api";
-import {getAll, WebviewWindow} from "@tauri-apps/api/window";
+import {invoke} from "@tauri-apps/api/core";
+import {getAllWebviewWindows, WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {storeSave} from "./local_store_actions";
 import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
+import {mkdir} from "@tauri-apps/plugin-fs";
 
 import {save} from "@tauri-apps/api/dialog";
 import { writeTextFile } from "@tauri-apps/api/fs";
@@ -53,8 +53,12 @@ export async function createSaunaScenarioMakerWindow() {
 const webview = new WebviewWindow("main");
 webview.once("tauri://close-requested", async function (e) {
     await storeSave();
-    for (const window of getAll()){
-        await window.close();
+    for (const window of await getAllWebviewWindows()){
+        try {
+            await window.close();
+        } finally {
+            console.log(window.label);
+        }
     }
 });
 
@@ -75,7 +79,7 @@ export async function getSaunaApiConnectionDetails(){
 
 export async function downloadFileFromUrl(url, location){
     // Create directory
-    await createDir(location, {recursive: true});
+    await mkdir(location, {recursive: true});
     // Invoke Rust command
     return await invoke('download_file', {
         dir: location,
@@ -97,20 +101,6 @@ export async function extractZipFile(zipfile, dir){
     });
 }
 
-export async function loadScopePackage(file) {
-    return await invoke('load_scope_package', {
-        path: file
-    });
-}
-
-export async function convertSectorFile(sctType, path, outFile) {
-    return await invoke('convert_sector_file', {
-        sctType,
-        path,
-        outFile
-    });
-}
-
 export const TauriWindowEnum = {
     MAP_PAGE: "mapPageLabel",
     COMMAND_WINDOW: "commandWindowLabel"
@@ -125,6 +115,7 @@ export async function createMapWindow(){
         title: "Sauna Map",
         width: 800,
         minHeight: 400,
+        visible: true,
         minWidth: 400
     });
 }
