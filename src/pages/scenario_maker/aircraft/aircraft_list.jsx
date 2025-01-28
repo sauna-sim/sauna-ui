@@ -74,6 +74,7 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
     }
 
     useEffect(() => {
+        console.log(aircrafts);
         isArrayEqual();
     }, [aircrafts, prevAircrafts]);
     return (
@@ -158,11 +159,11 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
                                 <td>{aircraft.alt}</td>
                                 <td>{aircraft.acftType}</td>
                                 <td>{aircraft.squawk}</td>
-                                <td>{aircraft.dep}</td>
-                                <td>{aircraft.arr}</td>
+                                <td>{aircraft.fp.origin}</td>
+                                <td>{aircraft.fp.destination}</td>
                                 <td>{aircraft.fp.route}</td>
-                                <td>{aircraft.fp.fpalt}</td>
-                                <td>{aircraft.fp.tas}</td>
+                                <td>{aircraft.fp.cruiseLevel}</td>
+                                <td>{aircraft.fp.filedTas}</td>
                                 <td>{aircraft.fp.flightRules}</td>
                                 <td className="p-2" style={{ width: "133px" }}>
                                     <Button

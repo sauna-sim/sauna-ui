@@ -28,31 +28,43 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
         alt: Yup.number()
             .required("Altitude is required")
             .max(99999, "The altitude cannot exceed 99,999ft"),
+        acftType: Yup.string()
+            .required("Aircraft Type is required")
+            .matches(/^[a-zA-Z0-9]+$/, "Alphanumeric characters only!"),
         squawk: Yup.string()
             .required("Squawk required")
             .matches(/^[0-7]{4}$/, "Squawk must be between 0000-7777"),
-        dep: Yup.string()
+        fp: Yup.object().shape({
+            origin: Yup.string()
             .required("Departure airport is required")
             .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
             .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
-        arr: Yup.string()
-        .required("Destination airport is required")
-        .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
-        .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
-        fp: Yup.object().shape({
+            destination: Yup.string()
+            .required("Destination airport is required")
+            .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
+            .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
             route: Yup.string()
                 .required("Flight Plan route is required"),
-            fpalt: Yup.number()
+            cruiseLevel: Yup.number()
             .required("Altitude is required")
             .min(0, "The altitude has to be atleast 0")
             .max(99999, "The altitude cannot exceed 99,999ft"),
-            tas: Yup.number()
+            filedTas: Yup.number()
                 .min(0, "Airspeed has to be atleast 1"),
         })
 
     })
 
     const onSubmit = async (values) => {
+        values.fp.aircraftType = values.acftType;
+        values.fp.alternate = "";
+        values.fp.actualDepTime = 0;
+        values.fp.estimatedDepTime = 0;
+        values.fp.hoursEnroute = 0;
+        values.fp.hoursFuel = 0;
+        values.fp.minutesEnroute = 0;
+        values.fp.minutesFuel = 0;
+        values.fp.remarks = "";
         onAircraftSubmit(values)
         onClose();
     };
@@ -83,12 +95,12 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                     alt: "",
                     acftType: "",
                     squawk: "",
-                    dep: "",
-                    arr: "",
                     fp: {
+                        origin: "",
+                        destination: "",
                         route: "",
-                        fpalt: "",
-                        tas: "",
+                        cruiseLevel: "",
+                        filedTas: "",
                         flightRules: "I",
                     },
                 }}
@@ -209,14 +221,14 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                     <Form.Label>Departure</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
-                                            name="dep"
-                                            value={values.dep}
+                                            name="fp.origin"
+                                            value={values.fp.origin}
                                             onChange={handleChangeUpperCase(handleChange)}
                                             onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "dep") && getIn(errors, "dep")}
+                                            isInvalid={getIn(touched, "fp.origin") && getIn(errors, "fp.origin")}
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "dep")}
+                                            {getIn(errors, "fp.origin")}
                                         </Form.Control.Feedback>
                                     </InputGroup>
                                 </Col>
@@ -224,14 +236,14 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                     <Form.Label>Arrival</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
-                                            name="arr"
-                                            value={values.arr}
+                                            name="fp.destination"
+                                            value={values.fp.destination}
                                             onChange={handleChangeUpperCase(handleChange)}
                                             onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "arr") && getIn(errors, "arr")}
+                                            isInvalid={getIn(touched, "fp.destination") && getIn(errors, "fp.destination")}
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "arr")}
+                                            {getIn(errors, "fp.destination")}
                                         </Form.Control.Feedback>
                                     </InputGroup>
                                 </Col>
@@ -258,15 +270,15 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                     <Form.Label>Cruise Altitude</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
-                                            name="fp.fpalt"
+                                            name="fp.cruiseLevel"
                                             type="number"
-                                            value={values.fp.fpalt}
+                                            value={values.fp.cruiseLevel}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.fpalt") && getIn(errors, "fp.fpalt")}
+                                            isInvalid={getIn(touched, "fp.cruiseLevel") && getIn(errors, "fp.cruiseLevel")}
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.fpalt")}
+                                            {getIn(errors, "fp.cruiseLevel")}
                                         </Form.Control.Feedback>
                                     </InputGroup>
                                 </Col>
@@ -274,15 +286,15 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                     <Form.Label>Cruise Speed</Form.Label>
                                     <InputGroup hasValidation>
                                         <Form.Control
-                                            name="fp.tas"
+                                            name="fp.filedTas"
                                             type="number"
-                                            value={values.fp.tas}
+                                            value={values.fp.filedTas}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.tas") && getIn(errors, "fp.tas")}
+                                            isInvalid={getIn(touched, "fp.filedTas") && getIn(errors, "fp.filedTas")}
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.tas")}
+                                            {getIn(errors, "fp.filedTas")}
                                         </Form.Control.Feedback>
                                     </InputGroup>
                                 </Col>
@@ -296,10 +308,10 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                             onBlur={handleBlur}
                                             isInvalid={getIn(touched, "fp.flightRules") && getIn(errors, "fp.flightRules")}
                                         >
-                                            <option value="I">IFR</option>
-                                            <option value="V">VFR</option>
-                                            <option value="D">DVFR</option>
-                                            <option value="S">SVFR</option>
+                                            <option value="IFR">IFR</option>
+                                            <option value="VFR">VFR</option>
+                                            <option value="DVFR">DVFR</option>
+                                            <option value="SVFR">SVFR</option>
                                         </Form.Select>
                                         <Form.Control.Feedback type="invalid">
                                             {getIn(errors, "fp.flightRules")}
