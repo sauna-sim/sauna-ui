@@ -6,7 +6,7 @@ mod utils;
 
 use crate::app_state::atc_scope_package::{
     get_scope_package_display_type, get_scope_package_facilities, get_scope_package_map,
-    get_scope_package_map_name, get_scope_package_symbol, is_scope_package_loaded,
+    get_scope_package_map_name, get_scope_package_symbols, is_scope_package_loaded,
     load_scope_package, save_scope_package,
 };
 use crate::app_state::local_store::{store_get, store_save, store_set};
@@ -47,7 +47,7 @@ fn main() {
             get_scope_package_facilities,
             get_scope_package_display_type,
             get_scope_package_map,
-            get_scope_package_symbol,
+            get_scope_package_symbols,
             get_scope_package_map_name
         ])
         .setup(|app| {

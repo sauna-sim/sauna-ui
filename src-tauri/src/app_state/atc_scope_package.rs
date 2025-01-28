@@ -145,14 +145,14 @@ pub fn get_scope_package_map_name(
 }
 
 #[tauri::command(async)]
-pub fn get_scope_package_symbol(
-    symbol_id: &str,
+pub fn get_scope_package_symbols(
+    symbol_ids: Vec<&str>,
     app_state: tauri::State<AppStateWrapper>,
-) -> Result<Option<AtcMapSymbol>, String> {
+) -> Result<Vec<Option<AtcMapSymbol>>, String> {
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {
-        Ok(pkg.symbols.get(symbol_id).map(|d| d.clone()))
+        Ok(symbol_ids.iter().map(|symbol_id| pkg.symbols.get(*symbol_id).map(|d| d.clone())).collect())
     } else {
         Err("No ATC Scope Package Loaded!".to_string())
     }

@@ -32,9 +32,9 @@ export async function getScopePackageMap(mapId) {
     });
 }
 
-export async function getScopePackageSymbol(symbolId) {
-    return await invoke('get_scope_package_symbol', {
-        symbolId
+export async function getScopePackageSymbols(symbolIds) {
+    return await invoke('get_scope_package_symbols', {
+        symbolIds
     });
 }
 
