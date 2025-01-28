@@ -16,6 +16,7 @@
     "fs:allow-remove",
     "fs:allow-rename",
     "fs:allow-exists",
+    "fs:allow-write-text-file",
     {
       "identifier": "fs:scope",
       "allow": [

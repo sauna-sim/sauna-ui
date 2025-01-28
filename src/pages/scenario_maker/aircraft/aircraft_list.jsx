@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import Button from 'react-bootstrap/Button';
-import Table from 'react-bootstrap/Table';
+import {Button, Modal, Table} from 'react-bootstrap';
 import AircraftListModal from './aircraft_list_modal';
-import { saveAircraftScenarioFile } from '../../../actions/tauri_actions';
+import { openAircraftScenarioFile, saveAircraftScenarioFile } from '../../../actions/tauri_actions';
 
 export default function AircraftList({ aircrafts, setAircrafts }) {
+    const [showSaveDialog, setShowSaveDialog] = useState(false);
 
-    const [showModal, setShowModal] = React.useState(false);
+    const [showAddAircraftModal, setShowAddAircraftModal] = React.useState(false);
     const [currentAircraft, setCurrentAircraft] = React.useState(null);
 
     const [fileHandle, setFileHandle] = React.useState(null);
@@ -23,15 +23,9 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
         fp: { route: "DCT XYZ", fpalt: 35000, tas: 420, flightRules: "I" },
     };
 
-    const getButtonVariant = () => {
-        if(isArrayEqual() && fileHandle){
-            return "success";
-        }
-        else {
-            return "outline-warning";
-        }
+    const [fileState, setFileState] = useState("success");
 
-    }
+
 
     const isArrayEqual = () => {
         if (prevAircrafts.length !== aircrafts.length) {
@@ -44,12 +38,13 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
             for(const key of Object.keys(prevAircraft)) {
                 if(prevAircraft[key] !== aircraft[key])
                 {
-                    return false;
+                    setFileState("outline-warning");
+                }
+                else{
+                    setFileState("success");
                 }
             }
         }
-
-        return true;
     }
 
     const onAircraftSubmit = (aircraft) => {
@@ -70,21 +65,66 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
         setAircrafts(updatedAircrafts);
     }
 
+    const handleAircraftScenarioFileLoad = async () => {
+        const aircraftList = await openAircraftScenarioFile({ setFileHandle });
+        if (aircraftList) {
+            setAircrafts(aircraftList.aircraft);
+            setPrevAircrafts(aircraftList.aircraft);
+        }
+    }
+
+    useEffect(() => {
+        isArrayEqual();
+    }, [aircrafts, prevAircrafts]);
     return (
         <div>
+            <Modal show={showSaveDialog} onHide={() => setShowSaveDialog(false)}>
+				<Modal.Header closeButton>
+					<Modal.Title>Save File</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					Are you sure you want to continue without saving? This cannot be undone!
+				</Modal.Body>
+				<Modal.Footer>
+                    <Button variant='danger' onClick={() => {
+                        handleAircraftScenarioFileLoad();
+                        setShowSaveDialog(false);
+                    }}>Yes</Button>
+                    <Button variant='primary' onClick={async () => {
+                        await saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts});
+                        handleAircraftScenarioFileLoad();
+                        setShowSaveDialog(false);
+                        }}>Save
+                    </Button>
+				</Modal.Footer>
+			</Modal>
             <Button
                 variant="secondary"
                 onClick={() => {
                     setCurrentAircraft(null);
-                    setShowModal(true);
+                    setShowAddAircraftModal(true);
                 }}
                 style={{marginBottom: "10px"}}
             >
                 Add Aircraft
+            </Button> {' '}
+            <Button
+                variant="secondary"
+                onClick={() => {
+                    if(fileState === "success") {
+                        handleAircraftScenarioFileLoad();
+                    }
+                    else {
+                        setShowSaveDialog(true);
+                    }
+                }}
+                style={{marginBottom: "10px"}}
+            >
+                Load Scenario File
             </Button>
-            {showModal && (
+            {showAddAircraftModal && (
                 <AircraftListModal
-                    onClose={() => setShowModal(false)}
+                    onClose={() => setShowAddAircraftModal(false)}
                     onAircraftSubmit={onAircraftSubmit}
                     aircraft={currentAircraft}
                     aircrafts={aircrafts}
@@ -113,10 +153,10 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
                         {aircrafts.map((aircraft, index) => (
                             <tr key={index}>
                                 <td>{aircraft.callsign}</td>
-                                <td>{aircraft.acftType}</td>
                                 <td>{aircraft.pos.lat}</td>
                                 <td>{aircraft.pos.lon}</td>
                                 <td>{aircraft.alt}</td>
+                                <td>{aircraft.acftType}</td>
                                 <td>{aircraft.squawk}</td>
                                 <td>{aircraft.dep}</td>
                                 <td>{aircraft.arr}</td>
@@ -130,7 +170,7 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
                                         size="sm"
                                         onClick={() => {
                                             setCurrentAircraft(aircraft);
-                                            setShowModal(true);
+                                            setShowAddAircraftModal(true);
                                         }}
                                         style={{ marginRight: "6px" }}
                                     >
@@ -163,14 +203,26 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
                 </Button>
 
                 <Button
-                    variant={getButtonVariant()}
+                    variant={fileState}
                     size="sm"
                     onClick={() => {
                         saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts});
                         setPrevAircrafts(aircrafts);
                     }}
+                    style={{ marginRight: "5px"}}
                 >
                     Save
+                </Button>
+
+                <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => {
+                        saveAircraftScenarioFile({fileHandle: null, setFileHandle, aircrafts});
+                        setPrevAircrafts(aircrafts);
+                    }}
+                >
+                    Save as
                 </Button>
             </div>
         </div>

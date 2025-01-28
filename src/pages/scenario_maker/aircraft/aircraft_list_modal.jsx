@@ -298,6 +298,8 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                         >
                                             <option value="I">IFR</option>
                                             <option value="V">VFR</option>
+                                            <option value="D">DVFR</option>
+                                            <option value="S">SVFR</option>
                                         </Form.Select>
                                         <Form.Control.Feedback type="invalid">
                                             {getIn(errors, "fp.flightRules")}

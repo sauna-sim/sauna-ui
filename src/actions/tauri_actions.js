@@ -4,14 +4,39 @@ import {storeSave} from "./local_store_actions";
 import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
-import {mkdir, writeTextFile} from "@tauri-apps/plugin-fs";
-import {save} from '@tauri-apps/plugin-dialog';
+import {mkdir, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
+import {save, open} from '@tauri-apps/plugin-dialog';
+
+
+export async function openAircraftScenarioFile({setFileHandle}) {
+    try{
+        const fileHandle = await open({
+            multiple: false,
+            filters: [{
+                name: "Aircraft Scenario Files",
+                extensions: ["json"]
+            }]
+        });
+        if(fileHandle) {
+            const fileContent = await readTextFile(fileHandle);
+            const parsedData = JSON.parse(fileContent);
+            setFileHandle(fileHandle);
+            return parsedData;
+        }
+        else {
+            console.log("Open operation was canceled");
+        }
+    } catch (error) {
+        console.error("Error opening file: ", error);
+    }
+}
 
 export async function saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts}) {
     try{
+        const dataToSave = {aircraft: aircrafts};
         if(fileHandle) {
             console.log(`File saved to: ${fileHandle}`);
-            await writeTextFile(fileHandle, JSON.stringify(aircrafts, null, 2));
+            await writeTextFile(fileHandle, JSON.stringify(dataToSave, null, 2));
         }
         else {
             const filePath = await save({
@@ -21,7 +46,7 @@ export async function saveAircraftScenarioFile({fileHandle, setFileHandle, aircr
 
             if(filePath) {
                 setFileHandle(filePath);
-                await writeTextFile(filePath, JSON.stringify(aircrafts, null, 2));
+                await writeTextFile(filePath, JSON.stringify(dataToSave, null, 2));
                 console.log(`File saved to: ${filePath}`);
             }
             else {
