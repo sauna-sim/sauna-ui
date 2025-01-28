@@ -58,3 +58,17 @@ export async function loadEuroscopeScenario(filename) {
         protocol: await getStoreItem("settings.fsdConnection.protocol")
     })).data;
 }
+
+export async function loadSaunaScenario(filename) {
+    const url = `${await getApiUrl()}/data/loadSaunaScenario`;
+    // Resend settings
+    await updateServerSettings(await getStoreItem("settings.apiSettings"));
+    return (await axiosSaunaApi.post(url, {
+        fileName: filename,
+        cid: await getStoreItem("settings.fsdConnection.networkId"),
+        password: await getStoreItem("settings.fsdConnection.password"),
+        server: await getStoreItem("settings.fsdConnection.hostname"),
+        port: await getStoreItem("settings.fsdConnection.port"),
+        protocol: await getStoreItem("settings.fsdConnection.protocol")
+    })).data;
+}
