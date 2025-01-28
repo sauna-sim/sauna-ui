@@ -1,5 +1,5 @@
 import React from "react";
-import {open} from '@tauri-apps/api/dialog';
+import {open} from '@tauri-apps/plugin-dialog';
 import {loadEuroscopeScenario, loadSaunaScenario} from "../../actions/data_actions";
 import {Button, ButtonGroup, Dropdown, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
