@@ -7,6 +7,7 @@ import {
     onAircraftCreated,
     onAircraftDeleted, resetAircraftList,
 } from "../redux/slices/aircraftSlice";
+import {onMessageReceive} from "../redux/slices/messagesSlice.js";
 
 // Axios Sauna-API Settings
 export const axiosSaunaApi = axios.create();
@@ -26,6 +27,8 @@ axiosSaunaApi.interceptors.response.use(
                 // Connection has been lost
                 reduxStore.dispatch(onConnectionLost());
                 reduxStore.dispatch(resetAircraftList());
+
+                // Close other windows
 
                 // Start retrying connection
                 establishApiConnection().then(() => {});
@@ -49,7 +52,6 @@ export async function establishApiConnection(){
     trying = true;
     while (!connected){
         try {
-            console.log("Trying", `${await getApiUrl()}/server/info`);
             const serverInfo = (await axiosSaunaApi.get(`${await getApiUrl()}/server/info`)).data;
             reduxStore.dispatch(onConnectionEstablished(serverInfo));
             reduxStore.dispatch(resetAircraftList());
@@ -79,6 +81,12 @@ async function startWebSocket(){
             switch (message.type){
                 case "SIM_STATE_UPDATE":
                     reduxStore.dispatch(onSimStateChange(message.data));
+                    break;
+                case "COMMAND_MSG":
+                    reduxStore.dispatch(onMessageReceive({
+                        received: true,
+                        msg: message.data
+                    }));
                     break;
                 case "AIRCRAFT_UPDATE":
                     handleAircraftUpdate(message.data);
@@ -118,6 +126,7 @@ function handleAircraftUpdate(data){
             reduxStore.dispatch(onAircraftCreated(data));
             break;
         case "DELETED":
+            console.log("deleted", data);
             reduxStore.dispatch(onAircraftDeleted(data.callsign));
             break;
     //     case "FSD_CONNECTION_STATUS":

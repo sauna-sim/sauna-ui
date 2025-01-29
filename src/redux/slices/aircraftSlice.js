@@ -5,7 +5,9 @@ export const aircraftSlice = createSlice({
     initialState: [],
     reducers: {
         onAircraftCreated: (state, action) => {
-            state.push(action.payload.callsign);
+            if (!state.includes(action.payload.callsign)) {
+                state.push(action.payload.callsign);
+            }
         },
         onAircraftDeleted: (state, action) => {
             const index = state.indexOf(action.payload.callsign);

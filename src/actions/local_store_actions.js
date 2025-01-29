@@ -1,4 +1,4 @@
-import {invoke} from "@tauri-apps/api";
+import {invoke} from "@tauri-apps/api/core";
 import {store as reduxStore} from '../redux/store';
 import {setNvgAuthenticated, setNvgIsCurrent, setNvgPackageInfo} from "../redux/slices/navigraphSlice";
 import {getSaunaApiConnectionDetails} from "./tauri_actions";
@@ -9,8 +9,6 @@ export async function getStoreItem(key){
         key
     });
 }
-
-
 
 export async function setStoreItem(key, value){
     // Invoke Rust command
@@ -31,15 +29,6 @@ export async function getApiSettings(){
 
 export async function saveApiSettings(apiSettings){
     await setStoreItem("settings.apiSettings", apiSettings);
-}
-
-export async function getRadarSettings(){
-    return await getStoreItem("settings.radarSettings");
-}
-
-export async function saveRadarSettings(radarSettings){
-    console.log(radarSettings);
-    await setStoreItem("settings.radarSettings", radarSettings);
 }
 
 export async function getFsdSettings(){

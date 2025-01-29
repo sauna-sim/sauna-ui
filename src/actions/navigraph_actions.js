@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
-    clearNavigraphRefreshToken, getApiUrl,
+    clearNavigraphRefreshToken,
+    getApiUrl,
     getNavigraphPackageInfo,
     getNavigraphRefreshToken,
     setNavigraphPackageInfo,
@@ -9,17 +10,12 @@ import {
     storeSave
 } from "./local_store_actions";
 import pkce from "@navigraph/pkce";
-import {
-    getNavigraphFullToken,
-    NAVIGRAPH_ACCESS_TOKEN,
-    NAVIGRAPH_TOKEN_EXPIRATION,
-    NAVIGRAPH_TOKEN_TYPE
-} from "./session_storage_actions";
+import {getNavigraphFullToken, SessionStorageKeys} from "./session_storage_actions";
 import qs from "qs";
 import {loadDFDFile} from "./data_actions";
 import {appDataDir, join} from "@tauri-apps/api/path";
 import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
-import {exists} from "@tauri-apps/api/fs";
+import {exists} from "@tauri-apps/plugin-fs";
 import {axiosSaunaApi} from "./api_connection_handler";
 
 const navigraphApiAuthUrl = "https://identity.api.navigraph.com";
@@ -46,7 +42,6 @@ axiosNavigraphApi.interceptors.response.use(
 
             // Refresh Token
             try {
-                console.log("Failed, refreshing Navigraph token.");
                 await refreshNavigraphToken();
                 axiosNavigraphApi.defaults.headers.common["Authorization"] = getNavigraphFullToken();
 
@@ -100,11 +95,10 @@ export async function navigraphAuthFlow(onDeviceAuthResp) {
 }
 
 export async function storeToken(tokenResponse) {
-    console.log(tokenResponse);
     // Session Storage
-    sessionStorage.setItem(NAVIGRAPH_ACCESS_TOKEN, tokenResponse.access_token);
-    sessionStorage.setItem(NAVIGRAPH_TOKEN_TYPE, tokenResponse.token_type);
-    sessionStorage.setItem(NAVIGRAPH_TOKEN_EXPIRATION, tokenResponse.expires_in);
+    sessionStorage.setItem(SessionStorageKeys.NAVIGRAPH_ACCESS_TOKEN, tokenResponse.access_token);
+    sessionStorage.setItem(SessionStorageKeys.NAVIGRAPH_TOKEN_TYPE, tokenResponse.token_type);
+    sessionStorage.setItem(SessionStorageKeys.NAVIGRAPH_TOKEN_EXPIRATION, tokenResponse.expires_in);
 
     // Electron Store
     await setNavigraphRefreshToken(tokenResponse.refresh_token);
@@ -220,8 +214,6 @@ export async function refreshNavigraphToken() {
         }
     );
 
-    console.log("Token refreshed");
-
     await storeToken(tokenResp.data);
 }
 
@@ -253,9 +245,6 @@ export async function checkNavigraphPackage() {
     // Get Server Packages
     const serverPackages = await getNavigraphPackages();
 
-    console.log("Local Package", localPackage);
-    console.log("Server Packages", serverPackages);
-
     // Find current and latest outdated package
     let currentPackage;
     let outdatedPackage;
@@ -286,9 +275,6 @@ export async function checkNavigraphPackage() {
 
     await setNavigraphPackageIsCurrent(isCurrentPkg);
 
-    console.log("Latest Server Package", latestServerPackage);
-    console.log(await join(await appDataDir(), "navdata"));
-
     // Check if we have the latest package
     if (latestServerPackage && latestServerPackage.files && latestServerPackage.files.length > 0) {
         // If we don't, update the local package
@@ -299,12 +285,10 @@ export async function checkNavigraphPackage() {
             // Download package
             const dir = await join(await appDataDir(), "navdata");
             const filename = await downloadFileFromUrl(latestServerPackage.files[0].signed_url, dir);
-            console.log("File downloaded", filename);
 
             // Extract zip
             try {
                 const filesInZip = await extractZipFile(filename, dir);
-                console.log(filesInZip);
                 if (filesInZip.length > 0) {
                     const newPackageInfo = {
                         package_id: latestServerPackage.package_id,
@@ -312,8 +296,6 @@ export async function checkNavigraphPackage() {
                         revision: latestServerPackage.revision,
                         filename: await join(dir, filesInZip[0])
                     };
-
-                    console.log("New Package", newPackageInfo);
 
                     // Update package
                     await setNavigraphPackageInfo(newPackageInfo);
@@ -330,8 +312,6 @@ export async function checkNavigraphPackage() {
 
 
 export async function getNavigraphPackages() {
-    console.log(parseJwt(sessionStorage.getItem(NAVIGRAPH_ACCESS_TOKEN)));
-
     const params = {
         //format: "orbx_v1", // TODO: Change this to our actual format
         package_status: "current,outdated"
