@@ -20,7 +20,7 @@ export default function AircraftList({ aircrafts, setAircrafts }) {
         squawk: "1234",
         dep: "EGLL",
         arr: "KLAX",
-        fp: { route: "DCT XYZ", fpalt: 35000, tas: 420, flightRules: "I" },
+        fp: { route: "DCT XYZ", fpalt: 35000, tas: 420, flightRules: "IFR" },
     };
 
     const [fileState, setFileState] = useState("success");

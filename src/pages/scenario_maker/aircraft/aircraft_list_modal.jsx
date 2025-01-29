@@ -101,7 +101,7 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                         route: "",
                         cruiseLevel: "",
                         filedTas: "",
-                        flightRules: "I",
+                        flightRules: "IFR",
                     },
                 }}
                 validationSchema={formSchema}

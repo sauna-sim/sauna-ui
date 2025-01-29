@@ -126,6 +126,7 @@ function handleAircraftUpdate(data){
             reduxStore.dispatch(onAircraftCreated(data));
             break;
         case "DELETED":
+            console.log("deleted", data);
             reduxStore.dispatch(onAircraftDeleted(data.callsign));
             break;
     //     case "FSD_CONNECTION_STATUS":
