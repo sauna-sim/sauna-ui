@@ -31,7 +31,7 @@
     "longDescription": "",
     "macOS": {
       "entitlements": null,
-      "exceptionDomain": "",
+      "exceptionDomain": "fonts.openmaptiles.org",
       "frameworks": [],
       "providerShortName": null,
       "signingIdentity": "-"
