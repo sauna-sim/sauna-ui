@@ -123,9 +123,7 @@ export const DataPage = ({}) => {
                         overlay={renderScenarioTooltip}
                     >
                         <Dropdown.Toggle variant="primary">
-                            <FontAwesomeIcon icon={faFileCirclePlus}/>
-                            <FontAwesomeIcon icon={faPlane}/>
-                            ES
+                            <FontAwesomeIcon icon={faPlane}/>{' '}Scenario
                         </Dropdown.Toggle>
                     </OverlayTrigger>
                     <Dropdown.Menu>
