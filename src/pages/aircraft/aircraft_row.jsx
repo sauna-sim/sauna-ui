@@ -19,11 +19,14 @@ export const AircraftRow = ({callsign}) => {
         void runWebSocket();
 
         return () => {
-            if (ws.current) {
-                ws.current.close();
+            try {
+                if (ws.current) {
+                    ws.current.close();
+                }
+            } finally {
                 ws.current = null;
+                shouldRunWebSocket.current = false;
             }
-            shouldRunWebSocket.current = false;
         }
     }, []);
 

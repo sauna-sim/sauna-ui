@@ -1,13 +1,13 @@
 import React from "react";
 import {open} from '@tauri-apps/plugin-dialog';
-import {loadEuroscopeScenario} from "../../actions/data_actions";
-import {Button, ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {loadEuroscopeScenario, loadSaunaScenario} from "../../actions/data_actions";
+import {Button, ButtonGroup, Dropdown, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {SettingsModal} from "../settings/settings";
 import {NavigraphAuthButton} from "../settings/navigraph_auth";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFileCirclePlus, faMap, faMessage, faPlane} from "@fortawesome/free-solid-svg-icons";
 import {SectorFilesButton} from "../settings/sector_files_button";
-import {createCommandWindow, createMapWindow} from "../../actions/tauri_actions";
+import {createCommandWindow, createMapWindow, createSaunaScenarioMakerWindow} from "../../actions/tauri_actions";
 
 export const DataPage = ({}) => {
     const openMapPage = async () => {
@@ -36,10 +36,32 @@ export const DataPage = ({}) => {
             }
         }
     }
+    const chooseSaunaScenarioFile = async () => {
+        const selected = await open({
+            title: "Select Sauna Scenario File",
+            multiple: true,
+            filters: [{
+                name: "Sauna Scenario File",
+                extensions: ["json"]
+            }]
+        });
 
-    const renderEsScenarioTooltip = (props) => (
+        if (selected !== null) {
+            if (Array.isArray(selected)) {
+                // Multiple scenario files selected
+                for(const filename of selected) {
+                    await loadSaunaScenario(filename);
+                }
+            } else {
+                // Single file selected
+                await loadSaunaScenario(filename);
+            }
+        }
+    }
+
+    const renderScenarioTooltip = (props) => (
         <Tooltip id="es-scenario-button-tooltip" {...props}>
-            Load EuroScope Scenario File
+            Load Scenario File
         </Tooltip>
     );
     const renderMapTooltip = (props) => (
@@ -48,15 +70,30 @@ export const DataPage = ({}) => {
         </Tooltip>
     );
 
+    const renderSaunaTooltip = (props) => (
+        <Tooltip id="sauna-button-tooltip" {...props}>
+            Open Sauna Scenario Maker
+        </Tooltip>
+    );
+
     const renderCommandTooltip = (props) => (
         <Tooltip id="command-button-tooltip" {...props}>
             Open Command Window
         </Tooltip>
-    )
+    );
 
     return (
         <>
             <div className={"mb-2 float-end"}>
+                <OverlayTrigger
+                    placement="bottom"
+                    delay={{show: 250, hide: 400}}
+                    overlay={renderSaunaTooltip}
+                >
+                    <Button variant={"primary"} onClick={createSaunaScenarioMakerWindow}
+                    >Scenario Maker</Button>
+                </OverlayTrigger>{' '}
+
                 <OverlayTrigger overlay={renderCommandTooltip}
                                 placement={"bottom"}
                                 delay={{show: 250, hide: 400}}>
@@ -78,14 +115,24 @@ export const DataPage = ({}) => {
                     <NavigraphAuthButton/>
                     <SectorFilesButton/>
                 </ButtonGroup>{' '}
-                <OverlayTrigger
-                    placement="bottom"
-                    delay={{show: 250, hide: 400}}
-                    overlay={renderEsScenarioTooltip}
-                >
-                    <Button variant={"primary"} onClick={chooseEsFile}
-                    ><FontAwesomeIcon icon={faFileCirclePlus}/> <FontAwesomeIcon icon={faPlane}/> ES</Button>
-                </OverlayTrigger>{' '}
+
+                <Dropdown className="d-inline" align="end">
+                    <OverlayTrigger
+                        placement="bottom"
+                        delay={{show: 250, hide: 400}}
+                        overlay={renderScenarioTooltip}
+                    >
+                        <Dropdown.Toggle variant="primary">
+                            <FontAwesomeIcon icon={faFileCirclePlus}/>
+                            <FontAwesomeIcon icon={faPlane}/>
+                            ES
+                        </Dropdown.Toggle>
+                    </OverlayTrigger>
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={chooseEsFile}>ES Scenario file</Dropdown.Item>
+                        <Dropdown.Item onClick={chooseSaunaScenarioFile}>Sauna Scenario file</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>{' '}
                 <SettingsModal/>
             </div>
         </>

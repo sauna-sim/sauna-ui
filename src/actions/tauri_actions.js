@@ -4,7 +4,73 @@ import {storeSave} from "./local_store_actions";
 import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
-import {mkdir} from "@tauri-apps/plugin-fs";
+import {mkdir, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
+import {save, open} from '@tauri-apps/plugin-dialog';
+
+
+export async function openAircraftScenarioFile({setFileHandle}) {
+    try{
+        const fileHandle = await open({
+            multiple: false,
+            filters: [{
+                name: "Aircraft Scenario Files",
+                extensions: ["json"]
+            }]
+        });
+        if(fileHandle) {
+            const fileContent = await readTextFile(fileHandle);
+            const parsedData = JSON.parse(fileContent);
+            setFileHandle(fileHandle);
+            return parsedData;
+        }
+        else {
+            console.log("Open operation was canceled");
+        }
+    } catch (error) {
+        console.error("Error opening file: ", error);
+    }
+}
+
+export async function saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts}) {
+    try{
+        const dataToSave = {aircraft: aircrafts};
+        if(fileHandle) {
+            console.log(`File saved to: ${fileHandle}`);
+            await writeTextFile(fileHandle, JSON.stringify(dataToSave, null, 2));
+        }
+        else {
+            const filePath = await save({
+                title: "Save Aircraft Scenario File",
+                defaultPath: "aircraft_scenario.json"
+            });
+
+            if(filePath) {
+                setFileHandle(filePath);
+                await writeTextFile(filePath, JSON.stringify(dataToSave, null, 2));
+                console.log(`File saved to: ${filePath}`);
+            }
+            else {
+                console.log("Save operation was canceled");
+            }
+        }
+    } catch (error) {
+        console.error("Error saving file: ", error);
+    }
+}
+
+//Create new window method tauri
+export async function createSaunaScenarioMakerWindow() {
+    new WebviewWindow("createStripWindowLabel", {
+        url: "#sauna_scenario_maker",
+        fullscreen: false,
+        height: 600,
+        resizable: true,
+        title: "Create Scenario Window",
+        width: 1000,
+        minimizable: true,
+        maximized: false,
+    });
+}
 
 // Register window close event for main window
 const webview = new WebviewWindow("main");
