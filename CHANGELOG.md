@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.1] - 2025-01-31
+### Changed
+- Cleaned up unused dependencies
+
 ## [0.19.0] - 2025-01-31
 ### Changed
 - New API with Navigraph authentication being handled on backend
@@ -29,7 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.19.0...master
+[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.19.1...master
+[0.19.1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.17.5...v0.18.0

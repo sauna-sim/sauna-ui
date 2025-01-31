@@ -11,7 +11,6 @@ import {
 } from "./local_store_actions";
 import pkce from "@navigraph/pkce";
 import {getNavigraphFullToken, SessionStorageKeys} from "./session_storage_actions";
-import qs from "qs";
 import {loadDFDFile} from "./data_actions";
 import {appDataDir, join} from "@tauri-apps/api/path";
 import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
