@@ -59,7 +59,7 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       rust-target-suffix: ${{ matrix.rust-target-suffix }}
       upload-bundle-artifacts: ${{ true }}
-      api-ref: 'v0.20.0'
+      api-ref: 'v0.21.0'
     secrets: inherit # Pass all secrets
 
   create-github-release:
@@ -68,9 +68,10 @@ jobs:
     needs: build
     steps:
       - name: Download Installers
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: installers
+          pattern: installers*
+          merge-multiple: true
           path: ${{ github.workspace }}/installers
       - uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:

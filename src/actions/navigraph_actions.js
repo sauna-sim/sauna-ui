@@ -18,8 +18,6 @@ import {downloadFileFromUrl, extractZipFile} from "./tauri_actions";
 import {exists} from "@tauri-apps/plugin-fs";
 import {axiosSaunaApi} from "./api_connection_handler";
 
-const navigraphApiAuthUrl = "https://identity.api.navigraph.com";
-
 // Configure Axios Navigraph Interceptors
 const axiosNavigraphApi = axios.create({
     baseURL: "https://api.navigraph.com/v1"
@@ -63,32 +61,20 @@ export async function hasNavigraphDataLoaded() {
     return (await axiosSaunaApi.get(url)).data;
 }
 
-/**
- * Get's Sauna's Navigraph credentials from API server.
- * If credentials are not available, throws 400 error.
- * @returns API Client ID and Secret
- */
-async function getNavigraphCreds() {
-    const url = `${await getApiUrl()}/data/navigraphApiCreds`;
-
-    return (await axiosSaunaApi.get(url)).data;
-}
-
 export async function navigraphAuthFlow(onDeviceAuthResp) {
     // Get Navigraph API Credentials
-    const navigraphCreds = await getNavigraphCreds();
 
     // Get PKCE Codes
     const pkceCodes = pkce();
 
     // Do DeviceAuthorization
-    const deviceAuthResp = await initNavigraphAuth(navigraphCreds, pkceCodes);
+    const deviceAuthResp = await initNavigraphAuth(pkceCodes);
 
     // Handle URL display/redirect to allow user to authorize the app
     onDeviceAuthResp(deviceAuthResp);
 
     // Poll for token
-    const tokenResponse = await pollNavigraphToken(navigraphCreds, pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
+    const tokenResponse = await pollNavigraphToken(pkceCodes, deviceAuthResp.device_code, deviceAuthResp.interval);
 
     // Store Token Info
     await storeToken(tokenResponse);
@@ -112,26 +98,18 @@ export async function storeToken(tokenResponse) {
  * @param pkceCodes PKCE Codes
  * @returns {Promise<any>} Device Authorization Response
  */
-export async function initNavigraphAuth(navigraphCreds, pkceCodes) {
+export async function initNavigraphAuth(pkceCodes) {
     // Start Auth Flow
-    const url = `${navigraphApiAuthUrl}/connect/deviceauthorization`;
+    const url = `${await getApiUrl()}/data/navigraphAuthInit`;
 
     const params = {
-        client_id: navigraphCreds.clientId,
-        client_secret: navigraphCreds.clientSecret,
-        code_challenge: pkceCodes.code_challenge,
-        code_challenge_method: "S256"
+        codeChallenge: pkceCodes.code_challenge,
+        codeChallengeMethod: "S256"
     };
 
-    const initResponse = await axios.post(
-        url,
-        qs.stringify(params),
-        {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
-        }
-    );
+    const initResponse = await axios.post(url, params);
+
+    console.log(initResponse);
 
     return initResponse.data;
 }
@@ -144,15 +122,13 @@ export async function initNavigraphAuth(navigraphCreds, pkceCodes) {
  * @param interval Interval returned from device auth response
  * @returns {Promise<any>} Navigraph Token Response
  */
-export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, interval = 5) {
+export async function pollNavigraphToken(pkceCodes, deviceCode, interval = 5) {
     let authorized = false;
-    const url = `${navigraphApiAuthUrl}/connect/token`;
+    const url = `${await getApiUrl()}/data/navigraphAuthToken`;
     const params = {
-        client_id: navigraphCreds.clientId,
-        client_secret: navigraphCreds.clientSecret,
-        code_verifier: pkceCodes.code_verifier,
-        grant_type: "urn:ietf:params:oauth:grant-type:device_code",
-        device_code: deviceCode,
+        codeVerifier: pkceCodes.code_verifier,
+        grantType: "urn:ietf:params:oauth:grant-type:device_code",
+        deviceCode: deviceCode,
         scope: "openid offline_access fmsdata"
     };
 
@@ -163,15 +139,7 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
 
         // Try the token endpoint
         try {
-            const tokenResp = await axios.post(
-                url,
-                qs.stringify(params),
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    }
-                }
-            );
+            const tokenResp = await axios.post(url, params);
 
             // Return successful response
             authorized = true;
@@ -193,26 +161,13 @@ export async function pollNavigraphToken(navigraphCreds, pkceCodes, deviceCode, 
 }
 
 export async function refreshNavigraphToken() {
-    // Get Navigraph API Credentials
-    const navigraphCreds = await getNavigraphCreds();
-
-    const url = `${navigraphApiAuthUrl}/connect/token`;
+    const url = `${await getApiUrl()}/data/navigraphAuthToken`;
     const params = {
-        client_id: navigraphCreds.clientId,
-        client_secret: navigraphCreds.clientSecret,
-        grant_type: "refresh_token",
-        refresh_token: await getNavigraphRefreshToken()
+        grantType: "refresh_token",
+        refreshToken: await getNavigraphRefreshToken()
     };
 
-    const tokenResp = await axios.post(
-        url,
-        qs.stringify(params),
-        {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
-        }
-    );
+    const tokenResp = await axios.post(url, params);
 
     await storeToken(tokenResp.data);
 }

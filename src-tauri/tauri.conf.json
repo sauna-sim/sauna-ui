@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "SaunaSim",
   "mainBinaryName": "SaunaSim",
-  "version": "0.18.1",
+  "version": "0.19.0",
   "identifier": "com.sauna.saunasim",
   "build": {
     "beforeBuildCommand": "npm run build",

@@ -69,6 +69,16 @@ jobs:
         uses: nuget/setup-nuget@v1
         with:
           nuget-version: 'latest'
+      - name: Use Stable Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: '${{ github.workspace }}/out/build'
+      - name: Install Rust Target
+        shell: pwsh
+        run: |
+          rustup target add ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
       - name: Build
         shell: pwsh
         run: |
@@ -77,15 +87,16 @@ jobs:
       - name: Build Sauna Vatsim Private
         shell: pwsh
         run: |
-          cd ${{ github.workspace }}/sauna-vatsim-private/sauna-vatsim-private
-          dotnet build sauna-vatsim-private.csproj --verbosity normal -c Release -o ${{ github.workspace }}/bin
+          cd ${{ github.workspace }}/sauna-vatsim-private
+          cargo build --verbose --target-dir ${{ github.workspace }}/out/build --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }} -r
+          Copy-Item -Path "${{ github.workspace }}/out/build/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/bin" -Include *.dll,*.so*,*.dylib*
       - name: Tar output folder
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/bin
           tar -cvzf ${{ github.workspace }}/SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
       - name: Archive binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}
           path: |
@@ -143,9 +154,9 @@ jobs:
           Get-ChildItem '${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}/release/bundle' -Recurse -Include *.exe,*.deb,*.dmg,*.app,*.msi,*.AppImage | Copy-Item -Destination '${{ github.workspace }}/installers'
       - name: Archive Installers
         if: ${{ inputs.upload-bundle-artifacts }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
-          name: installers
+          name: installers-${{ inputs.short-os }}-${{ inputs.arch }}
           path: |
             ${{ github.workspace }}/installers/*

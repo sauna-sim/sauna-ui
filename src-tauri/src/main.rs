@@ -101,7 +101,7 @@ fn main() {
     });
 }
 
-#[tauri::command(async)]
+#[tauri::command]
 fn download_file(url: &str, dir: &str) -> Result<String, String> {
     // Get filename from url
     let parsed_url = reqwest::Url::parse(url).map_err(stringify_error)?;
