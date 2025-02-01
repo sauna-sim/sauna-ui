@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import {FormControl} from "react-bootstrap";
 import {useSelector} from "react-redux";
 import {sendTextCommand} from "../../actions/command_actions.js";
+import {Dropdown} from "primereact/dropdown";
+import {InputText} from "primereact/inputtext";
 
 export const CommandWindow = ({}) => {
     const messages = useSelector((state) => state.messages);
@@ -67,17 +69,13 @@ export const CommandWindow = ({}) => {
                     display: "flex",
                     flexDirection: "row"
                 }}>
-                    <FormControl
-                        as={"select"}
+                    <Dropdown
                         value={selectedCallsign ?? ""}
-                        style={{width: "100px"}}
-                        className={"me-1"}
-                        onChange={(e) => setSelectedCallsign(e.target.value)}
-                    >
-                        {callsignItems}
-                    </FormControl>
-                    <FormControl
-                        type={"text"}
+                        className={"mr-1"}
+                        onChange={(e) => setSelectedCallsign(e.value)}
+                        options={aircraftList} />
+                    <InputText
+                        className={"w-full flex-grow-1"}
                         autoFocus={true}
                         placeholder={"Enter Command"}
                         autoCorrect="off"

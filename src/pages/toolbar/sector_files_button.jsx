@@ -1,6 +1,6 @@
 import React, {Fragment, useEffect} from "react";
 import {open} from '@tauri-apps/plugin-dialog';
-import {getLoadedSectorFiles, loadSectorFile} from "../../actions/data_actions";
+import {getLoadedSectorFiles, loadSectorFile} from "../../actions/data_actions.js";
 import {useSelector} from "react-redux";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMap} from "@fortawesome/free-solid-svg-icons/faMap";

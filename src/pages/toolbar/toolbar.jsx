@@ -1,10 +1,10 @@
 import React, {useRef} from "react";
 import {open} from '@tauri-apps/plugin-dialog';
 import {loadEuroscopeScenario, loadSaunaScenario} from "../../actions/data_actions";
-import {SettingsModal} from "../settings/settings";
-import {NavigraphAuthButton} from "../settings/navigraph_auth";
+import {SettingsModal} from "./settings.jsx";
+import {NavigraphAuthButton} from "./navigraph_auth.jsx";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {SectorFilesButton} from "../settings/sector_files_button";
+import {SectorFilesButton} from "./sector_files_button.jsx";
 import {createCommandWindow, createMapWindow, createSaunaScenarioMakerWindow} from "../../actions/tauri_actions";
 import {Toolbar} from "primereact/toolbar";
 import {Button} from "primereact/button";
@@ -70,7 +70,8 @@ export const MainToolbar = ({}) => {
     return (
         <>
             <Toolbar
-                end={<>
+                className={"m-2"}
+                end={<div className={"flex flex-wrap"}>
                     <Button
                         onClick={createSaunaScenarioMakerWindow}
                         tooltip={"Open Sauna Scenario Maker"}
@@ -92,7 +93,7 @@ export const MainToolbar = ({}) => {
                         className={"mr-2"}
                         icon={(options) => <FontAwesomeIcon icon={faMap} {...options.iconProps}/>} />
 
-                    <ButtonGroup className={"mr-2"}>
+                    <ButtonGroup className={"mr-2"} size={"small"}>
                         <NavigraphAuthButton/>
                         <SectorFilesButton/>
                     </ButtonGroup>
@@ -118,7 +119,7 @@ export const MainToolbar = ({}) => {
                         onClick={(event) => scenarioMenu.current.toggle(event)}
                     />
                     <SettingsModal />
-                </>}
+                </div>}
             />
         </>
     )

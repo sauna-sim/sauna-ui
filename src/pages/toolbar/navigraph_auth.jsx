@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {checkNavigraphPackage, navigraphAuthFlow} from "../../actions/navigraph_actions";
+import {checkNavigraphPackage, navigraphAuthFlow} from "../../actions/navigraph_actions.js";
 import NavigraphLogoPng from "../../assets/images/NavigraphLogo.png";
 import {useSelector} from "react-redux";
 import {Button} from "primereact/button";
@@ -73,7 +73,7 @@ export const NavigraphAuthButton = ({}) => {
                 severity={failed ? "danger" : "secondary"}
                 onClick={attemptAuth}
                 loading={loading}
-                icon={(options) => <img src={NavigraphLogoPng} width={20} height={20} {...options.iconProps} alt={"Navigraph Logo"}/>}
+                icon={(options) => <img src={NavigraphLogoPng} width={18} height={18} {...options.iconProps} alt={"Navigraph Logo"}/>}
                 label={failed ? "Failed" : "Log In"} />
         }
 
@@ -100,7 +100,7 @@ export const NavigraphAuthButton = ({}) => {
                     loading={loading}
                     tooltip={`Reload ${navigraphState.isCurrent ? "Current" : "Outdated"} Navigraph Cycle ${packageVersion}`}
                     tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                    icon={(options) => <img src={NavigraphLogoPng} width={20} height={20} {...options.iconProps} alt={"Navigraph Logo"}/>}
+                    icon={(options) => <img src={NavigraphLogoPng} width={18} height={18} {...options.iconProps} alt={"Navigraph Logo"}/>}
                     label={failed ? "Failed" : packageVersion} />
             </>
         )

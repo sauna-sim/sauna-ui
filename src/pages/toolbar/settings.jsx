@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Formik, getIn} from "formik";
-import {getApiSettings, getFsdSettings, getStoreItem, saveApiSettings, saveFsdSettings, storeSave} from "../../actions/local_store_actions";
-import {getFsdProtocolRevisions} from "../../actions/enum_actions";
-import {updateServerSettings} from "../../actions/data_actions";
+import {getApiSettings, getFsdSettings, getStoreItem, saveApiSettings, saveFsdSettings, storeSave} from "../../actions/local_store_actions.js";
+import {getFsdProtocolRevisions} from "../../actions/enum_actions.js";
+import {updateServerSettings} from "../../actions/data_actions.js";
 import * as Yup from "yup";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
@@ -62,6 +62,7 @@ export const SettingsModal = ({}) => {
     const getButton = () => <Button
         severity={"secondary"}
         onClick={open}
+        size={"small"}
         icon={(options) => <FontAwesomeIcon icon={faGear} {...options.iconProps}/>}/>;
 
     if (!uiSettings) {
