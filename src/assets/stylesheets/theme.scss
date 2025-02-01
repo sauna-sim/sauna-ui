@@ -2,29 +2,30 @@
  * Bootstrap Stylesheet and Theme
  */
 
-@import "bootstrap/scss/bootstrap";
+//@import "bootstrap/scss/bootstrap";
+@import "primereact/resources/themes/lara-dark-blue/theme.css";
 
 // FMA/PFD Colors
-.pfd-selected {
-  color: $cyan
-}
-
-.pfd-managed {
-  color: $pink-700;
-}
-
-.pfd-measured {
-  color: $green;
-}
-
-.fma-active-conv {
-  color: $green;
-}
-
-.fma-active-fms {
-  color: $pink-700;
-}
-
-.fma-armed {
-  color: $white;
-}
+//.pfd-selected {
+//  color: $cyan
+//}
+//
+//.pfd-managed {
+//  color: $pink-700;
+//}
+//
+//.pfd-measured {
+//  color: $green;
+//}
+//
+//.fma-active-conv {
+//  color: $green;
+//}
+//
+//.fma-active-fms {
+//  color: $pink-700;
+//}
+//
+//.fma-armed {
+//  color: $white;
+//}

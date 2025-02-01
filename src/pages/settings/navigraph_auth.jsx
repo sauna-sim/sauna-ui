@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Button, Image, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {checkNavigraphPackage, navigraphAuthFlow} from "../../actions/navigraph_actions";
 import NavigraphLogoPng from "../../assets/images/NavigraphLogo.png";
 import {useSelector} from "react-redux";
+import {Button} from "primereact/button";
+import {Dialog} from "primereact/dialog";
 
 export const NavigraphAuthButton = ({}) => {
     const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -25,7 +26,7 @@ export const NavigraphAuthButton = ({}) => {
             setFailed(false);
         } catch (e) {
             console.error(e);
-            if (e === "NAVIGRAPH_AUTH_EXPIRED"){
+            if (e === "NAVIGRAPH_AUTH_EXPIRED") {
                 setLoading(false);
                 setFailed(false);
             } else {
@@ -49,7 +50,7 @@ export const NavigraphAuthButton = ({}) => {
             await checkNavigraphPackage();
             setLoading(false);
             setFailed(false);
-        } catch (e){
+        } catch (e) {
             closeVerification();
             setLoading(false);
             setFailed(true);
@@ -69,10 +70,11 @@ export const NavigraphAuthButton = ({}) => {
     const getNavigraphButton = () => {
         if (!navigraphState.authenticated) {
             return <Button
-                variant={failed ? "danger" : "secondary"}
+                severity={failed ? "danger" : "secondary"}
                 onClick={attemptAuth}
-                disabled={loading}
-            ><Image src={NavigraphLogoPng} width={20} height={20}/> {failed ? "Failed" : "Log In"}</Button>
+                loading={loading}
+                icon={(options) => <img src={NavigraphLogoPng} width={20} height={20} {...options.iconProps} alt={"Navigraph Logo"}/>}
+                label={failed ? "Failed" : "Log In"} />
         }
 
         let packageVersion = navigraphState.packageInfo.cycle;
@@ -80,17 +82,11 @@ export const NavigraphAuthButton = ({}) => {
             packageVersion += `r${navigraphState.packageInfo.revision}`;
         }
 
-        const renderTooltip = (props) => (
-            <Tooltip id="navigraph-auth-button-tooltip" {...props}>
-                Reload {navigraphState.isCurrent ? "Current" : "Outdated"} Navigraph Cycle {packageVersion}
-            </Tooltip>
-        );
-
         let buttonVariant;
 
-        if (failed){
+        if (failed) {
             buttonVariant = "danger";
-        } else if (navigraphState.isCurrent){
+        } else if (navigraphState.isCurrent) {
             buttonVariant = "success";
         } else {
             buttonVariant = "warning";
@@ -98,17 +94,14 @@ export const NavigraphAuthButton = ({}) => {
 
         return (
             <>
-                <OverlayTrigger
-                    placement="bottom"
-                    delay={{ show: 250, hide: 400 }}
-                    overlay={renderTooltip}
-                >
-                    <Button
-                        variant={buttonVariant}
-                        onClick={refreshPackage}
-                        disabled={loading}
-                    ><Image src={NavigraphLogoPng} width={20} height={20}/> {failed ? "Failed" : packageVersion}</Button>
-                </OverlayTrigger>
+                <Button
+                    variant={buttonVariant}
+                    onClick={refreshPackage}
+                    loading={loading}
+                    tooltip={`Reload ${navigraphState.isCurrent ? "Current" : "Outdated"} Navigraph Cycle ${packageVersion}`}
+                    tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
+                    icon={(options) => <img src={NavigraphLogoPng} width={20} height={20} {...options.iconProps} alt={"Navigraph Logo"}/>}
+                    label={failed ? "Failed" : packageVersion} />
             </>
         )
     }
@@ -117,27 +110,23 @@ export const NavigraphAuthButton = ({}) => {
         <>
             {getNavigraphButton()}
 
-            <Modal show={showVerificationModal} onHide={closeVerification}>
-                <Modal.Header>
-                    <Modal.Title>Navigraph Authentication</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <a
-                        href={verificationUrl}
-                        className="text-blue-600 bg-gray-500/10 p-3 rounded-lg"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        Open sign in page
-                    </a>
-                    <span className="opacity-50">or scan this QR code:</span>
-                    <div className="p-2 rounded-lg bg-white mt-1">
-                        <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${verificationUrl}`}
-                            alt="Navigraph Verification QR Qode"/>
-                    </div>
-                </Modal.Body>
-            </Modal>
+            <Dialog visible={showVerificationModal} onHide={closeVerification}
+                    header={"Navigraph Authentication"}>
+                <a
+                    href={verificationUrl}
+                    className="text-blue-600 bg-gray-500/10 p-3 rounded-lg"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    Open sign in page
+                </a>
+                <span className="opacity-50">or scan this QR code:</span>
+                <div className="p-2 rounded-lg bg-white mt-1">
+                    <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${verificationUrl}`}
+                        alt="Navigraph Verification QR Qode"/>
+                </div>
+            </Dialog>
         </>
     )
 }

@@ -2,9 +2,9 @@ import React, {Fragment, useEffect} from "react";
 import {open} from '@tauri-apps/plugin-dialog';
 import {getLoadedSectorFiles, loadSectorFile} from "../../actions/data_actions";
 import {useSelector} from "react-redux";
-import {Badge, Button, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMap} from "@fortawesome/free-solid-svg-icons";
+import {faMap} from "@fortawesome/free-solid-svg-icons/faMap";
+import {Button} from "primereact/button";
 
 export const SectorFilesButton = ({}) => {
     const sectorFilesLoaded = useSelector(state => state.sectorFiles.value);
@@ -42,27 +42,18 @@ export const SectorFilesButton = ({}) => {
         await refreshSectorFiles();
     }
 
-    const renderTooltip = (props) => (
-        <Tooltip id="sector-files-button-tooltip" {...props}>
-            Load Sector File NavData
-        </Tooltip>
-    );
-
     console.log(sectorFilesLoaded);
 
     return (
         <>
-            <OverlayTrigger
-                placement="bottom"
-                delay={{show: 250, hide: 400}}
-                overlay={renderTooltip}
-            >
-                <Button
-                    variant={sectorFilesLoaded && sectorFilesLoaded.length > 0 ? "success" : "secondary"}
-                    onClick={loadASectorFile}
-                ><FontAwesomeIcon icon={faMap}/> SCT <Badge
-                    bg={"secondary"}>{sectorFilesLoaded ? sectorFilesLoaded.length : 0}</Badge></Button>
-            </OverlayTrigger>
+            <Button
+                severity={sectorFilesLoaded && sectorFilesLoaded.length > 0 ? "success" : "secondary"}
+                onClick={loadASectorFile}
+                tooltip={"Load Sector File NavData"}
+                tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
+                icon={(options) => <FontAwesomeIcon icon={faMap} {...options.iconProps} />}
+                label={"SCT"}
+                badge={`${sectorFilesLoaded ? sectorFilesLoaded.length : 0}`} />
         </>
     )
 }

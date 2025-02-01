@@ -3,10 +3,15 @@ import {Formik, getIn} from "formik";
 import {getApiSettings, getFsdSettings, getStoreItem, saveApiSettings, saveFsdSettings, storeSave} from "../../actions/local_store_actions";
 import {getFsdProtocolRevisions} from "../../actions/enum_actions";
 import {updateServerSettings} from "../../actions/data_actions";
-import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faGear} from "@fortawesome/free-solid-svg-icons";
+import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
+import {Button} from "primereact/button";
+import {Dialog} from "primereact/dialog";
+import {InputText} from "primereact/inputtext";
+import {Dropdown} from "primereact/dropdown";
+import {Password} from "primereact/password";
+import {InputMask} from "primereact/inputmask";
 
 export const SettingsModal = ({}) => {
     const [showModal, setShowModal] = useState(false);
@@ -54,9 +59,12 @@ export const SettingsModal = ({}) => {
         close();
     }
 
-    const getButton = () => <Button variant={"secondary"} onClick={open}><FontAwesomeIcon icon={faGear}/></Button>
+    const getButton = () => <Button
+        severity={"secondary"}
+        onClick={open}
+        icon={(options) => <FontAwesomeIcon icon={faGear} {...options.iconProps}/>}/>;
 
-    if (!uiSettings){
+    if (!uiSettings) {
         return getButton();
     }
 
@@ -88,11 +96,13 @@ export const SettingsModal = ({}) => {
         <>
             {getButton()}
 
-            <Modal show={showModal}>
-                <Modal.Header>
-                    <Modal.Title>Settings</Modal.Title>
-                </Modal.Header>
-
+            <Dialog
+                onHide={close}
+                closable={false}
+                closeOnEscape={false}
+                header={"Settings"}
+                style={{width: '50vw'}}
+                visible={showModal}>
                 <Formik
                     initialValues={uiSettings}
                     onSubmit={onSubmit}
@@ -107,127 +117,135 @@ export const SettingsModal = ({}) => {
                           isSubmitting,
                           setFieldValue
                       }) => (
-                        <Form onSubmit={handleSubmit}>
-                            <Modal.Body>
-                                <h5>Sauna API Server Settings</h5>
-                                <Row className="mb-3">
-                                    <Col sm={6}>
-                                        <Form.Label>Position Calculation Rate</Form.Label>
-                                        <InputGroup hasValidation>
-                                            <Form.Control
-                                                name="apiSettings.posCalcRate"
-                                                type="number"
-                                                disabled={true}
-                                                value={values.apiSettings.posCalcRate}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                isInvalid={getIn(touched, "apiSettings.posCalcRate") && getIn(errors, "apiSettings.posCalcRate")}
-                                            />
-                                            <InputGroup.Text>ms</InputGroup.Text>
-                                            <Form.Control.Feedback type="invalid">
-                                                {getIn(errors, "apiSettings.posCalcRate")}
-                                            </Form.Control.Feedback>
-                                        </InputGroup>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Label>Command Frequency</Form.Label>
-                                        <InputGroup hasValidation>
-                                            <Form.Control
-                                                name="apiSettings.commandFrequency"
-                                                value={values.apiSettings.commandFrequency}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                isInvalid={getIn(touched, "apiSettings.commandFrequency") && getIn(errors, "apiSettings.commandFrequency")}
-                                            />
-                                            <InputGroup.Text>MHz</InputGroup.Text>
-                                            <Form.Control.Feedback type="invalid">
-                                                {getIn(errors, "apiSettings.commandFrequency")}
-                                            </Form.Control.Feedback>
-                                        </InputGroup>
-                                    </Col>
-                                </Row>
+                        <form onSubmit={handleSubmit} noValidate={true}>
+                            <h5>Sauna API Server Settings</h5>
+                            <div className={"formgrid grid"}>
+                                <div className={"field col-12 md:col-6"}>
+                                    <label htmlFor={"settingsFormPosCalcRate"}>Position Calculation Rate</label>
+                                    <div className={"p-inputgroup flex-1"}>
+                                        <InputText
+                                            id={"settingsFormPosCalcRate"}
+                                            name="apiSettings.posCalcRate"
+                                            disabled={true}
+                                            value={values.apiSettings.posCalcRate}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            invalid={getIn(touched, "apiSettings.posCalcRate") && getIn(errors, "apiSettings.posCalcRate")}
+                                        />
+                                        <span className={"p-inputgroup-addon"}>ms</span>
+                                    </div>
+                                    <small className={"p-error"}>
+                                        {getIn(errors, "apiSettings.posCalcRate")}
+                                    </small>
+                                </div>
+                                <div className={"field col-12 md:col-6"}>
+                                    <label htmlFor={"settingsFormCommandFrequency"}>Command Frequency</label>
+                                    <div className={"p-inputgroup flex-1"}>
+                                        <InputMask
+                                            id={"settingsFormCommandFrequency"}
+                                            name="apiSettings.commandFrequency"
+                                            value={values.apiSettings.commandFrequency}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            mask={"999.99?9"}
+                                            invalid={getIn(touched, "apiSettings.commandFrequency") && getIn(errors, "apiSettings.commandFrequency")}
+                                        />
+                                        <span className={"p-inputgroup-addon"}>MHz</span>
+                                    </div>
+                                    <small className={"p-error"}>
+                                        {getIn(errors, "apiSettings.commandFrequency")}
+                                    </small>
+                                </div>
+                            </div>
 
-                                <h5>FSD Connection Info</h5>
-                                <Row className="mb-3">
-                                    <Form.Group as={Col} sm={5} controlId={"settingsFormFsdHostName"}>
-                                        <Form.Label>Hostname</Form.Label>
-                                        <Form.Control
-                                            name="fsdConnection.hostname"
-                                            value={values.fsdConnection.hostname}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fsdConnection.hostname") && getIn(errors, "fsdConnection.hostname")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fsdConnection.hostname")}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                    <Form.Group as={Col} sm={3} controlId={"settingsFormFsdPort"}>
-                                        <Form.Label>Port</Form.Label>
-                                        <Form.Control
-                                            name="fsdConnection.port"
-                                            type="number"
-                                            value={values.fsdConnection.port}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fsdConnection.port") && getIn(errors, "fsdConnection.port")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fsdConnection.port")}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                    <Form.Group as={Col} sm={4} controlId={"settingsFormFsdProtocol"}>
-                                        <Form.Label>Protocol Version</Form.Label>
-                                        <Form.Select
-                                            name="fsdConnection.protocol"
-                                            value={values.fsdConnection.protocol}
-                                            onChange={handleChange}>
-                                            {getProtocolRevisionOptions()}
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Row>
-                                <Row className="mb-3">
-                                    <Form.Group as={Col} sm={6} controlId={"settingsFormFsdNid"}>
-                                        <Form.Label>Network ID</Form.Label>
-                                        <Form.Control
-                                            name="fsdConnection.networkId"
-                                            value={values.fsdConnection.networkId}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fsdConnection.networkId") && getIn(errors, "fsdConnection.networkId")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fsdConnection.networkId")}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                    <Form.Group as={Col} sm={6} controlId={"settingsFormFsdPass"}>
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control
-                                            name="fsdConnection.password"
-                                            type="password"
-                                            value={values.fsdConnection.password}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fsdConnection.password") && getIn(errors, "fsdConnection.password")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fsdConnection.password")}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Row>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={close} disabled={isSubmitting}>
-                                    Close
-                                </Button>
-                                <Button variant="primary" type="submit" disabled={isSubmitting}>
-                                    Save
-                                </Button>
-                            </Modal.Footer>
-                        </Form>
+                            <h5>FSD Connection Info</h5>
+                            <div className={"formgrid grid"}>
+                                <div className={"field col-12 md:col-5"}>
+                                    <label htmlFor={"settingsFormFsdHostName"}>Hostname</label>
+                                    <InputText
+                                        className={"w-full"}
+                                        id={"settingsFormFsdHostName"}
+                                        name="fsdConnection.hostname"
+                                        value={values.fsdConnection.hostname}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        invalid={getIn(touched, "fsdConnection.hostname") && getIn(errors, "fsdConnection.hostname")}
+                                    />
+                                    <small className={"p-error"}>
+                                        {getIn(errors, "fsdConnection.hostname")}
+                                    </small>
+                                </div>
+                                <div className={"field col-12 md:col-3"}>
+                                    <label htmlFor={"settingsFormFsdPort"}>Port</label>
+                                    <InputText
+                                        className={"w-full"}
+                                        id={"settingsFormFsdPort"}
+                                        name="fsdConnection.port"
+                                        keyfilter={"int"}
+                                        value={values.fsdConnection.port}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        invalid={getIn(touched, "fsdConnection.port") && getIn(errors, "fsdConnection.port")}
+                                    />
+                                    <small className={"p-error"}>
+                                        {getIn(errors, "fsdConnection.port")}
+                                    </small>
+                                </div>
+                                <div className={"field col-12 md:col-4"}>
+                                    <label htmlFor={"settingsFormFsdProtocol"}>Protocol Version</label>
+                                    <Dropdown
+                                        className={"w-full"}
+                                        id={"settingsFormFsdProtocol"}
+                                        name="fsdConnection.protocol"
+                                        value={values.fsdConnection.protocol}
+                                        onChange={handleChange}
+                                        options={protocolRevisions} />
+                                </div>
+                            </div>
+                            <div className={"formgrid grid"}>
+                                <div className={"field col-12 md:col-6"}>
+                                    <label htmlFor={"settingsFormFsdNid"}>Network ID</label>
+                                    <InputText
+                                        className={"w-full"}
+                                        id={"settingsFormFsdNid"}
+                                        name="fsdConnection.networkId"
+                                        value={values.fsdConnection.networkId}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        invalid={getIn(touched, "fsdConnection.networkId") && getIn(errors, "fsdConnection.networkId")}
+                                    />
+                                    <small className={"p-error"}>
+                                        {getIn(errors, "fsdConnection.networkId")}
+                                    </small>
+                                </div>
+                                <div className={"field col-12 md:col-6"}>
+                                    <label htmlFor={"settingsFormFsdPass"}>Password</label>
+                                    <Password
+                                        className={"w-full"}
+                                        inputClassName={"w-full"}
+                                        inputId={"settingsFormFsdPass"}
+                                        name="fsdConnection.password"
+                                        value={values.fsdConnection.password}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        feedback={false}
+                                        toggleMask={true}
+                                        pt={{iconField: {root: {className: "w-full"}}}}
+                                        invalid={getIn(touched, "fsdConnection.password") && getIn(errors, "fsdConnection.password")}
+                                    />
+                                    <small className={"p-error"}>
+                                        {getIn(errors, "fsdConnection.password")}
+                                    </small>
+                                </div>
+                            </div>
+                            <div className={"formgrid grid justify-content-end mr-1"}>
+                                <Button severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} className={"mr-3"}/>
+                                <Button type="submit" loading={isSubmitting} label={"Save"}/>
+                            </div>
+                        </form>
                     )}
                 </Formik>
-            </Modal>
+            </Dialog>
         </>
     )
 }
