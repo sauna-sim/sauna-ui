@@ -14,9 +14,14 @@ import {faChevronDown} from "@fortawesome/free-solid-svg-icons/faChevronDown";
 import {faMessage} from "@fortawesome/free-solid-svg-icons/faMessage";
 import {faMap} from "@fortawesome/free-solid-svg-icons/faMap";
 import {faPlane} from "@fortawesome/free-solid-svg-icons/faPlane";
+import {pauseall, removeAllAircraft, setAllSimRate, unpauseall} from "../../actions/aircraft_actions.js";
+import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {useSelector} from "react-redux";
+import {InputNumber} from "primereact/inputnumber";
 
 export const MainToolbar = ({}) => {
     const scenarioMenu = useRef(null);
+    const apiServer = useSelector(state => state.apiServer);
 
     const openMapPage = async () => {
         await createMapWindow();
@@ -57,7 +62,7 @@ export const MainToolbar = ({}) => {
         if (selected !== null) {
             if (Array.isArray(selected)) {
                 // Multiple scenario files selected
-                for(const filename of selected) {
+                for (const filename of selected) {
                     await loadSaunaScenario(filename);
                 }
             } else {
@@ -67,31 +72,81 @@ export const MainToolbar = ({}) => {
         }
     }
 
+    const getSimStateActions = () => {
+        const {simState} = apiServer;
+        let pauseButton;
+        if (simState.paused) {
+            pauseButton = <Button
+                severity={"success"}
+                outlined={true}
+                className="mr-2"
+                onClick={unpauseall}
+                icon={(options) => <FontAwesomeIcon icon={faPlay} {...options.iconProps}/>}
+            />;
+        } else {
+            pauseButton = <Button
+                severity={"danger"}
+                outlined={true}
+                className="mr-2"
+                onClick={pauseall}
+                icon={(options) => <FontAwesomeIcon icon={faPause} {...options.iconProps}/>}
+            />;
+        }
+        return (
+            <>
+                {pauseButton}
+                <div className={"p-inputgroup flex-1 mr-2"}>
+                    <InputNumber
+                        style={{width: "50px"}}
+                        value={simState.simRate}
+                        onValueChange={async (e) => setAllSimRate(e.value)}
+                        minFractionDigits={0}
+                        maxFractionDigits={1}
+                        min={0.1}
+                        max={8} />
+                    <span className={"p-inputgroup-addon"}>
+                        x
+                    </span>
+                </div>
+                <Button
+                    severity="danger"
+                    className="mr-2"
+                    onClick={removeAllAircraft}
+                    icon={(options) => <FontAwesomeIcon icon={faTrash} {...options.iconProps}/>}
+                    label={"All"}
+                />
+            </>
+        )
+    }
+
     return (
         <>
             <Toolbar
                 className={"m-2"}
+                start={<div className={"flex flex-wrap"}>
+                    {getSimStateActions()}
+                </div>}
                 end={<div className={"flex flex-wrap"}>
                     <Button
                         onClick={createSaunaScenarioMakerWindow}
                         tooltip={"Open Sauna Scenario Maker"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
                         className={"mr-2"}
-                        label={"Scenario Maker"} />
+                        label={"Scenario Maker"}/>
                     <Button
                         severity={"secondary"}
                         onClick={createCommandWindow}
                         tooltip={"Open Command Window"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
                         className={"mr-2"}
-                        icon={(options) => <FontAwesomeIcon icon={faMessage} {...options.iconProps}/>} />
+                        icon={(options) => <FontAwesomeIcon icon={faMessage} {...options.iconProps}/>}/>
                     <Button
                         severity={"secondary"}
                         onClick={openMapPage}
                         tooltip={"Open Map Window"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
                         className={"mr-2"}
-                        icon={(options) => <FontAwesomeIcon icon={faMap} {...options.iconProps}/>} />
+                        icon={(options) => <FontAwesomeIcon icon={faMap} {...options.iconProps}/>}/>
 
                     <ButtonGroup className={"mr-2"} size={"small"}>
                         <NavigraphAuthButton/>
@@ -103,22 +158,22 @@ export const MainToolbar = ({}) => {
                         popup={true}
                         popupAlignment={"right"}
                         model={[
-                        {
-                            label: "ES Scenario File",
-                            command: chooseEsFile
-                        },
-                        {
-                            label: "Sauna Scenario File",
-                            command: chooseSaunaScenarioFile
-                        }
-                    ]} />
+                            {
+                                label: "ES Scenario File",
+                                command: chooseEsFile
+                            },
+                            {
+                                label: "Sauna Scenario File",
+                                command: chooseSaunaScenarioFile
+                            }
+                        ]}/>
                     <Button
                         icon={(options) => <FontAwesomeIcon icon={faPlane} {...options.iconProps}/>}
                         label={<>Scenario <FontAwesomeIcon icon={faChevronDown}/></>}
                         className={"mr-2"}
                         onClick={(event) => scenarioMenu.current.toggle(event)}
                     />
-                    <SettingsModal />
+                    <SettingsModal/>
                 </div>}
             />
         </>

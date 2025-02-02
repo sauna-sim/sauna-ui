@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {round, wait} from "../../actions/utilities";
 import {AircraftDetail} from "./aircraft_detail";
-import {Button, Col, Row} from "react-bootstrap";
+import {Button} from "primereact/button";
 import {pauseAircraft, unpauseAircraft} from "../../actions/aircraft_actions";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPause, faPlay} from "@fortawesome/free-solid-svg-icons";
@@ -110,13 +110,21 @@ export const AircraftRow = ({callsign}) => {
         if (simState) {
             let pauseButton;
             if (simState.paused) {
-                pauseButton = <Button variant="outline-success" className="me-2"
-                                      onClick={() => unpauseAircraft(aircraft.callsign)}
-                ><FontAwesomeIcon icon={faPlay}/></Button>;
+                pauseButton = <Button
+                    severity={"success"}
+                    outlined={true}
+                    className="mr-2"
+                    onClick={() => unpauseAircraft(aircraft.callsign)}
+                    icon={(options) => <FontAwesomeIcon icon={faPlay} {...options.iconProps} />}
+                />;
             } else {
-                pauseButton = <Button variant="outline-danger" className="me-2"
-                                      onClick={() => pauseAircraft(aircraft.callsign)}
-                ><FontAwesomeIcon icon={faPause}/></Button>
+                pauseButton = <Button
+                    severity={"danger"}
+                    outlined={true}
+                    className="mr-2"
+                    onClick={() => pauseAircraft(aircraft.callsign)}
+                    icon={(options) => <FontAwesomeIcon icon={faPause} {...options.iconProps} />}
+                />;
             }
             return (
                 <>
@@ -154,21 +162,21 @@ export const AircraftRow = ({callsign}) => {
 
     const getFma = () => {
         return <>
-            <Row>
+            <div className={"flex flex-row"}>
 
-            </Row>
-            <Row>
-                <Col className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</Col>
-                <Col
-                    className={isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</Col>
-                <Col
-                    className={isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</Col>
-            </Row>
-            <Row>
-                <Col className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedThrustModes)}</Col>
-                <Col className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedLateralModes)}</Col>
-                <Col className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedVerticalModes)}</Col>
-            </Row>
+            </div>
+            <div className={"flex flex-row"}>
+                <div className={"col fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</div>
+                <div
+                    className={isModeFms(aircraft.autopilot.currentLateralMode) ? "col fma-active-fms" : "col fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</div>
+                <div
+                    className={isModeFms(aircraft.autopilot.currentVerticalMode) ? "col fma-active-fms" : "col fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</div>
+            </div>
+            <div className={"flex flex-row"}>
+                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedThrustModes)}</div>
+                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedLateralModes)}</div>
+                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedVerticalModes)}</div>
+            </div>
         </>
     }
 

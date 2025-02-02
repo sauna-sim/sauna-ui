@@ -16,28 +16,6 @@ export const aircraftSlice = createSlice({
         resetAircraftList: (state, action) => {
             return [];
         }
-        // onAircraftStatusChange: (state, action) => {
-        //     const foundAircraft = state[action.payload.callsign];
-        //     if (foundAircraft) {
-        //         foundAircraft.connectionStatus = action.payload.data;
-        //     }
-        // },
-        // onAircraftSimStateChange: (state, action) => {
-        //     const foundAircraft = state[action.payload.callsign];
-        //     if (foundAircraft) {
-        //         foundAircraft.simState = action.payload.data;
-        //     }
-        // },
-        // onAircraftPositionUpdate: (state, action) => {
-        //     state[action.payload.callsign] = action.payload.data;
-        // },
-        // setAircraftList: (state, action) => {
-        //     const newState = {};
-        //     action.payload.forEach((acft) => {
-        //         state[acft.callsign] = acft;
-        //     });
-        //     console.log(state);
-        // }
     }
 });
 
@@ -45,10 +23,6 @@ export const {
     onAircraftCreated,
     onAircraftDeleted,
     resetAircraftList
-    // onAircraftStatusChange,
-    // onAircraftSimStateChange,
-    // onAircraftPositionUpdate,
-    // setAircraftList
 } = aircraftSlice.actions;
 
 export const aircraftReducer = aircraftSlice.reducer;

@@ -1,66 +1,14 @@
 import React from "react";
-import {pauseall, removeAllAircraft, setAllSimRate, unpauseall,} from "../../actions/aircraft_actions";
-import {Button, ButtonToolbar, FormControl, InputGroup, Table} from "react-bootstrap";
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useSelector} from "react-redux";
-import {AircraftRow} from "./aircraft_row";
+import {AircraftRow} from "./aircraft_row.jsx";
 
 export const AircraftPage = ({}) => {
     const aircraftList = useSelector(state => state.aircraftList);
-    const apiServer = useSelector(state => state.apiServer);
-
-    const getSimStateActions = () => {
-        const {simState} = apiServer;
-        let pauseButton;
-        if (simState.paused) {
-            pauseButton = <Button variant="outline-success" className="me-2"
-                                  onClick={unpauseall}
-            ><FontAwesomeIcon icon={faPlay}/></Button>;
-        } else {
-            pauseButton = <Button variant="outline-danger" className="me-2"
-                                  onClick={pauseall}
-            ><FontAwesomeIcon icon={faPause}/></Button>
-        }
-        return (
-            <>
-                {pauseButton}
-                <InputGroup className="me-2">
-                    <FormControl
-                        type="number"
-                        max="8.0"
-                        min="0.1"
-                        step="0.1"
-                        value={simState.simRate}
-                        onChange={async (e) => {
-                            let num = Number(e.target.value);
-                            if (!isNaN(num) && num >= 0.1) {
-                                await setAllSimRate(Number(e.target.value));
-                            }
-                        }}
-                        required
-                        placeholder="1.0"
-                        aria-label="Sim Rate"
-                        aria-describedby="global-simrate-addon2"
-                    />
-                    <InputGroup.Text id="global-simrate-addon2">x</InputGroup.Text>
-                </InputGroup>
-                <Button variant="danger" className="me-2" onClick={removeAllAircraft}><FontAwesomeIcon
-                    icon={faTrash}/> All</Button>
-            </>
-        )
-    }
-
-    const getAircraftTable = () => {
-        return aircraftList.map((callsign) => <AircraftRow key={callsign} callsign={callsign}/>);
-    }
 
     return (
-        <>
-            <ButtonToolbar className={"mb-2"}>
-                {getSimStateActions()}
-            </ButtonToolbar>
-            <Table striped bordered hover size={"sm"}>
+        <div className={"p-2"}>
+            <h2>Aircraft</h2>
+            <table>
                 <thead>
                 <tr>
                     <th/>
@@ -82,9 +30,9 @@ export const AircraftPage = ({}) => {
                 </tr>
                 </thead>
                 <tbody>
-                {getAircraftTable()}
+                {aircraftList.map(callsign => <AircraftRow key={callsign} callsign={callsign}/>)}
                 </tbody>
-            </Table>
-        </>
+            </table>
+        </div>
     )
 }

@@ -52,7 +52,7 @@ export const ApiConnectionSettings = ({}) => {
                       handleSubmit,
                       isSubmitting,
                   }) => (
-                    <form onSubmit={handleSubmit} noValidate={true} className={"mt-3"}>
+                    <form onSubmit={handleSubmit} noValidate={true} className={"m-3"}>
                         <div className={"formgrid grid"}>
                             <div className={"field sm:col-7 col-12 mt-3"}>
                                 <FloatLabel>
