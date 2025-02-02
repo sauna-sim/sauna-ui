@@ -1,9 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {MapLibre} from "./map_libre";
 import {open, save} from '@tauri-apps/plugin-dialog';
-import DropdownItem from "react-bootstrap/DropdownItem";
-import DropdownTreeSelect from "react-dropdown-tree-select";
-import 'react-dropdown-tree-select/dist/styles.css'
 import {FiltersModal} from "./filters_modal.jsx";
 import {getScopePackageFacilities, isScopePackageLoaded, loadScopePackage, saveScopePackage} from "../../actions/scope_package_actions.js";
 import {getCurDisplay, getFacilitiesDropDownData} from "./map_util.js";
@@ -13,6 +10,7 @@ import {faChevronDown} from "@fortawesome/free-solid-svg-icons/faChevronDown";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Button} from "primereact/button";
 import {TreeSelect} from "primereact/treeselect";
+import {Dropdown} from "primereact/dropdown";
 
 export const MapPage = () => {
     const [facilities, setFacilities] = useState();
@@ -166,26 +164,24 @@ export const MapPage = () => {
                                     onChange={onFacilityDropdownChange}
                                     options={facilityDropDownData}
                                     selectionMode={"single"}
+                                    tooltip={"Select Facility"}
+                                    tooltipOptions={{position: "bottom"}}
                                 />
                             }
                             {facilities && curDisplay && curDisplay.facility &&
                                 <>
-                                    <Menu
-                                        ref={selectDisplayMenu}
-                                        model={curDisplay.facility.displays.map((disp, key) => {
+                                    <Dropdown
+                                        className={"mr-2"}
+                                        value={displayIndex}
+                                        onChange={(e) => setDisplayIndex(e.value)}
+                                        options={curDisplay.facility.displays.map((disp, key) => {
                                             return {
-                                                id: key,
                                                 label: disp.name,
-                                                command: ({item}) => setDisplayIndex(item.id)
+                                                value: key
                                             }
                                         })}
-                                        popup={true}
-                                    />
-                                    <Button
-                                        severity={"secondary"}
-                                        label={<>Select Display <FontAwesomeIcon icon={faChevronDown}/></>}
-                                        onClick={(event) => selectDisplayMenu.current.toggle(event)}
-                                        className={"mr-2"}
+                                        tooltip={"Select Display"}
+                                        tooltipOptions={{position: "bottom"}}
                                     />
                                 </>
                             }
