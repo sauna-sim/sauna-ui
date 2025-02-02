@@ -1,32 +1,29 @@
 import React, {useState} from "react";
-
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
-
 import AircraftList from "./aircraft/aircraft_list";
 import NavDataList from "./nav-data/nav_data_list";
+import {TabPanel, TabView} from "primereact/tabview";
 
 export default function SaunaScenarioMaker() {
-    const [key, setKey] = useState('navdata');
+    const [key, setKey] = useState(0);
 
     const [aircrafts, setAircrafts] = useState([]);
 
     return (
-        <Tabs
-            id="controlled-tab-example"
-            activeKey={key}
-            onSelect={(k) => setKey(k)}
-            className="mb-3"
+        <TabView
+            className={"h-screen flex flex-column"}
+            panelContainerClassName={"flex-grow-1"}
+            activeIndex={key}
+            onTabChange={(k) => setKey(k.index)}
         >
-            <Tab eventKey="navdata" title="Navdata">
+            <TabPanel header="Navdata">
                 <NavDataList/>
-            </Tab>
-            <Tab eventKey="aircraft" title="Aircraft">
+            </TabPanel>
+            <TabPanel header="Aircraft">
                 <AircraftList
                     aircrafts={aircrafts}
                     setAircrafts={setAircrafts}
                 />
-            </Tab>
-        </Tabs>
+            </TabPanel>
+        </TabView>
     );
 }

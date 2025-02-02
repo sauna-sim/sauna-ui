@@ -2,6 +2,7 @@ import React from "react";
 import { Formik, getIn } from 'formik';
 import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
 import * as Yup from "yup";
+import {Dialog} from "primereact/dialog";
 
 export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft, aircrafts }) {
 
@@ -76,14 +77,13 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
         }
     }
     return (
-        <Modal
-            show onHide={onClose}
-            backdrop="static"
-            centered
+        <Dialog
+            visible={true}
+            modal={true}
+            position={"center"}
+            onHide={onClose}
+            header={aircraft ? "Edit Aircraft" : "Add Aircraft"}
         >
-            <Modal.Header closeButton>
-                <Modal.Title>{aircraft ? "Edit Aircraft" : "Add Aircraft"}</Modal.Title>
-            </Modal.Header>
             <Formik
                 initialValues={aircraft? aircraft:{
 
@@ -115,7 +115,7 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                     handleBlur,
                     handleSubmit,
                 }) => (
-                    <Form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit}>
                         <Modal.Body>
                             <Row className="mb-3">
                                 <Col sm={6}>
@@ -328,9 +328,9 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                                 Save Changes
                             </Button>
                         </Modal.Footer>
-                    </Form>
+                    </form>
                 )}
             </Formik>
-        </Modal>
+        </Dialog>
     );
 }
