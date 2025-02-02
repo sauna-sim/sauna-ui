@@ -9,10 +9,10 @@ export default ({}) => {
 
     if (apiServer.connected){
         return (
-            <>
+            <div className={"flex flex-column h-screen"}>
                 <MainToolbar />
                 <AircraftPage />
-            </>
+            </div>
         )
     }
 

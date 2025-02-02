@@ -240,7 +240,7 @@ export const SettingsModal = ({}) => {
                                 </div>
                             </div>
                             <div className={"formgrid grid justify-content-end mr-1"}>
-                                <Button severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} className={"mr-3"}/>
+                                <Button type={"button"} severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} className={"mr-3"}/>
                                 <Button type="submit" loading={isSubmitting} label={"Save"}/>
                             </div>
                         </form>

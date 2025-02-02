@@ -224,20 +224,19 @@ const getMapFeatures = async (facilities, cur_display, visibleFeatures, mapCache
     };
 }
 
-const getFacilityDropdownData = (facilityId, facility, pathString, selectedPath) => {
+const getFacilityDropdownData = (facilityId, facility, pathString) => {
     return {
+        id: pathString,
+        key: pathString,
         label: facility.name,
-        value: pathString,
-        checked: pathString === selectedPath,
-        children: facility.child_facilities.map((child, index) => getFacilityDropdownData(index, child, `${pathString}.${index}`, selectedPath))
+        children: facility.child_facilities.map((child, index) => getFacilityDropdownData(index, child, `${pathString}.${index}`))
     }
 }
 
-export const getFacilitiesDropDownData = (facilities, facilityIndex) => {
-    return {
-        label: "Select Facility",
-        value: "null",
-        expanded: true,
-        children: facilities ? facilities.map((child, index) => getFacilityDropdownData(index, child, `${index}`, facilityIndex)) : []
+export const getFacilitiesDropDownData = (facilities) => {
+    if (!facilities){
+        return [];
     }
+
+    return facilities.map((facility, index) => getFacilityDropdownData(index, facility, `${index}`));
 }

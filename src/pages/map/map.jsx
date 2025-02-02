@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import {MapLibre} from "./map_libre";
-import {Button, DropdownButton} from "react-bootstrap";
 import {open, save} from '@tauri-apps/plugin-dialog';
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownTreeSelect from "react-dropdown-tree-select";
@@ -8,6 +7,12 @@ import 'react-dropdown-tree-select/dist/styles.css'
 import {FiltersModal} from "./filters_modal.jsx";
 import {getScopePackageFacilities, isScopePackageLoaded, loadScopePackage, saveScopePackage} from "../../actions/scope_package_actions.js";
 import {getCurDisplay, getFacilitiesDropDownData} from "./map_util.js";
+import {Toolbar} from "primereact/toolbar";
+import {Menu} from "primereact/menu";
+import {faChevronDown} from "@fortawesome/free-solid-svg-icons/faChevronDown";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Button} from "primereact/button";
+import {TreeSelect} from "primereact/treeselect";
 
 export const MapPage = () => {
     const [facilities, setFacilities] = useState();
@@ -20,10 +25,12 @@ export const MapPage = () => {
     const [mapZoom, setMapZoom] = useState(100000);
     const [mapRotation, setMapRotation] = useState(0);
     const mapCache = useRef(new Map());
+    const loadPackageMenu = useRef(null);
+    const selectDisplayMenu = useRef(null);
 
     useEffect(() => {
-        setFacilityDropDownData(getFacilitiesDropDownData(facilities, facilityIndex));
-    }, [facilities, facilityIndex]);
+        setFacilityDropDownData(getFacilitiesDropDownData(facilities));
+    }, [facilities]);
 
     useEffect(() => {
         setVisibleFeatures([]);
@@ -133,11 +140,9 @@ export const MapPage = () => {
         }
     }
 
-    const onFacilityDropdownChange = (curNode, selNodes) => {
-        if (selNodes && selNodes[0]) {
-            setFacilityIndex(selNodes[0].value);
-            setDisplayIndex(0);
-        }
+    const onFacilityDropdownChange = ({value}) => {
+        setFacilityIndex(value);
+        setDisplayIndex(0);
     }
 
     return (
@@ -148,38 +153,70 @@ export const MapPage = () => {
                 height: "100vh",
                 width: "100vw"
             }}>
-                <div className="m-2"
-                     style={{
-                         display: "flex",
-                         flexDirection: "row"
-                     }}>
-                    <h4 style={{flexGrow: "1"}}>{curDisplay.fullName}</h4>
-                    {facilities &&
-                        <DropdownTreeSelect data={facilityDropDownData} mode="radioSelect" onChange={onFacilityDropdownChange}/>
+                <Toolbar
+                    className={"m-2"}
+                    start={<h4 className={"m-0"}>{curDisplay.fullName}</h4>}
+                    end={
+                        <div className={"flex flex-wrap"}>
+                            {facilities &&
+                                <TreeSelect
+                                    className={"mr-2"}
+                                    filter={true}
+                                    value={facilityIndex}
+                                    onChange={onFacilityDropdownChange}
+                                    options={facilityDropDownData}
+                                    selectionMode={"single"}
+                                />
+                            }
+                            {facilities && curDisplay && curDisplay.facility &&
+                                <>
+                                    <Menu
+                                        ref={selectDisplayMenu}
+                                        model={curDisplay.facility.displays.map((disp, key) => {
+                                            return {
+                                                id: key,
+                                                label: disp.name,
+                                                command: ({item}) => setDisplayIndex(item.id)
+                                            }
+                                        })}
+                                        popup={true}
+                                    />
+                                    <Button
+                                        severity={"secondary"}
+                                        label={<>Select Display <FontAwesomeIcon icon={faChevronDown}/></>}
+                                        onClick={(event) => selectDisplayMenu.current.toggle(event)}
+                                        className={"mr-2"}
+                                    />
+                                </>
+                            }
+                            {facilities && curDisplay &&
+                                <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay}>
+                                    {({handleShow}) => (
+                                        <Button severity="secondary" onClick={handleShow} label={"Filters"} className={"mr-2"}/>
+                                    )}
+                                </FiltersModal>
+                            }
+                            {facilities &&
+                                <Button onClick={handleSavePackage} label={"Save"} className={"mr-2"}/>
+                            }
+                            <Button
+                                label={<>Load <FontAwesomeIcon icon={faChevronDown}/></>}
+                                onClick={(event) => loadPackageMenu.current.toggle(event)}
+                            />
+                            <Menu
+                                ref={loadPackageMenu}
+                                popup={true}
+                                model={Object.entries(loadOptions).map(([key, value]) => {
+                                    return {
+                                        id: key,
+                                        label: value.name,
+                                        command: ({item}) => void handleLoadPackage(item.id)
+                                    }
+                                })}
+                            />
+                        </div>
                     }
-                    {facilities && curDisplay && curDisplay.facility &&
-                        <DropdownButton title="Select Display" variant="secondary" onSelect={(eventKey) => setDisplayIndex(eventKey)}>
-                            {curDisplay.facility.displays.map((disp, key) => {
-                                return <DropdownItem key={key} eventKey={key}>{disp.name}</DropdownItem>
-                            })}
-                        </DropdownButton>
-                    }
-                    {facilities && curDisplay &&
-                        <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay}>
-                            {({handleShow}) => (
-                                <Button variant="secondary" onClick={handleShow}>Filters</Button>
-                            )}
-                        </FiltersModal>
-                    }
-                    {facilities &&
-                        <Button variant={"primary"} onClick={handleSavePackage}>Save</Button>
-                    }
-                    <DropdownButton title="Load" variant="primary" onSelect={handleLoadPackage}>
-                        {Object.entries(loadOptions).map(([key, value]) =>
-                            <DropdownItem key={key} eventKey={key}>{value.name}</DropdownItem>
-                        )}
-                    </DropdownButton>
-                </div>
+                />
                 <div style={{flexGrow: "1"}}>
                     <MapLibre features={curDisplay.mapData} zoom={mapZoom} center={mapCenter} rotation={mapRotation}/>
                 </div>

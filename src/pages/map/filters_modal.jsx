@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Button, Form, Modal} from "react-bootstrap";
+import {Button} from "primereact/button";
 import {Formik} from "formik";
 import {getScopePackageMapName, isScopePackageLoaded} from "../../actions/scope_package_actions.js";
+import {Dialog} from "primereact/dialog";
+import {Checkbox} from "primereact/checkbox";
 
 export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, children}) => {
     const [show, setShow] = useState(false);
@@ -58,10 +60,12 @@ export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, chil
         <>
             {children({handleShow})}
 
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Filters</Modal.Title>
-                </Modal.Header>
+            <Dialog
+                modal={true}
+                visible={show}
+                header={"Filters"}
+                onHide={handleClose}
+            >
                 <Formik
                     initialValues={initValues}
                     onSubmit={onSubmit}
@@ -76,38 +80,38 @@ export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, chil
                           isSubmitting,
                           setFieldValue
                       }) => (
-                        <Form onSubmit={handleSubmit}>
-                            <Modal.Body>
-                                <Button variant="info" onClick={() => {
+                        <form onSubmit={handleSubmit} noValidate={true}>
+                            <Button
+                                type={"button"}
+                                className={"mb-2"}
+                                severity="info"
+                                onClick={() => {
                                     for (const key of Object.keys(availValues)) {
-                                        setFieldValue(key, true);
+                                        void setFieldValue(key, true);
                                     }
-                                }}>Select All</Button>
+                                }}
+                                label={"Select All"}
+                            />
+                            <div className={"flex flex-column gap-1"}>
                                 {Object.keys(availValues).map((key) => (
-                                    <Form.Group>
-                                        <Form.Check
-                                            key={key}
-                                            type="checkbox"
-                                            label={availValues[key]}
+                                    <div className={"flex"} key={key}>
+                                        <Checkbox
+                                            checked={values[key]}
                                             name={key}
                                             onChange={handleChange}
-                                            checked={values[key]}
                                         />
-                                    </Form.Group>
+                                        <label className={"ml-2"}>{availValues[key]}</label>
+                                    </div>
                                 ))}
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={handleClose} disabled={isSubmitting}>
-                                    Cancel
-                                </Button>
-                                <Button variant="primary" type="submit" disabled={isSubmitting}>
-                                    Apply
-                                </Button>
-                            </Modal.Footer>
-                        </Form>
+                            </div>
+                            <div className={"formgrid grid justify-content-end mr-1"}>
+                                <Button type={"button"} severity="secondary" onClick={handleClose} disabled={isSubmitting} label={"Cancel"} className={"mr-3"}/>
+                                <Button type="submit" loading={isSubmitting} label={"Apply"}/>
+                            </div>
+                        </form>
                     )}
                 </Formik>
-            </Modal>
+            </Dialog>
         </>
     )
 }
