@@ -9,7 +9,7 @@ import {save, open} from '@tauri-apps/plugin-dialog';
 
 
 export async function openAircraftScenarioFile({setFileHandle}) {
-    try{
+    try {
         const fileHandle = await open({
             multiple: false,
             filters: [{
@@ -17,13 +17,12 @@ export async function openAircraftScenarioFile({setFileHandle}) {
                 extensions: ["json"]
             }]
         });
-        if(fileHandle) {
+        if (fileHandle) {
             const fileContent = await readTextFile(fileHandle);
             const parsedData = JSON.parse(fileContent);
             setFileHandle(fileHandle);
             return parsedData;
-        }
-        else {
+        } else {
             console.log("Open operation was canceled");
         }
     } catch (error) {
@@ -32,24 +31,22 @@ export async function openAircraftScenarioFile({setFileHandle}) {
 }
 
 export async function saveAircraftScenarioFile({fileHandle, setFileHandle, aircrafts}) {
-    try{
+    try {
         const dataToSave = {aircraft: aircrafts};
-        if(fileHandle) {
+        if (fileHandle) {
             console.log(`File saved to: ${fileHandle}`);
             await writeTextFile(fileHandle, JSON.stringify(dataToSave, null, 2));
-        }
-        else {
+        } else {
             const filePath = await save({
                 title: "Save Aircraft Scenario File",
                 defaultPath: "aircraft_scenario.json"
             });
 
-            if(filePath) {
+            if (filePath) {
                 setFileHandle(filePath);
                 await writeTextFile(filePath, JSON.stringify(dataToSave, null, 2));
                 console.log(`File saved to: ${filePath}`);
-            }
-            else {
+            } else {
                 console.log("Save operation was canceled");
             }
         }
@@ -74,33 +71,39 @@ export async function createSaunaScenarioMakerWindow() {
 
 // Register window close event for main window
 const webview = new WebviewWindow("main");
-webview.once("tauri://close-requested", async function (e) {
+webview.onCloseRequested(async function (e) {
     await storeSave();
-    for (const window of await getAllWebviewWindows()){
-        try {
-            await window.close();
-        } finally {
-            console.log(window.label);
+    for (const window of await getAllWebviewWindows()) {
+        if (window.label !== "main") {
+            try {
+                await window.close();
+            } finally {
+                console.log(window.label);
+            }
+        } else {
+            console.log("Main");
         }
     }
 });
 
 // Listen to sauna api builtin events
-updateSaunaApiBuiltIn().then(() => {})
+updateSaunaApiBuiltIn().then(() => {
+})
 listen("sauna-api-builtin", (event) => {
     reduxStore.dispatch(onBuiltInChange(event.payload));
-}).then(() => {});
+}).then(() => {
+});
 
-export async function updateSaunaApiBuiltIn(){
+export async function updateSaunaApiBuiltIn() {
     const builtIn = await invoke('get_sauna_api_builtin', {});
     reduxStore.dispatch(onBuiltInChange(builtIn));
 }
 
-export async function getSaunaApiConnectionDetails(){
+export async function getSaunaApiConnectionDetails() {
     return await invoke("get_sauna_api_conn_details", {});
 }
 
-export async function downloadFileFromUrl(url, location){
+export async function downloadFileFromUrl(url, location) {
     // Create directory
     await mkdir(location, {recursive: true});
     // Invoke Rust command
@@ -116,7 +119,7 @@ export async function readTextFileLines(fileName) {
     });
 }
 
-export async function extractZipFile(zipfile, dir){
+export async function extractZipFile(zipfile, dir) {
     // Invoke Rust command
     return await invoke('extract_zip', {
         dir: dir,
@@ -129,7 +132,7 @@ export const TauriWindowEnum = {
     COMMAND_WINDOW: "commandWindowLabel"
 };
 
-export async function createMapWindow(){
+export async function createMapWindow() {
     new WebviewWindow(TauriWindowEnum.MAP_PAGE, {
         url: "#map",
         fullscreen: false,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button } from "primereact/button";
 import AirportModal from "./airport_modal";
 
 export default function NavDataList() {
@@ -24,14 +24,14 @@ export default function NavDataList() {
     return(
         <div>
             <Button
-                variant="secondary"
+                severity="secondary"
                 onClick={() => {
                     setCurrentAirport(null);
                     setShowAirportModal(true);
                 }}
-            >
-                Add Airport
-            </Button>
+                label={"Add Airport"}
+                className={"mr-2"}
+            />
             {showAirportModal && (
                 <AirportModal
                     onClose={() => setShowAirportModal(false)}

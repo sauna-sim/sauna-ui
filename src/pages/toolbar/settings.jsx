@@ -12,6 +12,7 @@ import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
 import {Password} from "primereact/password";
 import {InputMask} from "primereact/inputmask";
+import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
 
 export const SettingsModal = ({}) => {
     const [showModal, setShowModal] = useState(false);
@@ -135,9 +136,7 @@ export const SettingsModal = ({}) => {
                                         />
                                         <span className={"p-inputgroup-addon"}>ms</span>
                                     </div>
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "apiSettings.posCalcRate")}
-                                    </small>
+                                    <FormikPrErrorMessage name={"apiSettings.posCalcRate"} />
                                 </div>
                                 <div className={"field col-12 md:col-6"}>
                                     <label htmlFor={"settingsFormCommandFrequency"}>Command Frequency</label>
@@ -153,9 +152,7 @@ export const SettingsModal = ({}) => {
                                         />
                                         <span className={"p-inputgroup-addon"}>MHz</span>
                                     </div>
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "apiSettings.commandFrequency")}
-                                    </small>
+                                    <FormikPrErrorMessage name={"apiSettings.commandFrequency"} />
                                 </div>
                             </div>
 
@@ -172,9 +169,7 @@ export const SettingsModal = ({}) => {
                                         onBlur={handleBlur}
                                         invalid={getIn(touched, "fsdConnection.hostname") && getIn(errors, "fsdConnection.hostname")}
                                     />
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "fsdConnection.hostname")}
-                                    </small>
+                                    <FormikPrErrorMessage name={"fsdConnection.hostname"} />
                                 </div>
                                 <div className={"field col-12 md:col-3"}>
                                     <label htmlFor={"settingsFormFsdPort"}>Port</label>
@@ -188,9 +183,7 @@ export const SettingsModal = ({}) => {
                                         onBlur={handleBlur}
                                         invalid={getIn(touched, "fsdConnection.port") && getIn(errors, "fsdConnection.port")}
                                     />
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "fsdConnection.port")}
-                                    </small>
+                                    <FormikPrErrorMessage name={"fsdConnection.port"} />
                                 </div>
                                 <div className={"field col-12 md:col-4"}>
                                     <label htmlFor={"settingsFormFsdProtocol"}>Protocol Version</label>
@@ -215,9 +208,7 @@ export const SettingsModal = ({}) => {
                                         onBlur={handleBlur}
                                         invalid={getIn(touched, "fsdConnection.networkId") && getIn(errors, "fsdConnection.networkId")}
                                     />
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "fsdConnection.networkId")}
-                                    </small>
+                                    <FormikPrErrorMessage name={"fsdConnection.networkId"} />
                                 </div>
                                 <div className={"field col-12 md:col-6"}>
                                     <label htmlFor={"settingsFormFsdPass"}>Password</label>
@@ -234,13 +225,11 @@ export const SettingsModal = ({}) => {
                                         pt={{iconField: {root: {className: "w-full"}}}}
                                         invalid={getIn(touched, "fsdConnection.password") && getIn(errors, "fsdConnection.password")}
                                     />
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "fsdConnection.password")}
-                                    </small>
+                                    <FormikPrErrorMessage name={"fsdConnection.password"} />
                                 </div>
                             </div>
                             <div className={"formgrid grid justify-content-end mr-1"}>
-                                <Button type={"button"} severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} className={"mr-3"}/>
+                                <Button type={"button"} severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} className={"mr-2"}/>
                                 <Button type="submit" loading={isSubmitting} label={"Save"}/>
                             </div>
                         </form>

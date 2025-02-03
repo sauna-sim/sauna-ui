@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import {FloatLabel} from "primereact/floatlabel";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
+import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
 
 export const ApiConnectionSettings = ({}) => {
     const [apiServerDetails, setApiServerDetails] = useState(null);
@@ -68,9 +69,7 @@ export const ApiConnectionSettings = ({}) => {
                                     />
                                     <label htmlFor={"settingsFormApiHostName"}>Host Name *</label>
                                 </FloatLabel>
-                                <small className={"p-error"}>
-                                    {getIn(errors, "hostName")}
-                                </small>
+                                <FormikPrErrorMessage name={"hostName"} />
                             </div>
                             <div className={"field sm:col-3 col-12 mt-3"}>
                                 <FloatLabel>
@@ -86,11 +85,7 @@ export const ApiConnectionSettings = ({}) => {
                                     />
                                     <label htmlFor={"settingsFormApiPort"}>Port *</label>
                                 </FloatLabel>
-                                <small>
-                                    <small className={"p-error"}>
-                                        {getIn(errors, "port")}
-                                    </small>
-                                </small>
+                                <FormikPrErrorMessage name={"port"} />
                             </div>
                             <div className={"sm:col-2 col-12 sm:mt-3"}>
                                 <Button className={"w-full"} type={"submit"} loading={isSubmitting}>

@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {FormControl} from "react-bootstrap";
 import {useSelector} from "react-redux";
 import {sendTextCommand} from "../../actions/command_actions.js";
 import {Dropdown} from "primereact/dropdown";

@@ -1,12 +1,13 @@
 import React from "react";
-import { Formik, getIn } from "formik";
-import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import {Formik, getIn} from "formik";
 import * as Yup from "yup";
+import {Dialog} from "primereact/dialog";
+import {InputText} from "primereact/inputtext";
+import {Button} from "primereact/button";
+import {FormikPrErrorMessage} from "../../../components/primereact_form.jsx";
 
 export default function AirportModal({onClose, onAirportSubmit, airport, airports}) {
-    const formSchema = Yup.object().shape({
-
-    });
+    const formSchema = Yup.object().shape({});
 
     const onSubmit = async (values) => {
         onAirportSubmit(values);
@@ -19,17 +20,16 @@ export default function AirportModal({onClose, onAirportSubmit, airport, airport
             handleChangeFunction(e);
         }
     };
-    return(
-        <Modal
-            show onHide={onClose}
-            backdrop="static"
-            centered
+    return (
+        <Dialog
+            visible={true}
+            onHide={onClose}
+            modal={true}
+            position={"center"}
+            header={airport ? "Edit Airport" : "Add Airport"}
         >
-            <Modal.Header closeButton>
-                <Modal.Title>{airport ? "Edit Airport" : "Add Airport"}</Modal.Title>
-            </Modal.Header>
             <Formik
-                initialValues={airport? airport:{
+                initialValues={airport ? airport : {
                     airportIdent: "",
                     airportElev: "",
                     runways: [
@@ -67,183 +67,153 @@ export default function AirportModal({onClose, onAirportSubmit, airport, airport
                 onSubmit={onSubmit}
             >
                 {({
-                    values,
-                    errors,
-                    touched,
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                }) => (
-                    <Form onSubmit={handleSubmit}>
-                        <Modal.Body>
-                            <h5>Airport Info</h5>
-                            <Row className="mb-3">
-                                <Col sm={6}>
-                                    <Form.Label>ICAO</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="airportIdent"
-                                            value={values.airportIdent}
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                  }) => (
+                    <form onSubmit={handleSubmit} noValidate={true}>
+                        <h5>Airport Info</h5>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>ICAO</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="airportIdent"
+                                    value={values.airportIdent}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "airportIdent") && getIn(errors, "airportIdent")}
+                                />
+                                <FormikPrErrorMessage name={"airportIdent"}/>
+                            </div>
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Elevation</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="airportElev"
+                                    type="number"
+                                    value={values.airportElev}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "airportElev") && getIn(errors, "airportElev")}
+                                />
+                                <FormikPrErrorMessage name={"airportElev"}/>
+                            </div>
+                        </div>
+                        <h5>Runways</h5>
+                        {values.runways.map((runway, index) => (
+                            <React.Fragment key={index}>
+                                <div className="formgrid grid mb-3">
+                                    <div className={"field col-12 sm:col-4"}>
+                                        <label>Thres 1 Ident</label>
+                                        <InputText
+                                            className={"w-full"}
+                                            name={`runways[${index}].thres1.ident`}
+                                            value={runway.thres1.ident}
                                             onChange={handleChangeUpperCase(handleChange)}
                                             onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "airportIdent") && getIn(errors, "airportIdent")}
+                                            invalid={
+                                                getIn(touched, `runways[${index}].thres1.ident`) &&
+                                                getIn(errors, `runways[${index}].thres1.ident`)
+                                            }
                                         />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "airportIdent")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={6}>
-                                    <Form.Label>Elevation</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="airportElev"
+                                        <FormikPrErrorMessage name={`runways[${index}].thres1.ident`}/>
+                                    </div>
+                                    <div className={"field col-12 sm:col-4"}>
+                                        <label>Thres 1 Lat</label>
+                                        <InputText
+                                            className={"w-full"}
+                                            name={`runways[${index}].thres1.lat`}
                                             type="number"
-                                            value={values.airportElev}
+                                            value={runway.thres1.lat}
                                             onChange={handleChangeUpperCase(handleChange)}
                                             onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "airportElev") && getIn(errors, "airportElev")}
+                                            invalid={
+                                                getIn(touched, `runways[${index}].thres1.lat`) &&
+                                                getIn(errors, `runways[${index}].thres1.lat`)
+                                            }
                                         />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "airportElev")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <h5>Runways</h5>
-                            {values.runways.map((runway, index) => (
-                                <React.Fragment key={index}>
-                                    <Row className="mb-3">
-                                        <Col sm={4}>
-                                            <Form.Label>Thres 1 Ident</Form.Label>
-                                            <InputGroup hasValidation>
-                                                <Form.Control
-                                                    name={`runways[${index}].thres1.ident`}
-                                                    value={runway.thres1.ident}
-                                                    onChange={handleChangeUpperCase(handleChange)}
-                                                    onBlur={handleBlur}
-                                                    isInvalid={
-                                                        getIn(touched, `runways[${index}].thres1.ident`) &&
-                                                        getIn(errors, `runways[${index}].thres1.ident`)
-                                                    }
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, `runways[${index}].thres1.ident`)}
-                                                </Form.Control.Feedback>
-                                            </InputGroup>
-                                        </Col>
-                                        <Col sm={4}>
-                                            <Form.Label>Thres 1 Lat</Form.Label>
-                                            <InputGroup hasValidation>
-                                                <Form.Control
-                                                    name={`runways[${index}].thres1.lat`}
-                                                    type="number"
-                                                    value={runway.thres1.lat}
-                                                    onChange={handleChangeUpperCase(handleChange)}
-                                                    onBlur={handleBlur}
-                                                    isInvalid={
-                                                        getIn(touched, `runways[${index}].thres1.lat`) &&
-                                                        getIn(errors, `runways[${index}].thres1.lat`)
-                                                    }
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, `runways[${index}].thres1.lat`)}
-                                                </Form.Control.Feedback>
-                                            </InputGroup>
-                                        </Col>
-                                        <Col sm={4}>
-                                            <Form.Label>Thres 1 Lon1</Form.Label>
-                                            <InputGroup hasValidation>
-                                                <Form.Control
-                                                    name={`runways[${index}].thres1.lon`}
-                                                    type="number"
-                                                    value={runway.thres1.lon}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    isInvalid={
-                                                        getIn(touched, `runways[${index}].thres1.lon`) &&
-                                                        getIn(errors, `runways[${index}].thres1.lon`)
-                                                    }
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, `runways[${index}].thres1.lon`)}
-                                                </Form.Control.Feedback>
-                                            </InputGroup>
-                                        </Col>
-                                    </Row>
-                                    <Row className="mb-3">
-                                        <Col sm={4}>
-                                            <Form.Label>Thres 2 Ident</Form.Label>
-                                            <InputGroup hasValidation>
-                                                <Form.Control
-                                                    name={`runways[${index}].thres2.ident`}
-                                                    value={runway.thres2.ident}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    isInvalid={
-                                                        getIn(touched, `runways[${index}].thres2.ident`) &&
-                                                        getIn(errors, `runways[${index}].thres2.ident`)
-                                                    }
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, `runways[${index}].thres2.ident`)}
-                                                </Form.Control.Feedback>
-                                            </InputGroup>
-                                        </Col>
-                                        <Col sm={4}>
-                                            <Form.Label>Thres 2 Lat</Form.Label>
-                                            <InputGroup hasValidation>
-                                                <Form.Control
-                                                    name={`runways[${index}].thres2.lat`}
-                                                    type="number"
-                                                    value={runway.thres2.lat}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    isInvalid={
-                                                        getIn(touched, `runways[${index}].thres2.lat`) &&
-                                                        getIn(errors, `runways[${index}].thres2.lat`)
-                                                    }
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, `runways[${index}].thres2.lat`)}
-                                                </Form.Control.Feedback>
-                                            </InputGroup>
-                                        </Col>
-                                        <Col sm={4}>
-                                            <Form.Label>Thres 2 Lon</Form.Label>
-                                            <InputGroup hasValidation>
-                                                <Form.Control
-                                                    name={`runways[${index}].thres2.lon`}
-                                                    type="number"
-                                                    value={runway.thres2.lon}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    isInvalid={
-                                                        getIn(touched, `runways[${index}].thres2.lon`) &&
-                                                        getIn(errors, `runways[${index}].thres2.lon`)
-                                                    }
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getIn(errors, `runways[${index}].thres2.lon`)}
-                                                </Form.Control.Feedback>
-                                            </InputGroup>
-                                        </Col>
-                                    </Row>
-                                </React.Fragment>
-                            ))}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={onClose}>
-                                Close
-                            </Button>
-                            <Button variant="primary" type="submit">
-                                Save Changes
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
+                                        <FormikPrErrorMessage name={`runways[${index}].thres1.lat`}/>
+                                    </div>
+                                    <div className={"field col-12 sm:col-4"}>
+                                        <label>Thres 1 Lon1</label>
+                                        <InputText
+                                            className={"w-full"}
+                                            name={`runways[${index}].thres1.lon`}
+                                            type="number"
+                                            value={runway.thres1.lon}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            invalid={
+                                                getIn(touched, `runways[${index}].thres1.lon`) &&
+                                                getIn(errors, `runways[${index}].thres1.lon`)
+                                            }
+                                        />
+                                        <FormikPrErrorMessage name={`runways[${index}].thres1.lon`}/>
+                                    </div>
+                                </div>
+                                <div className="formgrid grid mb-3">
+                                    <div className={"field col-12 sm:col-4"}>
+                                        <label>Thres 2 Ident</label>
+                                        <InputText
+                                            className={"w-full"}
+                                            name={`runways[${index}].thres2.ident`}
+                                            value={runway.thres2.ident}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            invalid={
+                                                getIn(touched, `runways[${index}].thres2.ident`) &&
+                                                getIn(errors, `runways[${index}].thres2.ident`)
+                                            }
+                                        />
+                                        <FormikPrErrorMessage name={`runways[${index}].thres2.ident`}/>
+                                    </div>
+                                    <div className={"field col-12 sm:col-4"}>
+                                        <label>Thres 2 Lat</label>
+                                        <InputText
+                                            className={"w-full"}
+                                            name={`runways[${index}].thres2.lat`}
+                                            type="number"
+                                            value={runway.thres2.lat}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            invalid={
+                                                getIn(touched, `runways[${index}].thres2.lat`) &&
+                                                getIn(errors, `runways[${index}].thres2.lat`)
+                                            }
+                                        />
+                                        <FormikPrErrorMessage name={`runways[${index}].thres2.lat`}/>
+                                    </div>
+                                    <div className={"field col-12 sm:col-4"}>
+                                        <label>Thres 2 Lon</label>
+                                        <InputText
+                                            className={"w-full"}
+                                            name={`runways[${index}].thres2.lon`}
+                                            type="number"
+                                            value={runway.thres2.lon}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            invalid={
+                                                getIn(touched, `runways[${index}].thres2.lon`) &&
+                                                getIn(errors, `runways[${index}].thres2.lon`)
+                                            }
+                                        />
+                                        <FormikPrErrorMessage name={`runways[${index}].thres2.lon`}/>
+                                    </div>
+                                </div>
+                            </React.Fragment>
+                        ))}
+                        <div className={"formgrid grid justify-content-end mr-1"}>
+                            <Button type={"button"} severity="secondary" onClick={onClose} label={"Close"}/>
+                            <Button type="submit" label={"Save Changes"}/>
+                        </div>
+                    </form>
 
                 )}
             </Formik>
-        </Modal>
+        </Dialog>
     );
 }

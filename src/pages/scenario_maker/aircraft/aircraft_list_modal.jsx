@@ -1,10 +1,13 @@
 import React from "react";
-import { Formik, getIn } from 'formik';
-import {Button, Col, Form, InputGroup, Modal, Row} from "react-bootstrap";
+import {Formik, getIn} from 'formik';
 import * as Yup from "yup";
 import {Dialog} from "primereact/dialog";
+import {InputText} from "primereact/inputtext";
+import {Dropdown} from "primereact/dropdown";
+import {Button} from "primereact/button";
+import {FormikPrErrorMessage} from "../../../components/primereact_form.jsx";
 
-export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft, aircrafts }) {
+export default function AircraftListModal({onClose, onAircraftSubmit, aircraft, aircrafts}) {
 
     const formSchema = Yup.object().shape({
         callsign: Yup.string()
@@ -37,19 +40,19 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
             .matches(/^[0-7]{4}$/, "Squawk must be between 0000-7777"),
         fp: Yup.object().shape({
             origin: Yup.string()
-            .required("Departure airport is required")
-            .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
-            .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
+                .required("Departure airport is required")
+                .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
+                .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
             destination: Yup.string()
-            .required("Destination airport is required")
-            .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
-            .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
+                .required("Destination airport is required")
+                .matches(/^[a-zA-Z0-9]*$/, "Alphanumeric characters only!")
+                .matches(/^.{3,4}$/, "Needs to be atleast 3 characters!"),
             route: Yup.string()
                 .required("Flight Plan route is required"),
             cruiseLevel: Yup.number()
-            .required("Altitude is required")
-            .min(0, "The altitude has to be atleast 0")
-            .max(99999, "The altitude cannot exceed 99,999ft"),
+                .required("Altitude is required")
+                .min(0, "The altitude has to be atleast 0")
+                .max(99999, "The altitude cannot exceed 99,999ft"),
             filedTas: Yup.number()
                 .min(0, "Airspeed has to be atleast 1"),
         })
@@ -85,7 +88,7 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
             header={aircraft ? "Edit Aircraft" : "Add Aircraft"}
         >
             <Formik
-                initialValues={aircraft? aircraft:{
+                initialValues={aircraft ? aircraft : {
 
                     callsign: "",
                     pos: {
@@ -108,226 +111,180 @@ export default function AircraftListModal({ onClose, onAircraftSubmit, aircraft,
                 onSubmit={onSubmit}
             >
                 {({
-                    values,
-                    errors,
-                    touched,
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                }) => (
-                    <form onSubmit={handleSubmit}>
-                        <Modal.Body>
-                            <Row className="mb-3">
-                                <Col sm={6}>
-                                    <Form.Label>Callsign</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="callsign"
-                                            value={values.callsign}
-                                            onChange={handleChangeUpperCase(handleChange)}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.callsign && !!errors.callsign}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.callsign}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={6}>
-                                    <Form.Label>Aircraft Type</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="acftType"
-                                            value={values.acftType}
-                                            onChange={handleChangeUpperCase(handleChange)}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "acftType") && getIn(errors, "acftType")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "acftType")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <Row className="mb-3">
-                                <Col sm={6}>
-                                    <Form.Label>Latitude</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="pos.lat"
-                                            type="number"
-                                            value={values.pos.lat}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "pos.lat") && getIn(errors, "pos.lat")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "pos.lat")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={6}>
-                                    <Form.Label>Longitude</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="pos.lon"
-                                            type="number"
-                                            value={values.pos.lon}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "pos.lon") && getIn(errors, "pos.lon")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "pos.lon")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <Row className="mb-3">
-                                <Col sm={6}>
-                                    <Form.Label>Altitude</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="alt"
-                                            type="number"
-                                            value={values.alt}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "alt") && getIn(errors, "alt")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "alt")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={6}>
-                                    <Form.Label>Squawk</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="squawk"
-                                            value={values.squawk}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "squawk") && getIn(errors, "squawk")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "squawk")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <Row className="mb-3">
-                                <Col sm={6}>
-                                    <Form.Label>Departure</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="fp.origin"
-                                            value={values.fp.origin}
-                                            onChange={handleChangeUpperCase(handleChange)}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.origin") && getIn(errors, "fp.origin")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.origin")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={6}>
-                                    <Form.Label>Arrival</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="fp.destination"
-                                            value={values.fp.destination}
-                                            onChange={handleChangeUpperCase(handleChange)}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.destination") && getIn(errors, "fp.destination")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.destination")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <Row className="mb-3">
-                                <Col>
-                                    <Form.Label>Flight Plan Route</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="fp.route"
-                                            value={values.fp.route}
-                                            onChange={handleChangeUpperCase(handleChange)}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.route") && getIn(errors, "fp.route")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.route")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                            <Row className="mb-3">
-                                <Col sm={4}>
-                                    <Form.Label>Cruise Altitude</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="fp.cruiseLevel"
-                                            type="number"
-                                            value={values.fp.cruiseLevel}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.cruiseLevel") && getIn(errors, "fp.cruiseLevel")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.cruiseLevel")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={4}>
-                                    <Form.Label>Cruise Speed</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Control
-                                            name="fp.filedTas"
-                                            type="number"
-                                            value={values.fp.filedTas}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.filedTas") && getIn(errors, "fp.filedTas")}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.filedTas")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                                <Col sm={4}>
-                                    <Form.Label>Flight Rules</Form.Label>
-                                    <InputGroup hasValidation>
-                                        <Form.Select
-                                            name="fp.flightRules"
-                                            value={values.fp.flightRules}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={getIn(touched, "fp.flightRules") && getIn(errors, "fp.flightRules")}
-                                        >
-                                            <option value="IFR">IFR</option>
-                                            <option value="VFR">VFR</option>
-                                            <option value="DVFR">DVFR</option>
-                                            <option value="SVFR">SVFR</option>
-                                        </Form.Select>
-                                        <Form.Control.Feedback type="invalid">
-                                            {getIn(errors, "fp.flightRules")}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Row>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={onClose}>
-                                Close
-                            </Button>
-                            <Button variant="primary" type="submit">
-                                Save Changes
-                            </Button>
-                        </Modal.Footer>
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                  }) => (
+                    <form onSubmit={handleSubmit} noValidate={true}>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field sm:col-6 col-12"}>
+                                <label>Callsign</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="callsign"
+                                    value={values.callsign}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={touched.callsign && !!errors.callsign}
+                                />
+                                <FormikPrErrorMessage name={"callsign"} />
+                            </div>
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Aircraft Type</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="acftType"
+                                    value={values.acftType}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "acftType") && getIn(errors, "acftType")}
+                                />
+                                <FormikPrErrorMessage name={"acftType"} />
+                            </div>
+                        </div>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Latitude</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="pos.lat"
+                                    type="number"
+                                    value={values.pos.lat}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "pos.lat") && getIn(errors, "pos.lat")}
+                                />
+                                <FormikPrErrorMessage name={"pos.lat"} />
+                            </div>
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Longitude</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="pos.lon"
+                                    type="number"
+                                    value={values.pos.lon}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "pos.lon") && getIn(errors, "pos.lon")}
+                                />
+                                <FormikPrErrorMessage name={"pos.lon"} />
+                            </div>
+                        </div>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Altitude</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="alt"
+                                    type="number"
+                                    value={values.alt}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "alt") && getIn(errors, "alt")}
+                                />
+                                <FormikPrErrorMessage name={"alt"} />
+                            </div>
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Squawk</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="squawk"
+                                    value={values.squawk}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "squawk") && getIn(errors, "squawk")}
+                                />
+                                <FormikPrErrorMessage name={"squawk"} />
+                            </div>
+                        </div>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Departure</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="fp.origin"
+                                    value={values.fp.origin}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "fp.origin") && getIn(errors, "fp.origin")}
+                                />
+                                <FormikPrErrorMessage name={"fp.origin"} />
+                            </div>
+                            <div className={"field col-12 sm:col-6"}>
+                                <label>Arrival</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="fp.destination"
+                                    value={values.fp.destination}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "fp.destination") && getIn(errors, "fp.destination")}
+                                />
+                                <FormikPrErrorMessage name={"fp.destination"} />
+                            </div>
+                        </div>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field col-12"}>
+                                <label>Flight Plan Route</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="fp.route"
+                                    value={values.fp.route}
+                                    onChange={handleChangeUpperCase(handleChange)}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "fp.route") && getIn(errors, "fp.route")}
+                                />
+                                <FormikPrErrorMessage name={"fp.route"} />
+                            </div>
+                        </div>
+                        <div className="formgrid grid mb-3">
+                            <div className={"field col-12 sm:col-4"}>
+                                <label>Cruise Altitude</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="fp.cruiseLevel"
+                                    type="number"
+                                    value={values.fp.cruiseLevel}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "fp.cruiseLevel") && getIn(errors, "fp.cruiseLevel")}
+                                />
+                                <FormikPrErrorMessage name={"fp.cruiseLevel"} />
+                            </div>
+                            <div className={"field col-12 sm:col-4"}>
+                                <label>Cruise Speed</label>
+                                <InputText
+                                    className={"w-full"}
+                                    name="fp.filedTas"
+                                    type="number"
+                                    value={values.fp.filedTas}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "fp.filedTas") && getIn(errors, "fp.filedTas")}
+                                />
+                                <FormikPrErrorMessage name={"fp.filedTas"} />
+                            </div>
+                            <div className={"field col-12 sm:col-4"}>
+                                <label>Flight Rules</label>
+                                <Dropdown
+                                    className={"w-full"}
+                                    name="fp.flightRules"
+                                    value={values.fp.flightRules}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    invalid={getIn(touched, "fp.flightRules") && getIn(errors, "fp.flightRules")}
+                                    options={["IFR", "VFR", "DVFR", "SVFR"]}
+                                />
+                                <FormikPrErrorMessage name={"fp.flightRules"} />
+                            </div>
+                        </div>
+                        <div className={"formgrid grid justify-content-end mr-1"}>
+                            <Button type="button" severity="secondary" onClick={onClose} label={"Close"} className={"mr-2"}/>
+                            <Button type="submit" label={"Save Changes"}/>
+                        </div>
                     </form>
                 )}
             </Formik>
