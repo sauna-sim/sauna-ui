@@ -94,15 +94,20 @@ export const AircraftRow = ({callsign}) => {
     }
 
     const handleWsClose = async () => {
-        if (ws.current) {
-            ws.current.close();
-        }
-        ws.current = null;
+        try {
+            if (ws.current) {
+                ws.current.close();
+            }
+        } catch (e) {
+            shouldRunWebSocket.current = false;
+        } finally {
+            ws.current = null;
 
-        // Otherwise retry the ws socket
-        if (shouldRunWebSocket.current) {
-            await wait(5000);
-            void runWebSocket();
+            // Otherwise retry the ws socket
+            if (shouldRunWebSocket.current) {
+                await wait(5000);
+                void runWebSocket();
+            }
         }
     }
 
@@ -228,7 +233,7 @@ export const AircraftRow = ({callsign}) => {
         <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
         <td>{`${round(aircraft.position.altimeterSetting.hectopascals)}hPa`}</td>
         <td>{`${round(aircraft.position.windDirection.degrees)} @ ${round(aircraft.position.windSpeed.knots)}kts`}</td>
-        <td>{aircraft.fms.asString}</td>
+        <td><div style={{overflow: "auto", height: "100px"}}>{aircraft.fms.asString}</div></td>
         <td><AircraftDetail aircraft={aircraft}/></td>
     </tr>
 }
