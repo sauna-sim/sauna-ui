@@ -95,7 +95,7 @@ export const NavigraphAuthButton = ({}) => {
         return (
             <>
                 <Button
-                    variant={buttonVariant}
+                    severity={buttonVariant}
                     onClick={refreshPackage}
                     loading={loading}
                     tooltip={`Reload ${navigraphState.isCurrent ? "Current" : "Outdated"} Navigraph Cycle ${packageVersion}`}
