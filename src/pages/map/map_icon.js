@@ -110,6 +110,7 @@ export const makeIcon = (iconDef, color, size = 1) => {
     return {
         data: image_data.data,
         width: crop.width,
-        height: crop.height
+        height: crop.height,
+        url: canvas.toDataURL("image/svg")
     };
 };

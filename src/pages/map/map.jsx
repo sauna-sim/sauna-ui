@@ -24,7 +24,7 @@ export const MapPage = () => {
     const [mapRotation, setMapRotation] = useState(0);
     const mapCache = useRef(new Map());
     const loadPackageMenu = useRef(null);
-    const selectDisplayMenu = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setFacilityDropDownData(getFacilitiesDropDownData(facilities));
@@ -97,31 +97,36 @@ export const MapPage = () => {
     }
 
     const handleLoadPackage = async (eventKey) => {
-        const pkgType = loadOptions[eventKey];
-        if (pkgType) {
-            const selected = await open(pkgType.openOptions);
+        setLoading(true);
+        try {
+            const pkgType = loadOptions[eventKey];
+            if (pkgType) {
+                const selected = await open(pkgType.openOptions);
 
-            if (selected) {
-                const sendObj = {};
-                if (eventKey === "2") {
-                    sendObj[pkgType.sctType] = {
-                        paths: selected
-                    };
-                } else {
-                    sendObj[pkgType.sctType] = {
-                        path: selected
+                if (selected) {
+                    const sendObj = {};
+                    if (eventKey === "2") {
+                        sendObj[pkgType.sctType] = {
+                            paths: selected
+                        };
+                    } else {
+                        sendObj[pkgType.sctType] = {
+                            path: selected
+                        }
+                    }
+
+                    await loadScopePackage(sendObj);
+
+                    if (await isScopePackageLoaded()) {
+                        setFacilities(await getScopePackageFacilities());
+                        setFacilityIndex("0");
+                        setDisplayIndex(0);
+                        mapCache.current.clear();
                     }
                 }
-
-                await loadScopePackage(sendObj);
-
-                if (await isScopePackageLoaded()) {
-                    setFacilities(await getScopePackageFacilities());
-                    setFacilityIndex("0");
-                    setDisplayIndex(0);
-                    mapCache.current.clear();
-                }
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -198,6 +203,7 @@ export const MapPage = () => {
                             <Button
                                 label={<>Load <FontAwesomeIcon icon={faChevronDown}/></>}
                                 onClick={(event) => loadPackageMenu.current.toggle(event)}
+                                loading={loading}
                             />
                             <Menu
                                 ref={loadPackageMenu}

@@ -4,6 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import {getAircraftList} from "../../actions/aircraft_actions";
 import * as turf from "@turf/turf";
 import TargetMarkerPng from "../../assets/images/TargetMarker.png";
+import {AircraftMarker} from "./aircraft_marker.jsx";
+import {makeIcon} from "./map_icon.js";
 
 export const MapLibre = ({features, center, zoom, rotation}) => {
     const mapContainer = useRef(null);
@@ -12,6 +14,42 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
     const [aircrafts, setAircrafts] = useState([]);
     const [oldIcons, setOldIcons] = useState([]);
     const [oldLineLayers, setOldLineLayers] = useState([]);
+    const defaultIcons = useRef(null);
+    const aircraftOptions = useRef(new Map());
+
+    // Default Icons
+    const getDefaultIcons = () => {
+        const tempIconDef = [
+            {Polygon: [[-2, -2], [-2, 2], [2, 2], [2, -2]]},
+            {Line: {start: [-2, -2], end: [-2, 2]}},
+            {Line: {start: [-2, 2], end: [2, 2]}},
+            {Line: {start: [2, 2], end: [2, -2]}},
+            {Line: {start: [2, -2], end: [-2, -2]}},
+
+        ];
+
+        const tempIcon = makeIcon(tempIconDef, "#ffffff", 1);
+
+        const trailDef = [
+            {Line: {start: [-2, -2], end: [-2, 2]}},
+            {Line: {start: [-2, 2], end: [2, 2]}},
+            {Line: {start: [2, 2], end: [2, -2]}},
+            {Line: {start: [2, -2], end: [-2, -2]}},
+        ];
+
+        const trailIcon = makeIcon(trailDef, "#ffffff", 1);
+
+        return [
+            {
+                id: 'temp-icon',
+                ...tempIcon
+            },
+            {
+                id: 'temp-icon-trail',
+                ...trailIcon
+            }
+        ];
+    }
 
     const mapStyle = {
         version: 8,
@@ -33,7 +71,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                 paint: {
                     "background-color": "rgba(0,0,0,1)"
                 },
-                layout:  {
+                layout: {
                     "visibility": "visible"
                 }
             },
@@ -54,6 +92,8 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
     useEffect(() => {
         if (map.current) return; // stops map from initializing more than once
 
+        defaultIcons.current = getDefaultIcons();
+
         map.current = new maplibregl.Map({
             container: mapContainer.current,
             center: [0, 0],
@@ -71,11 +111,6 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
         );
 
         map.current.on('load', async () => {
-            const targetMarkerImg = await map.current.loadImage(TargetMarkerPng);
-
-            map.current.addImage('target-marker', targetMarkerImg.data);
-            //sdf
-
             map.current.addSource('scope-package', {
                 'type': 'geojson',
                 //'tolerance': 0,
@@ -102,22 +137,9 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                 'filter': ['==', '$type', 'Polygon']
             });
 
-            // Temp Icon
-            const width = 4;
-            const bytesPerPixel = 4;
-            const data = new Uint8Array(width * width * bytesPerPixel);
-
-            for (let x = 0; x < width; x++) {
-                for (let y = 0; y < width; y++) {
-                    const offset = (y * width + x) * bytesPerPixel;
-                    data[offset + 0] = 255;
-                    data[offset + 1] = 255;
-                    data[offset + 2] = 255;
-                    data[offset + 3] = 255;
-                }
-            }
-
-            map.current.addImage('temp-icon', {width, height: width, data});
+            defaultIcons.current.forEach((icon) => {
+                map.current.addImage(icon.id, icon);
+            });
 
             map.current.addLayer({
                 'id': `scope-package-points`,
@@ -182,7 +204,15 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                 'filter': ['==', '$type', 'Point']
             });
 
-            map.current.addSource('aircrafts', {
+            map.current.addSource('aircraftTrails', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': []
+                }
+            });
+
+            map.current.addSource('aircraftRoutes', {
                 'type': 'geojson',
                 'data': {
                     'type': 'FeatureCollection',
@@ -191,83 +221,136 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
             });
 
             map.current.addLayer({
-                'id': 'aircrafts',
+                'id': 'aircraftTrails',
                 'type': 'symbol',
-                'source': 'aircrafts',
-                'paint': {
-                    'text-color': '#ffffff',
-                },
+                'source': 'aircraftTrails',
                 'layout': {
-                    'text-field': ['get', 'callsign'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                    ],
-                    'text-size': 12,
-                    'text-variable-anchor-offset': [
-                        "top-left", [1, 1.25],
-                        "left", [1, 0],
-                        "bottom-left", [1, 1.25],
-                        "bottom", [0, 1.25],
-                        "bottom-right", [1, 1.25],
-                        "right", [1, 0],
-                        "top-right", [1, 1.25],
-                        "top", [0, 1.25],
-                    ],
-                    'text-justify': 'auto',
-                    'text-overlap': 'cooperative',
                     'icon-image': ["coalesce",
-                        ["image", "icon-symbol-aircraft_corr_prim_s"],
-                        ["image", 'target-marker']
+                        ["image", 'temp-icon-trail']
                     ],
                     'icon-rotation-alignment': 'map',
                     'icon-overlap': 'always',
                     'icon-ignore-placement': true
                 }
             });
+            map.current.addLayer({
+                'id': 'aircraftRoutes',
+                'type': 'line',
+                'source': 'aircraftRoutes',
+                'paint': {
+                    'line-color': 'pink',
+                    'line-width': 1,
+                },
+            });
         });
 
         return () => map.current = null;
     }, []);
 
-    useEffect(() => {
-        const pollFunc = async () => {
-            aircraftPoll.current = setInterval(async () => {
-                try {
-                    const aircraftList = await getAircraftList(true);
+    const aircraftPollFunc = async () => {
+        try {
+            const aircraftList = await getAircraftList(true);
 
-                    setAircrafts(aircraftList);
-                } catch (e) {
-                    console.log(e);
+            setAircrafts((prevState) => {
+                // History trails
+                for (const aircraft of aircraftList) {
+                    const foundCraft = prevState.find((acft) => acft.callsign === aircraft.callsign);
+                    const trails = [];
+                    let trailI = 0;
+
+                    if (foundCraft) {
+                        trailI = (foundCraft.trailI ?? 0) + 1;
+                        if (trailI % 5 === 0) {
+                            trails.push([
+                                foundCraft.position.longitude.degrees,
+                                foundCraft.position.latitude.degrees,
+                                foundCraft.position.trueAltitude.meters]);
+
+                            if (foundCraft.trails) {
+                                trails.push(...foundCraft.trails.slice(0, 29));
+                            }
+                            trailI = 0;
+                        } else {
+                            if (foundCraft.trails) {
+                                trails.push(...foundCraft.trails.slice(0, 30));
+                            }
+                        }
+                    }
+
+                    aircraft.trails = trails;
+                    aircraft.trailI = trailI;
                 }
-            }, 1000)
-        };
+
+                return aircraftList;
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    useEffect(() => {
+        aircraftPoll.current = setInterval(aircraftPollFunc, 1000);
 
         console.log("Aircraft Poll Start");
-        pollFunc();
 
         return () => clearInterval(aircraftPoll.current);
     }, []);
 
     useEffect(() => {
         console.log("Aircraft Update")
-        const acftPoints = aircrafts.map((acft) => {
-            return {
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Point',
-                    'coordinates': [acft.position.longitude.degrees, acft.position.latitude.degrees, acft.position.trueAltitude.meters]
-                },
-                "properties": {
-                    'callsign': acft.callsign,
-                    'bearing': acft.position.track_True.degrees
+        const trails = [];
+        const routeLines = [];
+        aircrafts.forEach((acft) => {
+            for (let i = 0; i < acft.trails.length && i < 5; i++) {
+                trails.push({
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': acft.trails[i]
+                    },
+                });
+            }
+
+            if (aircraftOptions.current.get(acft.callsign)?.showRoute) {
+                if (acft.fms?.fmsLines) {
+                    routeLines.push(...acft.fms.fmsLines.map((line) => {
+                        if (line.center){
+                            const circle = turf.lineArc(
+                                [line.center.lon.degrees, line.center.lat.degrees],
+                                line.radius_m,
+                                line.clockwise ? line.startTrueBearing : line.endTrueBearing,
+                                line.clockwise ? line.endTrueBearing : line.startTrueBearing,
+                                {
+                                    units: "meters"
+                                }
+                            );
+
+                            return circle;
+                        } else {
+                            return {
+                                'type': 'Feature',
+                                'geometry': {
+                                    'type': 'LineString',
+                                    'coordinates': [
+                                        [line.startPoint.lon.degrees, line.startPoint.lat.degrees],
+                                        [line.endPoint.lon.degrees, line.endPoint.lat.degrees]
+                                    ]
+                                }
+                            }
+                        }
+                    }));
                 }
             }
         });
 
-        if (map.current && map.current.getSource('aircrafts')) {
-            map.current.getSource('aircrafts').setData({
+        if (map.current) {
+            map.current.getSource('aircraftTrails')?.setData({
                 'type': 'FeatureCollection',
-                'features': acftPoints
+                'features': trails
+            });
+            map.current.getSource('aircraftRoutes')?.setData({
+                'type': 'FeatureCollection',
+                'features': routeLines
             });
         }
     }, [aircrafts]);
@@ -373,10 +456,10 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
             setOldLineLayers(newLayerIds);
 
             // Background
-            if (features?.background === "Satellite"){
+            if (features?.background === "Satellite") {
                 map.current.setLayoutProperty("background", "visibility", "none");
                 map.current.setLayoutProperty("background-satellite", "visibility", "visible");
-            } else if (features?.background?.Color){
+            } else if (features?.background?.Color) {
                 map.current.setLayoutProperty("background", "visibility", "visible");
                 map.current.setLayoutProperty("background-satellite", "visibility", "none");
                 map.current.setPaintProperty("background", "background-color", features.background.Color);
@@ -407,21 +490,44 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
     }, [center, zoom])
 
     useEffect(() => {
-         console.log("Rotation update");
-         if (map.current){
-             if (map.current.isMoving()) {
-                 map.current.once('moveend', () => {
-                     map.current.rotateTo(rotation);
-                 })
-             } else {
-                 map.current.rotateTo(rotation);
-             }
-         }
+        console.log("Rotation update");
+        if (map.current) {
+            if (map.current.isMoving()) {
+                map.current.once('moveend', () => {
+                    map.current.rotateTo(rotation);
+                })
+            } else {
+                map.current.rotateTo(rotation);
+            }
+        }
     }, [rotation]);
 
+    const getAircraftIcon = () => {
+        const foundIcon = features?.icons.find((icon) => icon.id === "icon-symbol-aircraft_corr_prim_s");
+
+        if (foundIcon) {
+            return foundIcon;
+        }
+
+        return defaultIcons.current[0];
+    }
+
+    const handleAircraftClick = (callsign) => {
+        if (!aircraftOptions.current.has(callsign)){
+            aircraftOptions.current.set(callsign, {});
+        }
+        const options = aircraftOptions.current.get(callsign);
+        options.showRoute = !options.showRoute;
+    }
+
     return (
-        <div ref={mapContainer} style={{
-            height: "100%"
-        }}/>
+        <>
+            <div ref={mapContainer} style={{
+                height: "100%"
+            }}/>
+            {aircrafts.map(acft => (
+                <AircraftMarker aircraft={acft} key={acft.callsign} map={map.current} icon={getAircraftIcon()} onClick={handleAircraftClick} />
+            ))}
+        </>
     );
 };

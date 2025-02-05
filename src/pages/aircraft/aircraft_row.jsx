@@ -208,10 +208,10 @@ export const AircraftRow = ({callsign}) => {
             <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag.degrees, 2)}</div>
         </td>
         <td>
-            <div className={aircraft.autopilot.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
-                {aircraft.autopilot.selectedSpeedUnits === "KNOTS" ?
+            <div className={aircraft.autopilot?.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
+                {aircraft.autopilot?.selectedSpeedUnits === "KNOTS" ?
                     aircraft.autopilot.selectedSpeed :
-                    `M${round(aircraft.autopilot.selectedSpeed / 100.0, 2)}`}
+                    `M${round(aircraft.autopilot?.selectedSpeed / 100.0, 2)}`}
             </div>
             <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed.knots, 2)}</div>
         </td>
