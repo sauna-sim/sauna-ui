@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import maplibregl from "maplibre-gl";
+import {round} from "../../actions/utilities.js";
 
 export const AircraftMarker = ({aircraft, icon, map, onClick, ...props}) => {
     const elementRef = useRef(null);
@@ -64,7 +65,6 @@ export const AircraftMarker = ({aircraft, icon, map, onClick, ...props}) => {
     }
 
     const handleMouseUp = (e) => {
-        console.log("Mouse Up", e);
         if (tagTransform !== null){
             // Move tag
             setTagPosition({
@@ -77,7 +77,6 @@ export const AircraftMarker = ({aircraft, icon, map, onClick, ...props}) => {
     }
 
     const handleMouseCancel = (e) => {
-        console.log("Leave", e);
         setTagTransform(null);
         e.preventDefault();
     }
@@ -91,11 +90,13 @@ export const AircraftMarker = ({aircraft, icon, map, onClick, ...props}) => {
             position: "absolute",
             background: "rgba(50, 50, 50, 0.25)",
             fontFamily: "var(--font-family-monospace)",
+            lineHeight: "1rem",
             cursor: "pointer",
             left: "0px",
             top: "0px",
             transform: `translate(${tagPosition.x}px, ${tagPosition.y}px)`,
-            zIndex: 51
+            zIndex: 51,
+            whiteSpace: "nowrap"
         };
 
         if (tagTransform !== null) {
@@ -113,7 +114,10 @@ export const AircraftMarker = ({aircraft, icon, map, onClick, ...props}) => {
             onPointerLeave={handleMouseUp}
             onClick={(e) => e.preventDefault()}
         >
-            {aircraft.callsign}
+            {aircraft.callsign}{' '}{aircraft.aircraftType}<br />
+            {String(round(aircraft.position.indicatedAltitude.feet / 100)).padStart(3, '0')}{' '}
+            {String(round(aircraft.position.groundSpeed.knots / 10)).padStart(2, '0')}{' '}
+            {aircraft.fms?.arrivalAirport?.identifier}
         </div>;
     }
 
