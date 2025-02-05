@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import {getAircraftList} from "../../actions/aircraft_actions";
 import * as turf from "@turf/turf";
 import TargetMarkerPng from "../../assets/images/TargetMarker.png";
-import {AircraftMarker} from "./aircraft_marker.jsx";
+import {AircraftMarker} from "./aircraft/aircraft_marker.jsx";
 import {makeIcon} from "./map_icon.js";
 
 export const MapLibre = ({features, center, zoom, rotation}) => {
