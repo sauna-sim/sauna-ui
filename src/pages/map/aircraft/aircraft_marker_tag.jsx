@@ -1,10 +1,9 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import maplibregl from "maplibre-gl";
 import {round} from "../../../actions/utilities.js";
 
 export const AircraftMarkerTag = ({aircraft, map, offset, onOffsetChange, onSizeChange}) => {
     const element = useRef(null);
-    const tagRef = useRef(null);
     const marker = useRef(null);
     const [clientStart, setClientStart] = useState(null);
     const [startOffset, setStartOffset] = useState(null);
@@ -36,11 +35,15 @@ export const AircraftMarkerTag = ({aircraft, map, offset, onOffsetChange, onSize
             aircraft.position.latitude.degrees]);
     }, [aircraft]);
 
-    useLayoutEffect(() => {
-        onSizeChange({
-            width: tagRef.current.clientWidth,
-            height: tagRef.current.clientHeight
-        })
+    const tagRef = useCallback((node) => {
+        if (node !== null) {
+            const resizeObserver = new ResizeObserver(() => {
+                const {height, width} = node.getBoundingClientRect();
+                onSizeChange({height, width});
+            });
+
+            resizeObserver.observe(node);
+        }
     }, []);
 
     // Tag Movement Events
@@ -79,7 +82,7 @@ export const AircraftMarkerTag = ({aircraft, map, offset, onOffsetChange, onSize
     }
 
     const handleMouseUp = (e) => {
-        if (clientStart !== null && startOffset !== null){
+        if (clientStart !== null && startOffset !== null) {
             onOffsetChange({
                 x: startOffset.x + (e.clientX - clientStart.x),
                 y: startOffset.y + (e.clientY - clientStart.y)
@@ -92,7 +95,7 @@ export const AircraftMarkerTag = ({aircraft, map, offset, onOffsetChange, onSize
     }
 
     const handleMouseCancel = (e) => {
-        if (clientStart !== null && startOffset !== null){
+        if (clientStart !== null && startOffset !== null) {
             onOffsetChange({
                 x: startOffset.x,
                 y: startOffset.y,
