@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2025-02-05
+### Added
+- Aircraft tags to map
+- Aircraft route display on map
+
+### Changed
+- PrimeReact styling to look more like Bootstrap
+
 ## [0.20.0] - 2025-02-03
 ### Changed
 - Moved from React Bootstrap to PrimeReact
@@ -40,7 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.20.0...master
+[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.0...master
+[0.20.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.19.1...v0.20.0
 [0.19.1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.18.1...v0.19.0
