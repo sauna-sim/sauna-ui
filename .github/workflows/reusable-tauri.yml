@@ -50,80 +50,42 @@ on:
         value: ${{ jobs.build.outputs.release-id }}
 
 jobs:
-  build-api:
+  build:
     runs-on: ${{ inputs.os }}
+    outputs:
+      release-id: ${{ steps.tauri-build.outputs.releaseId }}
     steps:
-      - name: Checkout Project
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
+      - name: Checkout Sauna API
         uses: actions/checkout@v4
         with:
           repository: 'Sauna-ATC-Training-Simulator/sauna-api'
           ref: ${{ inputs.api-ref }}
-          submodules: 'recursive'
-      - name: Checkout Sauna Vatsim Private Project
+          path: 'sauna-api'
+      - name: Checkout Sauna Vatsim Private
         uses: actions/checkout@v4
         with:
           repository: 'Sauna-ATC-Training-Simulator/sauna-vatsim-private'
           token: ${{ secrets.SAUNA_PAT }}
           path: 'sauna-vatsim-private'
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.x.x
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@v1
-        with:
-          nuget-version: 'latest'
-      - name: Use Stable Rust
-        uses: dtolnay/rust-toolchain@stable
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: '${{ github.workspace }}/out/build'
-      - name: Install Rust Target
-        shell: pwsh
-        run: |
-          rustup target add ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
-      - name: Build
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}/sauna-api
-          dotnet build --verbosity normal -c Release -r ${{ inputs.short-os }}-${{ inputs.arch }} -p:PlatformTarget=${{ inputs.arch }} -o ${{ github.workspace }}/bin --self-contained
-      - name: Build Sauna Vatsim Private
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}/sauna-vatsim-private
-          cargo build --verbose --target-dir ${{ github.workspace }}/out/build --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }} -r
-          Copy-Item -Path "${{ github.workspace }}/out/build/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/bin" -Include *.dll,*.so*,*.dylib*
-      - name: Tar output folder
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}/bin
-          tar -cvzf ${{ github.workspace }}/SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
-      - name: Archive binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}
-          path: |
-            ${{ github.workspace }}/SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
-  
-  build:
-    needs: build-api
-    runs-on: ${{ inputs.os }}
-    outputs:
-      release-id: ${{ steps.tauri-build.outputs.releaseId }}
-    steps:
-      - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'npm'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.x.x
       - name: Use Stable Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target'
+          workspaces: |
+            ./src-tauri -> target
+            ./sauna-vatsim-private -> bin
       - name: Install Rust Target
         shell: pwsh
         run: |
@@ -133,21 +95,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 6.x.x
-      - name: Download Sauna-API
-        uses: actions/download-artifact@v4
-        with:
-          name: SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}
-          path: ${{ github.workspace }}/src-tauri/sauna-api
-      - name: Extract Sauna-API
+      - name: Build Sauna API
         shell: pwsh
         run: |
-          cd ${{ github.workspace }}/src-tauri/sauna-api
-          tar -xvf SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
-          rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
+          cd ${{ github.workspace }}/sauna-api/sauna-api
+          dotnet build --verbosity normal -c Release -r ${{ inputs.short-os }}-${{ inputs.arch }} -p:PlatformTarget=${{ inputs.arch }} -o ${{ github.workspace }}/src-tauri/sauna-api --self-contained
+      - name: Build Sauna Vatsim Private
+        shell: pwsh
+        run: |
+          cd ${{ github.workspace }}/sauna-vatsim-private
+          cargo build --verbose --target-dir ${{ github.workspace }}/sauna-vatsim-private/bin --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }} -r
+          Copy-Item -Path "${{ github.workspace }}/sauna-vatsim-private/bin/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/src-tauri/sauna-api" -Include *.dll,*.so*,*.dylib*
       - name: npm install
         run: npm install
       - id: tauri-build
