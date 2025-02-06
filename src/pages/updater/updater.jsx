@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {check} from "@tauri-apps/plugin-updater";
 import {getStoreItem, setStoreItem} from "../../actions/local_store_actions.js";
 import {Dialog} from "primereact/dialog";
@@ -14,13 +14,17 @@ import {
     updaterSteps
 } from "../../redux/slices/updaterSlice.js";
 import {ProgressBar} from "primereact/progressbar";
+import {round} from "../../actions/utilities.js";
+import {debounce} from "lodash";
 
 export const Updater = () => {
     const updaterState = useSelector((state) => state.updater);
     const dispatch = useDispatch();
+    const [update, setUpdate] = useState(null);
+    const downloaded = useRef(0);
 
     useEffect(() => {
-        if (!updaterState.prompted && import.meta.env.DEV) {
+        if (!updaterState.prompted && !import.meta.env.DEV) {
             void checkForUpdates();
         }
     }, []);
@@ -37,7 +41,8 @@ export const Updater = () => {
 
                 if (ignoreVersion !== update.version) {
                     // Prompt for update
-                    dispatch(promptForUpdate(update));
+                    dispatch(promptForUpdate());
+                    setUpdate(update);
                     console.log(update);
                 }
             }
@@ -50,23 +55,34 @@ export const Updater = () => {
         await setStoreItem("settings.updaterIgnoreVersion", update.version);
         dispatch(closeUpdatePrompt());
     }
+    const updateProgress = debounce(() => {
+        console.log(downloaded.current);
+        dispatch(updateDownloadProgress(downloaded.current));
+        downloaded.current = 0;
+    }, 100);
 
     const performUpdate = async () => {
         dispatch(updateDownloadStarted(0));
 
-        await updaterState.update.downloadAndInstall((e) => {
+        if (!update){
+            setUpdate(await check());
+        }
+
+        await update.download((e) => {
             switch (e.event) {
                 case "Started":
                     dispatch(updateDownloadStarted(e.data.contentLength));
                     break;
                 case "Progress":
-                    dispatch(updateDownloadProgress(e.data.chunkLength));
+                    downloaded.current += e.data.chunkLength;
+                    updateProgress();
                     break;
                 case "Finished":
                     dispatch(updateDownloadFinished());
                     break;
             }
         });
+        await update.install();
         await relaunch();
         dispatch(closeUpdatePrompt());
     }
@@ -75,11 +91,11 @@ export const Updater = () => {
         const {step, downloaded, downloadSize} = updaterState;
         switch (step) {
             case updaterSteps.DOWNLOADING:
-                const percent = downloadSize ? downloaded * 100 / downloadSize : 0;
+                const percent = round(downloadSize ? downloaded * 100 / downloadSize : 0);
 
                 return <>
                     <h3>Downloading...</h3>
-                    <ProgressBar value={percent} />
+                    <ProgressBar value={percent}  />
                 </>;
             case updaterSteps.INSTALLING:
                 return <>
@@ -90,11 +106,12 @@ export const Updater = () => {
         return <></>;
     }
 
-    const {step, update} = updaterState;
+    const {step} = updaterState;
 
     return (
         <>
             <Dialog
+                draggable={false}
                 header={"Update Available!"}
                 onHide={() => {
                 }}
@@ -105,6 +122,7 @@ export const Updater = () => {
                 breakpoints={{'750px': '75vw', '500px': '100vw'}}
                 closable={false}
                 closeOnEscape={false}
+                resizable={false}
                 footer={<>
                     <Button type={"button"} label={"Dismiss"} onClick={() => dispatch(closeUpdatePrompt())}/>
                     <Button type={"button"} severity={"danger"} label={"Skip Version"} onClick={ignoreUpdate}/>
@@ -118,6 +136,8 @@ export const Updater = () => {
             </Dialog>
             <Dialog
                 header={"Updating..."}
+                draggable={false}
+                resizable={false}
                 onHide={() => {
                 }}
                 visible={step === updaterSteps.DOWNLOADING || step === updaterSteps.INSTALLING}

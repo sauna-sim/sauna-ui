@@ -16,7 +16,6 @@ export const updaterSlice = createSlice({
     reducers: {
         promptForUpdate: (state, action) => {
             state.prompted = true;
-            state.update = action.payload;
             state.step = updaterSteps.UPDATE_PROMPT;
             console.log(state);
         },
