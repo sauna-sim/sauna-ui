@@ -20,7 +20,7 @@ export const Updater = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (!updaterState.prompted) {
+        if (!updaterState.prompted && import.meta.env.DEV) {
             void checkForUpdates();
         }
     }, []);

@@ -4,16 +4,5 @@
     "resources": [
       "sauna-api/**/*"
     ]
-  },
-  "plugins": {
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDgzMjc3NzUyRTYxQjVBMUEKUldRYVdodm1VbmNuZzlJZjgxaUZybkgvYkc4UHl6c2hjTXhuV2hERk1Lc0hhNkY5Y2tNWitvR0YK",
-      "endpoints": [
-        "https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/releases/latest/downloads/latest.json"
-      ],
-      "windows": {
-        "installMode": "passive"
-      }
-    }
   }
 }

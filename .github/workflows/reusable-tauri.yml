@@ -150,7 +150,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: 'v__VERSION__'
-          args: -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
+          args: -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json --verbose
           includeUpdaterJson: 'true'
           tauriScript: 'npm run tauri'
           updaterJsonPreferNsis: 'true'
