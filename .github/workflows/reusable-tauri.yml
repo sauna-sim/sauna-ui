@@ -132,7 +132,7 @@ jobs:
         if: inputs.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libttng-ust0
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
