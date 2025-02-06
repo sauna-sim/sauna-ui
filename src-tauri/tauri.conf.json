@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "SaunaSim",
   "mainBinaryName": "SaunaSim",
-  "version": "0.21.2",
+  "version": "0.21.3",
   "identifier": "com.sauna.saunasim",
   "build": {
     "beforeBuildCommand": "npm run build",
@@ -12,7 +12,6 @@
   },
   "bundle": {
     "active": true,
-    "createUpdaterArtifacts": true,
     "category": "DeveloperTool",
     "copyright": "",
     "targets": "all",
@@ -46,15 +45,7 @@
     }
   },
   "plugins": {
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDgzMjc3NzUyRTYxQjVBMUEKUldRYVdodm1VbmNuZzlJZjgxaUZybkgvYkc4UHl6c2hjTXhuV2hERk1Lc0hhNkY5Y2tNWitvR0YK",
-      "endpoints": [
-        "https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/releases/latest/downloads/latest.json"
-      ],
-      "windows": {
-        "installMode": "passive"
-      }
-    }
+
   },
   "app": {
     "windows": [
