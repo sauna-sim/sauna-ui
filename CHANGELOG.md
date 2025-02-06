@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.21.6] - 2025-02-05
+## [0.21.7] - 2025-02-06
 ### Added
 - Updater
+
+### Fixed
+- Bug with linux releases
 
 ## [0.21.1] - 2025-02-05
 ### Fixed
@@ -56,8 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.6...master
-[0.21.6]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.1...v0.21.6
+[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.7...master
+[0.21.7]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.1...v0.21.7
 [0.21.1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.19.1...v0.20.0
