@@ -108,6 +108,11 @@ jobs:
           Copy-Item -Path "${{ github.workspace }}/sauna-vatsim-private/bin/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/src-tauri/sauna-api" -Include *.dll,*.so*,*.dylib*
       - name: npm install
         run: npm install
+      - name: Remove .NET 8 Linux Troublesome Dependencies
+        if: inputs.os == 'ubuntu-22.04'
+        shell: pwsh
+        run: |
+          Remove-Item -Path "${{ github.workspace }}/src-tauri/sauna-api/libcoreclrtraceptprovider.so" -Force
       - id: tauri-build
         name: Tauri Build
         if: ${{ inputs.upload-bundle-artifacts }}
