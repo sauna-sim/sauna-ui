@@ -155,3 +155,4 @@ jobs:
           tauriScript: 'npm run tauri'
           updaterJsonPreferNsis: 'true'
           releaseDraft: 'true'
+          retryAttempts: 1
