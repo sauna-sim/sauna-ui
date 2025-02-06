@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Updater
 
+### Changed
+- API Updated to 0.22.0
+
 ### Fixed
 - Bug with linux releases
 
