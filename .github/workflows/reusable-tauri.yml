@@ -149,10 +149,12 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v__VERSION__
           releaseName: 'v__VERSION__'
           args: -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
           includeUpdaterJson: 'true'
           tauriScript: 'npm run tauri'
-          updaterJsonPreferNsis: 'true'
+          updaterJsonPreferNsis: 'true',
+          releaseDraft: 'true'
