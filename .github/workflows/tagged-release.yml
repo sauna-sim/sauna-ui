@@ -16,7 +16,7 @@ jobs:
           - os: macos-latest
             short-os: osx
             rust-os: apple-darwin
-            tauri-bundles: dmg
+            tauri-bundles: dmg,app
           - os: windows-latest
             short-os: win
             rust-os: pc-windows-msvc
@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-22.04
             short-os: linux
             rust-os: unknown-linux-gnu
-            tauri-bundles: deb
+            tauri-bundles: deb,appimage
 #          - arch: x86
 #            rust-arch: i686
           - arch: x64
@@ -61,21 +61,3 @@ jobs:
       upload-bundle-artifacts: ${{ true }}
       api-ref: 'v0.21.0'
     secrets: inherit # Pass all secrets
-
-  create-github-release:
-    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
-    runs-on: ubuntu-22.04
-    needs: build
-    steps:
-      - name: Download Installers
-        uses: actions/download-artifact@v4
-        with:
-          pattern: installers*
-          merge-multiple: true
-          path: ${{ github.workspace }}/installers
-      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            ${{ github.workspace}}/installers/*

@@ -28,6 +28,9 @@ fn main() {
     let _ = fix_path_env::fix();
 
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_websocket::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
@@ -59,21 +62,11 @@ fn main() {
             let mut app_state_guard = binding.0.lock().unwrap();
 
             // Initialize Store
-            app_state_guard.init(
-                &app.path()
-                    .app_data_dir()
-                    .unwrap()
-                    .join("config.json"),
-            );
+            app_state_guard.init(&app.path().app_data_dir().unwrap().join("config.json"));
 
             // Start Sauna API
             app_state_guard
-                .start_sauna_api(
-                    &app.path()
-                        .resource_dir()
-                        .unwrap()
-                        .join("sauna-api")
-                )
+                .start_sauna_api(&app.path().resource_dir().unwrap().join("sauna-api"))
                 .ok();
 
             // Send Sauna API Built In event

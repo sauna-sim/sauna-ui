@@ -1,5 +1,10 @@
 {
   "identifier": "migrated",
+  "platforms": [
+    "macOS",
+    "windows",
+    "linux"
+  ],
   "description": "permissions that were migrated from v1",
   "local": true,
   "windows": [
@@ -36,6 +41,8 @@
     "dialog:allow-confirm",
     "dialog:default",
     "shell:default",
-    "fs:default"
+    "fs:default",
+    "updater:default",
+    "process:default"
   ]
 }

@@ -106,8 +106,8 @@ jobs:
     needs: build-api
     runs-on: ${{ inputs.os }}
     env:
-      TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
@@ -143,20 +143,16 @@ jobs:
           rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
       - name: npm install
         run: npm install
-      - name: Build and Package
-        shell: pwsh
-        run: npm run package -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
-      - name: Copy Installers
+      - name: Tauri Build
         if: ${{ inputs.upload-bundle-artifacts }}
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory '${{ github.workspace }}/installers'
-          Get-ChildItem '${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}/release/bundle' -Recurse -Include *.exe,*.deb,*.dmg,*.app,*.msi,*.AppImage | Copy-Item -Destination '${{ github.workspace }}/installers'
-      - name: Archive Installers
-        if: ${{ inputs.upload-bundle-artifacts }}
-        uses: actions/upload-artifact@v4
-        continue-on-error: true
+        uses: tauri-apps/tauri-action@v0
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          name: installers-${{ inputs.short-os }}-${{ inputs.arch }}
-          path: |
-            ${{ github.workspace }}/installers/*
+          tagName: v__VERSION__
+          releaseName: 'v__VERSION__'
+          args: -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json
+          includeUpdaterJson: 'true'
+          tauriScript: 'npm run tauri'
+          updaterJsonPreferNsis: 'true'

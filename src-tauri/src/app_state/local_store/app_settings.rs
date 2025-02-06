@@ -9,6 +9,8 @@ pub struct Settings {
     pub api_settings: ApiSettings,
     #[serde(default)]
     pub fsd_connection: FsdConnectionSettings,
+    #[serde(default)]
+    pub updater_ignore_version: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]

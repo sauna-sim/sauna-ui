@@ -5,6 +5,7 @@ import {aircraftReducer} from "./slices/aircraftSlice";
 import {apiServerReducer} from "./slices/apiSlice";
 import { getNavigraphPackageInfo, isNavigraphAuthenticated } from "../actions/local_store_actions";
 import {messagesReducer} from "./slices/messagesSlice.js";
+import {updaterReducer} from "./slices/updaterSlice.js";
 
 export const store = configureStore({
     reducer: {
@@ -12,7 +13,8 @@ export const store = configureStore({
         sectorFiles: sectorFilesReducer,
         aircraftList: aircraftReducer,
         apiServer: apiServerReducer,
-        messages: messagesReducer
+        messages: messagesReducer,
+        updater: updaterReducer
     }
 });
 

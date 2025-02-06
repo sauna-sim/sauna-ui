@@ -152,7 +152,10 @@ pub fn get_scope_package_symbols(
     let app_state_guard = app_state.0.lock().unwrap();
 
     if let Some(pkg) = &app_state_guard.map_scope_package {
-        Ok(symbol_ids.iter().map(|symbol_id| pkg.symbols.get(*symbol_id).map(|d| d.clone())).collect())
+        Ok(symbol_ids
+            .iter()
+            .map(|symbol_id| pkg.symbols.get(*symbol_id).map(|d| d.clone()))
+            .collect())
     } else {
         Err("No ATC Scope Package Loaded!".to_string())
     }
