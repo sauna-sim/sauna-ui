@@ -66,10 +66,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build
     steps:
-      - uses: "softprops/action-gh-release@v2"
+      - uses: StuYarrow/publish-release@v1.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          draft: false
-          make_latest: 'true'
-          generate_release_notes: true
+          id: ${{ steps.build.outputs.release-id }}

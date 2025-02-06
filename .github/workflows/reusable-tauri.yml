@@ -44,6 +44,10 @@ on:
         default: 'master'
         required: false
         type: string
+    outputs:
+      release-id:
+        description: "Draft Release ID"
+        value: ${{ jobs.build.outputs.release-id }}
 
 jobs:
   build-api:
@@ -105,6 +109,8 @@ jobs:
   build:
     needs: build-api
     runs-on: ${{ inputs.os }}
+    outputs:
+      release-id: ${{ steps.tauri-build.outputs.releaseId }}
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
@@ -140,7 +146,8 @@ jobs:
           rm SaunaApi-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
       - name: npm install
         run: npm install
-      - name: Tauri Build
+      - id: tauri-build
+        name: Tauri Build
         if: ${{ inputs.upload-bundle-artifacts }}
         uses: tauri-apps/tauri-action@v0
         env:
