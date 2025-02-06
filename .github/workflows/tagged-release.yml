@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, arm64] #x86, arm
-        os: [macos-latest, windows-latest, ubuntu-22.04]
+        os: [macos-latest, windows-latest, ubuntu-24.04]
         include:
           - os: macos-latest
             short-os: osx
@@ -21,10 +21,10 @@ jobs:
             short-os: win
             rust-os: pc-windows-msvc
             tauri-bundles: nsis
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             short-os: linux
             rust-os: unknown-linux-gnu
-            tauri-bundles: deb,appimage
+            tauri-bundles: deb,appimage,rpm
 #          - arch: x86
 #            rust-arch: i686
           - arch: x64
@@ -47,7 +47,7 @@ jobs:
 #            arch: arm
           - os: windows-latest
             arch: arm64
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             arch: arm64
     uses: ./.github/workflows/reusable-tauri.yml
     with:
@@ -63,7 +63,7 @@ jobs:
     secrets: inherit # Pass all secrets
   create-github-release:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - uses: StuYarrow/publish-release@v1.1.2

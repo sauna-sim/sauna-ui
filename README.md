@@ -1,7 +1,7 @@
 # SaunaSim
 [![Build Status]][actions]
 [![License Img]][license]
-[![Latest Version]][1]
+[![Latest Version]][githubreleases]
 [![Changelog Img]][changelog]
 
 [Build Status]: https://img.shields.io/github/actions/workflow/status/Sauna-ATC-Training-Simulator/sauna-ui/build-and-test.yml?branch=master
@@ -11,6 +11,7 @@
 [License Img]: https://img.shields.io/badge/License-GPLv3-blue
 [license]: LICENSE
 [Latest Version]: https://img.shields.io/github/v/release/Sauna-ATC-Training-Simulator/sauna-ui?include_prereleases
+[githubreleases]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/releases/latest
 
 ## About
 This is a project that will allow for simulated ATC sessions (sweatbox sessions). It can be used on the VATSIM sweatbox server or on private FSD servers. By allowing airport and aircraft scenario configurations, it will allow ARTCCs and FIRs to better train their controllers for situations that they may encounter on the VATSIM network.
@@ -23,13 +24,13 @@ This project is the UI for SaunaSim. It's built in React, bundled through Vite, 
 The API contains most of the core simulation code. For production, the UI will bundle the API.
 
 ## Download
-[![Release](https://img.shields.io/github/v/release/Sauna-ATC-Training-Simulator/sauna-ui?include_prereleases&style=for-the-badge)][1]
-
 Simply download the appropriate installer and install from the link above.
 
 **Note:** If the binary for your operating system is not provided, it must be compiled from source.
 
-[1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/releases/latest
+[![Release](https://img.shields.io/github/v/release/Sauna-ATC-Training-Simulator/sauna-ui?include_prereleases&style=for-the-badge)][1]
+
+
 
 ## Dependencies
 This project depends on the following frameworks and packages:

@@ -91,10 +91,16 @@ jobs:
         run: |
           rustup target add ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
       - name: Install Linux Dependencies
-        if: inputs.os == 'ubuntu-22.04'
+        if: inputs.os == 'ubuntu-24.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libappindicator3-dev librsvg2-dev libudev-dev patchelf \
+            libwebkit2gtk-4.1-0=2.44.0-2 \
+            libwebkit2gtk-4.1-dev=2.44.0-2 \
+            libjavascriptcoregtk-4.1-0=2.44.0-2 \
+            libjavascriptcoregtk-4.1-dev=2.44.0-2 \
+            gir1.2-javascriptcoregtk-4.1=2.44.0-2 \
+            gir1.2-webkit2-4.1=2.44.0-2
       - name: Build Sauna API
         shell: pwsh
         run: |
@@ -109,7 +115,7 @@ jobs:
       - name: npm install
         run: npm install
       - name: Remove .NET 8 Linux Troublesome Dependencies
-        if: inputs.os == 'ubuntu-22.04'
+        if: inputs.os == 'ubuntu-24.04'
         shell: pwsh
         run: |
           Remove-Item -Path "${{ github.workspace }}/src-tauri/sauna-api/libcoreclrtraceptprovider.so" -Force
