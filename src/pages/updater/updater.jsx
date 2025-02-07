@@ -16,6 +16,7 @@ import {
 import {ProgressBar} from "primereact/progressbar";
 import {round} from "../../actions/utilities.js";
 import {debounce} from "lodash";
+import { cleanupBeforeTauriExit } from "../../actions/tauri_actions.js";
 
 export const Updater = () => {
     const updaterState = useSelector((state) => state.updater);
@@ -82,6 +83,7 @@ export const Updater = () => {
                     break;
             }
         });
+        await cleanupBeforeTauriExit();
         await update.install();
         await relaunch();
         dispatch(closeUpdatePrompt());

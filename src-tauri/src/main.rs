@@ -51,7 +51,8 @@ fn main() {
             get_scope_package_display_type,
             get_scope_package_map,
             get_scope_package_symbols,
-            get_scope_package_map_name
+            get_scope_package_map_name,
+            cleanup_before_exit_tauri
         ])
         .setup(|app| {
             // Send Sauna API Built In event
@@ -77,7 +78,7 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
     app.run(|_app_handle, event| match event {
-        tauri::RunEvent::Exit { .. } | tauri::RunEvent::ExitRequested { .. } => {
+        tauri::RunEvent::Exit { .. } => {
             // Get app state
             let binding = _app_handle.state::<AppStateWrapper>();
             let mut app_state_guard = binding.0.lock().unwrap();
@@ -86,6 +87,7 @@ fn main() {
             if let Some(local_store) = app_state_guard.local_store.as_ref() {
                 local_store.save().ok();
             }
+            println!("Stopping Sauna API");
 
             // Stop sauna API
             app_state_guard.stop_sauna_api();
@@ -147,4 +149,21 @@ fn extract_zip(dir: &str, zip_file_name: &str) -> Result<Vec<String>, String> {
     zip_archive.extract(dir).map_err(stringify_error)?;
 
     Ok(files_in_zip)
+}
+
+#[tauri::command]
+fn cleanup_before_exit_tauri(app_state: tauri::State<AppStateWrapper>) -> Result<(), String> {    
+    // Get app state
+    let mut app_state_guard = app_state.0.lock().unwrap();
+
+    // Save local store
+    if let Some(local_store) = app_state_guard.local_store.as_ref() {
+        local_store.save().ok();
+    }
+    println!("Stopping Sauna API");
+
+    // Stop sauna API
+    app_state_guard.stop_sauna_api();
+
+    Ok(())
 }

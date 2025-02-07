@@ -158,3 +158,7 @@ export async function createCommandWindow() {
         minWidth: 200
     })
 }
+
+export async function cleanupBeforeTauriExit() {
+    await invoke('cleanup_before_exit_tauri');
+}
