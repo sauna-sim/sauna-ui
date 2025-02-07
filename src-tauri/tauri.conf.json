@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "SaunaSim",
   "mainBinaryName": "SaunaSim",
-  "version": "0.21.11",
+  "version": "0.21.12",
   "identifier": "com.sauna.saunasim",
   "build": {
     "beforeBuildCommand": "npm run build",
@@ -11,11 +11,9 @@
     "devUrl": "http://localhost:5003"
   },
   "bundle": {
-    "active": true,
-    "category": "DeveloperTool",
-    "copyright": "",
+    "active": false,
+    "category": "SimulationGame",
     "targets": "all",
-    "externalBin": [],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -24,21 +22,21 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "nsis": {
+        "installMode": "both"
+      }
     },
-    "longDescription": "",
     "macOS": {
-      "entitlements": null,
       "exceptionDomain": "fonts.openmaptiles.org",
-      "frameworks": [],
-      "providerShortName": null,
       "signingIdentity": "-"
     },
     "resources": [],
-    "shortDescription": "",
+    "shortDescription": "ATC Training Simulator",
     "linux": {
+      "appimage": {
+        "bundleMediaFramework": true
+      },
       "deb": {
         "depends": []
       }
