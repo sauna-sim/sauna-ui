@@ -6,6 +6,7 @@ import {pauseAircraft, unpauseAircraft} from "../../actions/aircraft_actions";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPause, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {getApiHostname, getApiPort} from "../../actions/local_store_actions";
+import WebSocket from "@tauri-apps/plugin-websocket";
 
 export const AircraftRow = ({callsign}) => {
     const ws = useRef(null);
@@ -21,9 +22,10 @@ export const AircraftRow = ({callsign}) => {
         return () => {
             try {
                 if (ws.current) {
-                    ws.current.close();
+                    void ws.current.disconnect();
                 }
             } finally {
+                delete ws.current;
                 ws.current = null;
                 shouldRunWebSocket.current = false;
             }
@@ -38,40 +40,35 @@ export const AircraftRow = ({callsign}) => {
         const wsUrl = `ws://${await getApiHostname()}:${await getApiPort()}/api/aircraft/websocketByCallsign/${callsign}`;
 
         try {
-            ws.current = new WebSocket(wsUrl);
+            ws.current = await WebSocket.connect(wsUrl);
 
-            ws.current.onopen = (event) => {
-                try {
-                    ws.current.send(JSON.stringify({
-                        type: "AIRCRAFT_POS_RATE",
-                        data: 2
-                    }));
-                } catch (e) {
-                    handleWsClose();
+            void ws.current.send(JSON.stringify({
+                type: "AIRCRAFT_POS_RATE",
+                data: 2
+            }));
+
+            ws.current.addListener((msg) => {
+                // Handle unexpected close
+                if (!msg.type){
+                    void handleWsClose(msg);
+                    return;
                 }
-            }
 
-            ws.current.onmessage = (event) => {
-                const message = JSON.parse(event.data);
+                if (msg.type === "Text") {
+                    const message = JSON.parse(msg.data);
 
-                // Determine message type
-                switch (message.type) {
-                    case "AIRCRAFT_UPDATE":
-                        handleAircraftUpdate(message.data);
-                        break;
+                    // Determine message type
+                    switch (message.type) {
+                        case "AIRCRAFT_UPDATE":
+                            handleAircraftUpdate(message.data);
+                            break;
+                    }
+                } else if (msg.type === "Close") {
+                    void handleWsClose(msg.data);
                 }
-            }
-
-            ws.current.onclose = (event) => {
-                handleWsClose();
-            }
-
-            ws.current.onerror = (event) => {
-                console.log(event);
-                handleWsClose();
-            }
+            });
         } catch (e) {
-            await handleWsClose();
+            void handleWsClose(e);
         }
     }
 
@@ -93,14 +90,17 @@ export const AircraftRow = ({callsign}) => {
         }
     }
 
-    const handleWsClose = async () => {
+    const handleWsClose = async (msg) => {
+        console.log(msg);
         try {
             if (ws.current) {
-                ws.current.close();
+                ws.current.remove
+                await ws.current.disconnect();
             }
         } catch (e) {
             shouldRunWebSocket.current = false;
         } finally {
+            delete ws.current;
             ws.current = null;
 
             // Otherwise retry the ws socket

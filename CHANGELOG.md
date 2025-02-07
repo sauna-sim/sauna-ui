@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.10] - 2025-02-06
+### Changed
+- Using Tauri Websockets
+
 ## [0.21.9] - 2025-02-06
 ### Fixed
 - Issue with AppImage builds with libwebkitgtk2.
@@ -66,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.9...master
+[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.10...master
+[0.21.10]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.9...v0.21.10
 [0.21.9]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.8...v0.21.9
 [0.21.8]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.1...v0.21.8
 [0.21.1]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.0...v0.21.1

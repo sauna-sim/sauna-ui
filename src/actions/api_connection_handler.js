@@ -8,6 +8,7 @@ import {
     onAircraftDeleted, resetAircraftList,
 } from "../redux/slices/aircraftSlice";
 import {onMessageReceive} from "../redux/slices/messagesSlice.js";
+import WebSocket from "@tauri-apps/plugin-websocket";
 
 // Axios Sauna-API Settings
 export const axiosSaunaApi = axios.create();
@@ -71,11 +72,17 @@ export async function establishApiConnection(){
 let ws;
 async function startWebSocket(){
     const wsUrl = `ws://${await getApiHostname()}:${await getApiPort()}/api/server/websocket`;
-    ws = new WebSocket(wsUrl);
+    ws = await WebSocket.connect(wsUrl);
 
-    ws.onopen = (event) => {
-        ws.onmessage = (event) => {
-            const message = JSON.parse(event.data);
+    ws.addListener((msg) => {
+        // Handle unexpected close
+        if (!msg.type){
+            void handleWsClose(msg);
+            return;
+        }
+
+        if (msg.type === "Text") {
+            const message = JSON.parse(msg.data);
 
             // Determine message type
             switch (message.type){
@@ -92,17 +99,19 @@ async function startWebSocket(){
                     handleAircraftUpdate(message.data);
                     break;
             }
+        } else if (msg.type === "Close") {
+            handleWsClose(msg.data);
         }
-    }
-    ws.onclose = (event) => {
-        handleWsClose();
-    }
-    ws.onerror = (event) => {
-        handleWsClose();
-    }
+    });
 }
 
-async function handleWsClose(){
+async function handleWsClose(closeEvent){
+    console.log(closeEvent);
+    try {
+        await ws.disconnect();
+    } catch (e) {
+        console.log(e);
+    }
     ws = null;
 
     // Check if api closed
@@ -116,7 +125,7 @@ async function handleWsClose(){
 
     // Otherwise retry the ws socket
     await wait(5000);
-    startWebSocket().then(() => {});
+    void startWebSocket();
 }
 
 function handleAircraftUpdate(data){

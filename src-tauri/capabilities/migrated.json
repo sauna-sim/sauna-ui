@@ -43,6 +43,7 @@
     "shell:default",
     "fs:default",
     "updater:default",
+    "websocket:default",
     "process:default"
   ]
 }
