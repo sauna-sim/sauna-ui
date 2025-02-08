@@ -66,9 +66,11 @@ fn main() {
             app_state_guard.init(&app.path().app_data_dir().unwrap().join("config.json"));
 
             // Start Sauna API
-            app_state_guard
-                .start_sauna_api(&app.path().resource_dir().unwrap().join("sauna-api"))
+            if let Ok(resource_path) = &app.path().resource_dir() {
+                app_state_guard
+                .start_sauna_api(resource_path.join("sauna-api"))
                 .ok();
+            }
 
             // Try again from exe dir
             if !app_state_guard.api_builtin {

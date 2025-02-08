@@ -189,7 +189,6 @@ jobs:
           gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/rpm/*.rpm
       - name: Build Standalone Version
         if: ${{ inputs.upload-bundle-artifacts && !(inputs.short-os == 'linux' && inputs.arch == 'arm64') }}
-        shell: pwsh
         run: npm run tauri build -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }} --no-bundle --verbose
       - name: Tar Gzip Build
         if: ${{ inputs.upload-bundle-artifacts }}
