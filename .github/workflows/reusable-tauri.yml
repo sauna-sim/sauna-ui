@@ -29,11 +29,6 @@ on:
         required: false
         default: 'all'
         type: string
-      rust-target-suffix:
-        description: 'Rust target suffix'
-        default: ''
-        required: false
-        type: string
       upload-bundle-artifacts:
         description: 'Whether or not to upload bundle artifacts'
         default: false
@@ -44,6 +39,11 @@ on:
         default: 'master'
         required: false
         type: string
+      tauri-create-updater:
+        description: 'Should updater be created?'
+        default: true
+        required: false
+        type: boolean
     outputs:
       release-id:
         description: "Draft Release ID"
@@ -89,9 +89,9 @@ jobs:
       - name: Install Rust Target
         shell: pwsh
         run: |
-          rustup target add ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }}
+          rustup target add ${{ inputs.rust-arch }}-${{ inputs.rust-os }}
       - name: Install Linux Dependencies
-        if: inputs.os == 'ubuntu-24.04'
+        if: ${{ inputs.short-os == 'linux' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y libappindicator3-dev librsvg2-dev libudev-dev patchelf \
@@ -101,6 +101,11 @@ jobs:
             libjavascriptcoregtk-4.1-dev=2.44.0-2 \
             gir1.2-javascriptcoregtk-4.1=2.44.0-2 \
             gir1.2-webkit2-4.1=2.44.0-2
+      - name: Install Linux Arm64 Tools
+        if: ${{ inputs.short-os == 'linux' && inputs.arch == 'arm64' }}
+        run: |
+          sudo apt-get install gcc-aarch64-linux-gnu -y
+          echo CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc >> "$GITHUB_ENV"
       - name: Build Sauna API
         shell: pwsh
         run: |
@@ -112,16 +117,22 @@ jobs:
           cd ${{ github.workspace }}/sauna-vatsim-private
           cargo build --verbose --target-dir ${{ github.workspace }}/sauna-vatsim-private/bin --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }} -r
           Copy-Item -Path "${{ github.workspace }}/sauna-vatsim-private/bin/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/src-tauri/sauna-api" -Include *.dll,*.so*,*.dylib*
+      - name: Get App Variables
+        shell: pwsh
+        run: |
+          echo "$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json) v$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)"
+          echo "APP_VERSION=$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_ENV
+          echo "APP_NAME=$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_ENV
       - name: npm install
         run: npm install
       - name: Remove .NET 8 Linux Troublesome Dependencies
-        if: inputs.os == 'ubuntu-24.04'
+        if: ${{ inputs.short-os == 'linux' }}
         shell: pwsh
         run: |
           Remove-Item -Path "${{ github.workspace }}/src-tauri/sauna-api/libcoreclrtraceptprovider.so" -Force
       - id: tauri-build
         name: Tauri Build
-        if: ${{ inputs.upload-bundle-artifacts }}
+        if: ${{ inputs.upload-bundle-artifacts && !(inputs.short-os == 'linux' && inputs.arch == 'arm64') }}
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -130,9 +141,68 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: 'v__VERSION__'
-          args: -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }}${{ inputs.rust-target-suffix }} --bundles ${{ inputs.tauri-bundles }} -c src-tauri/tauri-prod.conf.json --verbose
+          args: -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }} --bundles ${{ inputs.tauri-bundles }} --verbose -c '{"bundle":{"createUpdaterArtifacts":${{ inputs.tauri-create-updater }},"active":true,"resources":["sauna-api/**/*"]}}'
           includeUpdaterJson: 'true'
           tauriScript: 'npm run tauri'
           updaterJsonPreferNsis: 'true'
           releaseDraft: 'true'
           retryAttempts: 1
+      - name: Tauri Build (linux-arm64)
+        if: ${{ inputs.upload-bundle-artifacts && inputs.short-os == 'linux' && inputs.arch == 'arm64' }}
+        uses: pguyot/arm-runner-action@v2.6.5
+        with:
+          base_image: https://dietpi.com/downloads/images/DietPi_RPi-ARMv8-Bookworm.img.xz
+          cpu: cortex-a72
+          bind_mount_repository: true
+          image_additional_mb: 10240
+          optimize_image: no
+          #exit_on_fail: no
+          commands: |
+            # Prevent Rust from complaining about $HOME not matching eid home
+            #export HOME=/root
+
+            # Workaround to CI worker being stuck on Updating crates.io index
+            export CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
+
+            # Install setup prerequisites
+            apt-get update -y --allow-releaseinfo-change
+            apt-get autoremove -y
+            apt-get install -y --no-install-recommends --no-install-suggests curl libwebkit2gtk-4.1-dev build-essential libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf libfuse2 file
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            . "$HOME/.cargo/env"
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | bash
+            apt-get install -y nodejs
+
+            # Install frontend dependencies
+            npm install
+
+            # Build the application
+            npm run tauri build -- -t aarch64-unknown-linux-gnu --bundles deb,rpm --verbose -c '{"bundle":{"createUpdaterArtifacts":false,"active":true,"resources":["sauna-api/**/*"]}}'
+            npm run tauri build -- -t aarch64-unknown-linux-gnu --no-bundle --verbose
+      - name: Upload Tauri Bundles (linux-arm64)
+        if: ${{ inputs.upload-bundle-artifacts && inputs.short-os == 'linux' && inputs.arch == 'arm64' }}
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb
+          gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/rpm/*.rpm
+      - name: Build Standalone Version
+        if: ${{ inputs.upload-bundle-artifacts && !(inputs.short-os == 'linux' && inputs.arch == 'arm64') }}
+        shell: pwsh
+        run: npm run tauri build -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }} --no-bundle --verbose
+      - name: Tar Gzip Build
+        if: ${{ inputs.upload-bundle-artifacts }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory '${{ github.workspace }}/out/tarpkg'
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/sauna-api" -Destination "${{ github.workspace }}/out/tarpkg" -Recurse
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/out/tarpkg" -Include ${{ env.APP_NAME }},${{ env.APP_NAME }}.exe
+          cd ${{ github.workspace }}/out/tarpkg
+          tar -cvzf ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
+      - name: Upload Tar Gzip Build
+        if: ${{ inputs.upload-bundle-artifacts }}
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz

@@ -42,7 +42,7 @@ impl AppState {
         self.local_store = Some(StoreContainer::new(local_store_path));
     }
 
-    pub fn start_sauna_api(&mut self, sauna_api_dir: &Path) -> Result<(), String> {
+    pub fn start_sauna_api(&mut self, sauna_api_dir: impl AsRef<Path>) -> Result<(), String> {
         // Get a port
         self.api_hostname = "localhost".to_owned();
         self.api_port =
@@ -50,7 +50,7 @@ impl AppState {
         self.api_builtin = true;
 
         self.api_process.start_child(
-            sauna_api_dir.join("SaunaApi"),
+            sauna_api_dir.as_ref().join("SaunaApi"),
             Some(sauna_api_dir),
             &["-p".to_owned(), self.api_port.to_string()],
         );

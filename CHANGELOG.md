@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2025-02-08
+### Added
+- ARM builds to windows and linux
+- Standalone builds
+
+### Removed
+- AppImage distribution
+
 ## [0.21.11] - 2025-02-07
 ### Fixed
 - Windows Updater not killing Sauna API.
@@ -74,7 +82,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.11...master
+[Unreleased]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.22.0...master
+[0.22.0]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.11...v0.22.0
 [0.21.11]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.10...v0.21.11
 [0.21.10]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.9...v0.21.10
 [0.21.9]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/compare/v0.21.8...v0.21.9

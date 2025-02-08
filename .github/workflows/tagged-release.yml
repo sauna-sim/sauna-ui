@@ -11,29 +11,27 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, arm64]
-        os: [macos-latest, windows-latest, ubuntu-24.04]
+        short-os: [win, osx, linux]
         include:
-          - os: macos-latest
-            short-os: osx
+          - short-os: osx
+            os: macos-latest
             rust-os: apple-darwin
             tauri-bundles: dmg,app
-          - os: windows-latest
-            short-os: win
+            tauri-create-updater: true
+          - short-os: win
+            os: windows-latest
             rust-os: pc-windows-msvc
             tauri-bundles: nsis
-          - os: ubuntu-24.04
-            short-os: linux
+            tauri-create-updater: true
+          - short-os: linux
+            os: ubuntu-24.04
             rust-os: unknown-linux-gnu
-            tauri-bundles: deb,appimage,rpm
+            tauri-bundles: deb,rpm
+            tauri-create-updater: false
           - arch: x64
             rust-arch: x86_64
           - arch: arm64
             rust-arch: aarch64
-        exclude:
-          - os: windows-latest
-            arch: arm64
-          - os: ubuntu-24.04
-            arch: arm64
     uses: ./.github/workflows/reusable-tauri.yml
     with:
       arch: ${{ matrix.arch }}
@@ -42,9 +40,9 @@ jobs:
       short-os: ${{ matrix.short-os }}
       rust-os: ${{ matrix.rust-os }}
       tauri-bundles: ${{ matrix.tauri-bundles }}
-      rust-target-suffix: ${{ matrix.rust-target-suffix }}
       upload-bundle-artifacts: ${{ true }}
-      api-ref: 'v0.22.1'
+      tauri-create-updater: ${{ matrix.tauri-create-updater }}
+      api-ref: 'v0.22.3'
     secrets: inherit # Pass all secrets
   create-github-release:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}

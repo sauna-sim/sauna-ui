@@ -70,6 +70,13 @@ fn main() {
                 .start_sauna_api(&app.path().resource_dir().unwrap().join("sauna-api"))
                 .ok();
 
+            // Try again from exe dir
+            if !app_state_guard.api_builtin {
+                app_state_guard
+                .start_sauna_api(&"sauna-api")
+                .ok();
+            }
+
             // Send Sauna API Built In event
             app.emit("sauna-api-builtin", app_state_guard.api_builtin)
                 .unwrap();
