@@ -32,6 +32,9 @@ jobs:
             rust-arch: x86_64
           - arch: arm64
             rust-arch: aarch64
+          - short-os: linux
+            arch: arm64
+            os: ubuntu-24.04-arm
     uses: ./.github/workflows/reusable-tauri.yml
     with:
       arch: ${{ matrix.arch }}
@@ -40,7 +43,7 @@ jobs:
       short-os: ${{ matrix.short-os }}
       rust-os: ${{ matrix.rust-os }}
       tauri-bundles: ${{ matrix.tauri-bundles }}
-      upload-bundle-artifacts: ${{ true }}
+      publish-release: ${{ true }}
       tauri-create-updater: ${{ matrix.tauri-create-updater }}
       api-ref: 'v0.22.3'
     secrets: inherit # Pass all secrets
@@ -49,16 +52,79 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build
     steps:
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
       - name: Publish Github Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: gh release edit ${{ needs.build.outputs.release-tag }} --latest --draft=false
+  create-aur-package:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
+    runs-on: ubuntu-24.04
+    needs: build
+    continue-on-error: true
+    env:
+      AUR_GENERATE_DEFS: true
+      AUR_PACKAGE_NAME: sauna-sim
+      AUR_DEFS_OUTPUT: ${{ github.workspace }}/aurpkg
+      AUR_DEB_PREFIX: SaunaSim
+      AUR_GITHUB_REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - name: Use Stable Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          prefix-key: "linux-x64"
+          shared-key: "tauri-build-aur"
+          workspaces: |
+            ./src-tauri -> target
+      - name: Install Rust Target
+        shell: pwsh
+        run: |
+          rustup target add x86_64-unknown-linux-gnu
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libappindicator3-dev librsvg2-dev libudev-dev patchelf \
+            libwebkit2gtk-4.1-0=2.44.0-2 \
+            libwebkit2gtk-4.1-dev=2.44.0-2 \
+            libjavascriptcoregtk-4.1-0=2.44.0-2 \
+            libjavascriptcoregtk-4.1-dev=2.44.0-2 \
+            gir1.2-javascriptcoregtk-4.1=2.44.0-2 \
+            gir1.2-webkit2-4.1=2.44.0-2
+      - name: npm install
+        run: npm install
+      - name: Create Package Def
+        run: |
+          mkdir -p ${{ env.AUR_DEFS_OUTPUT }}
+          npm run tauri build
+      - name: Publish AUR Package
+        uses: KSXGitHub/github-actions-deploy-aur@v3
+        with:
+          pkgname: ${{ env.AUR_PACKAGE_NAME }}
+          pkgbuild: ${{ env.AUR_DEFS_OUTPUT }}/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+
   cleanup-github-release:
     if: failure()
     runs-on: ubuntu-24.04
     needs: [build, create-github-release]
     steps:
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
       - name: Remove Github Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
