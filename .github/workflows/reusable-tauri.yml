@@ -185,11 +185,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb
-          gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/rpm/*.rpm
+          gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb --clobber
+          gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/rpm/*.rpm --clobber
       - name: Build Standalone Version
         if: ${{ inputs.upload-bundle-artifacts && !(inputs.short-os == 'linux' && inputs.arch == 'arm64') }}
-        run: npm run tauri build -- -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }} --no-bundle --verbose
+        shell: pwsh
+        run: npm run tauri build '--' -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }} --no-bundle --verbose
       - name: Tar Gzip Build
         if: ${{ inputs.upload-bundle-artifacts }}
         shell: pwsh
@@ -204,4 +205,4 @@ jobs:
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz
+        run: gh release upload v${{ env.APP_VERSION }} ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz --clobber
