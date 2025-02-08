@@ -45,15 +45,15 @@ on:
         required: false
         type: boolean
     outputs:
-      release-id:
-        description: "Draft Release ID"
-        value: ${{ jobs.build.outputs.release-id }}
+      release-tag:
+        description: "Draft Release Tag"
+        value: ${{ jobs.build.outputs.release-tag }}
 
 jobs:
   build:
     runs-on: ${{ inputs.os }}
     outputs:
-      release-id: ${{ steps.tauri-build.outputs.releaseId }}
+      release-tag: ${{ steps.app-variables.outputs.releaseTag }}
     steps:
       - name: Checkout Sauna UI
         uses: actions/checkout@v4
@@ -117,12 +117,14 @@ jobs:
           cd ${{ github.workspace }}/sauna-vatsim-private
           cargo build --verbose --target-dir ${{ github.workspace }}/sauna-vatsim-private/bin --target ${{ inputs.rust-arch }}-${{ inputs.rust-os }} -r
           Copy-Item -Path "${{ github.workspace }}/sauna-vatsim-private/bin/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/src-tauri/sauna-api" -Include *.dll,*.so*,*.dylib*
-      - name: Get App Variables
+      - id: app-variables
+        name: Get App Variables
         shell: pwsh
         run: |
           echo "$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json) v$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)"
           echo "APP_VERSION=$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_ENV
           echo "APP_NAME=$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_ENV
+          echo "releaseTag=v$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_OUTPUT
       - name: npm install
         run: npm install
       - name: Remove .NET 8 Linux Troublesome Dependencies

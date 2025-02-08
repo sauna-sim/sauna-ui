@@ -49,8 +49,18 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build
     steps:
-      - uses: StuYarrow/publish-release@v1.1.2
+      - name: Publish Github Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          id: ${{ needs.build.outputs.release-id }}
+        shell: pwsh
+        run: gh release edit ${{ needs.build.outputs.release-tag }} --latest --draft=false
+  cleanup-github-release:
+    if: failure()
+    runs-on: ubuntu-24.04
+    needs: [build, create-github-release]
+    steps:
+      - name: Remove Github Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: gh release delete ${{ needs.build.outputs.release-tag }} -y
