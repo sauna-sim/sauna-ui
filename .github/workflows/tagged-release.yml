@@ -117,6 +117,8 @@ jobs:
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           commit_message: Update AUR package
           ssh_keyscan_types: rsa,ecdsa,ed25519
+          assets: |
+            ${{ env.AUR_DEFS_OUTPUT }}/*.install
 
   cleanup-github-release:
     if: failure()
