@@ -60,13 +60,13 @@ jobs:
       - name: Checkout Sauna API
         uses: actions/checkout@v4
         with:
-          repository: 'Sauna-ATC-Training-Simulator/sauna-api'
+          repository: 'sauna-sim/sauna-api'
           ref: ${{ inputs.api-ref }}
           path: 'sauna-api'
       - name: Checkout Sauna Vatsim Private
         uses: actions/checkout@v4
         with:
-          repository: 'Sauna-ATC-Training-Simulator/sauna-vatsim-private'
+          repository: 'sauna-sim/sauna-vatsim-private'
           token: ${{ secrets.SAUNA_PAT }}
           path: 'sauna-vatsim-private'
       - name: Use Node.js

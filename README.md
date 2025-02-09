@@ -4,14 +4,14 @@
 [![Latest Version]][githubreleases]
 [![Changelog Img]][changelog]
 
-[Build Status]: https://img.shields.io/github/actions/workflow/status/Sauna-ATC-Training-Simulator/sauna-ui/build-and-test.yml?branch=master
-[actions]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/actions?query=branch%3Amaster
+[Build Status]: https://img.shields.io/github/actions/workflow/status/sauna-sim/sauna-ui/build-and-test.yml?branch=master
+[actions]: https://github.com/sauna-sim/sauna-ui/actions?query=branch%3Amaster
 [Changelog Img]: https://img.shields.io/badge/Changelog-blue
 [changelog]: CHANGELOG.md
 [License Img]: https://img.shields.io/badge/License-GPLv3-blue
 [license]: LICENSE
-[Latest Version]: https://img.shields.io/github/v/release/Sauna-ATC-Training-Simulator/sauna-ui?include_prereleases
-[githubreleases]: https://github.com/Sauna-ATC-Training-Simulator/sauna-ui/releases/latest
+[Latest Version]: https://img.shields.io/github/v/release/sauna-sim/sauna-ui?include_prereleases
+[githubreleases]: https://github.com/sauna-sim/sauna-ui/releases/latest
 
 ## About
 This is a project that will allow for simulated ATC sessions (sweatbox sessions). It can be used on the VATSIM sweatbox server or on private FSD servers. By allowing airport and aircraft scenario configurations, it will allow ARTCCs and FIRs to better train their controllers for situations that they may encounter on the VATSIM network.
@@ -20,17 +20,8 @@ The idea was to create a realistic sweatbox simulator that could account for per
 
 This project is the UI for SaunaSim. It's built in React, bundled through Vite, and runs on Tauri. Communication to the API is done through http requests and websockets. For production purposes, the API is bundled as part of the application.
 
-### [Sauna API](https://github.com/Sauna-ATC-Training-Simulator/sauna-api)
+### [Sauna API](https://github.com/sauna-sim/sauna-api)
 The API contains most of the core simulation code. For production, the UI will bundle the API.
-
-## Download
-Simply download the appropriate installer and install from the link above.
-
-**Note:** If the binary for your operating system is not provided, it must be compiled from source.
-
-[![Release](https://img.shields.io/github/v/release/Sauna-ATC-Training-Simulator/sauna-ui?include_prereleases&style=for-the-badge)][1]
-
-
 
 ## Dependencies
 This project depends on the following frameworks and packages:
@@ -54,8 +45,6 @@ To build a bundle for production:
 - Ensure `sauna-api` binaries are in `src-tauri/sauna-api`.
   - This will allow Tauri to bundle them into the application for production.
 - Run `npm run package`
-
-This generates an installer in `src-tauri/target/release/bundle`
 
 ## Usage
 Ensure that your settings are set correctly in the settings dialog.
@@ -82,4 +71,4 @@ Aircraft are paused by default when the scenario is loaded in. All aircraft are 
 
 The allowable commands are documented here:
 
-[Command Reference Guide](https://github.com/Sauna-ATC-Training-Simulator/sauna-api/blob/master/Commands.md)
+[Command Reference Guide](https://github.com/sauna-sim/sauna-api/blob/master/Commands.md)

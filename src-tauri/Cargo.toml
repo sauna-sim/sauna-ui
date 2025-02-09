@@ -1,11 +1,11 @@
 [package]
 name = "sauna_sim"
-version = "0.22.3"
+version = "0.22.4"
 description = "SaunaSim. An ATC Training Simulator."
 authors = ["SaunaSim"]
 license = "GPL-3"
-repository = "git+https://github.com/Sauna-ATC-Training-Simulator/sauna-ui.git"
-homepage = "https://github.com/Sauna-ATC-Training-Simulator/sauna-ui"
+repository = "git+https://github.com/sauna-sim/sauna-ui.git"
+homepage = "https://github.com/sauna-sim/sauna-ui"
 #default-run = "app"
 edition = "2021"
 rust-version = "1.80"
