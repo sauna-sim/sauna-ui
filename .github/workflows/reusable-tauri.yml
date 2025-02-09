@@ -48,12 +48,20 @@ on:
       release-tag:
         description: "Draft Release Tag"
         value: ${{ jobs.build.outputs.release-tag }}
+      app-binary-name:
+        description: "App Binary Name"
+        value: ${{ jobs.build.outputs.app-binary-name }}
+      app-version:
+        description: "App Version"
+        value: ${{ jobs.build.outputs.app-version }}
 
 jobs:
   build:
     runs-on: ${{ inputs.os }}
     outputs:
       release-tag: v${{ steps.app-variables.outputs.appVersion }}
+      app-binary-name: ${{ steps.app-variables.outputs.appBinaryName }}
+      app-version: ${{ steps.app-variables.outputs.appVersion }}
     steps:
       - name: Checkout Sauna UI
         uses: actions/checkout@v4
@@ -145,10 +153,6 @@ jobs:
           updaterJsonPreferNsis: 'true'
           releaseDraft: 'true'
           retryAttempts: 1
-      - name: Build Standalone Version
-        if:  ${{ inputs.publish-release }}
-        shell: pwsh
-        run: npm run tauri build '--' -t ${{ inputs.rust-arch }}-${{ inputs.rust-os }} --no-bundle --verbose
       - name: Tar Gzip Build
         if: ${{ inputs.publish-release }}
         shell: pwsh

@@ -13,6 +13,8 @@ fn main() {
         && env::var("AUR_DEFS_OUTPUT").is_ok()
         && env::var("AUR_DEB_PREFIX").is_ok()
         && env::var("AUR_GITHUB_REPO").is_ok()
+        && env::var("AUR_DEB_SHA256_AMD64").is_ok()
+        && env::var("AUR_DEB_SHA256_ARM64").is_ok()
     {
         let crate_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
         let target_dir = PathBuf::from(env::var("AUR_DEFS_OUTPUT").unwrap());
@@ -46,6 +48,8 @@ fn replace_file_vars(in_file: &PathBuf, out_file: &PathBuf) {
         ("${CARGO_PKG_VERSION}", env::var("CARGO_PKG_VERSION").unwrap()),
         ("${CARGO_PKG_DESCRIPTION}", env::var("CARGO_PKG_DESCRIPTION").unwrap()),
         ("${CARGO_PKG_HOMEPAGE}", env::var("CARGO_PKG_HOMEPAGE").unwrap()),
+        ("${AUR_DEB_SHA256_AMD64}", env::var("AUR_DEB_SHA256_AMD64").unwrap()),
+        ("${AUR_DEB_SHA256_ARM64}", env::var("AUR_DEB_SHA256_ARM64").unwrap()),
     ];
 
     for (from, to) in rules {
