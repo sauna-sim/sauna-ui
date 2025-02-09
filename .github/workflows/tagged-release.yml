@@ -45,6 +45,7 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       publish-release: ${{ true }}
       tauri-create-updater: ${{ matrix.tauri-create-updater }}
+      generate-aur-defs: ${{ matrix.short-os == 'linux' && matrix.arch == 'x64' }}
       api-ref: 'v0.22.4'
     secrets: inherit # Pass all secrets
   create-github-release:
@@ -65,68 +66,32 @@ jobs:
     needs: build
     continue-on-error: true
     env:
-      AUR_GENERATE_DEFS: true
       AUR_PACKAGE_NAME: sauna-sim
-      AUR_DEFS_OUTPUT: ${{ github.workspace }}/aurpkg
-      AUR_DEB_PREFIX: SaunaSim
-      AUR_GITHUB_REPO: ${{ github.repository }}
     steps:
       - name: Checkout Sauna UI
         uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - name: Download AUR Artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-      - name: Use Stable Rust
-        uses: dtolnay/rust-toolchain@stable
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          prefix-key: "linux-x64"
-          shared-key: "tauri-build-aur"
-          workspaces: |
-            ./src-tauri -> target
-      - name: Install Rust Target
+          name: aur-package-defs
+          path: ${{ github.workspace }}/aurdefs
+      - name: Add Deb Checksums
         shell: pwsh
         run: |
-          rustup target add x86_64-unknown-linux-gnu
-      - name: Install Linux Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libappindicator3-dev librsvg2-dev libudev-dev patchelf \
-            libwebkit2gtk-4.1-0=2.44.0-2 \
-            libwebkit2gtk-4.1-dev=2.44.0-2 \
-            libjavascriptcoregtk-4.1-0=2.44.0-2 \
-            libjavascriptcoregtk-4.1-dev=2.44.0-2 \
-            gir1.2-javascriptcoregtk-4.1=2.44.0-2 \
-            gir1.2-webkit2-4.1=2.44.0-2
-      - name: npm install
-        run: npm install
-      - name: Get Deb Checksums
-        shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release download ${{ needs.build.outputs.release-tag }} '*.deb'
-          echo AUR_DEB_SHA256_AMD64=$((Get-FileHash ${{ env.AUR_DEB_PREFIX }}_${{ needs.build.outputs.release-version}}_amd64.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_ENV"
-          echo AUR_DEB_SHA256_ARM64=$((Get-FileHash ${{ env.AUR_DEB_PREFIX }}_${{ needs.build.outputs.release-version}}_arm64.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_ENV"
-      - name: Create Package Def
-        run: |
-          mkdir -p ${{ env.AUR_DEFS_OUTPUT }}
-          npm run tauri build
+          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('@AUR_DEB_SHA256_AMD64@', '${{ needs.build.outputs.deb-sha256-x64 }}') | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
+          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('@AUR_DEB_SHA256_ARM64@', '${{ needs.build.outputs.deb-sha256-arm64 }}') | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
       - name: Publish AUR Package
         uses: KSXGitHub/github-actions-deploy-aur@v3
         with:
           pkgname: ${{ env.AUR_PACKAGE_NAME }}
-          pkgbuild: ${{ env.AUR_DEFS_OUTPUT }}/PKGBUILD
+          pkgbuild: ${{ github.workspace }}/aurdefs/PKGBUILD
           commit_username: ${{ secrets.AUR_USERNAME }}
           commit_email: ${{ secrets.AUR_EMAIL }}
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           commit_message: Update AUR package
           ssh_keyscan_types: rsa,ecdsa,ed25519
           assets: |
-            ${{ env.AUR_DEFS_OUTPUT }}/*.install
+            ${{ github.workspace }}/aurdefs/*.install
 
   cleanup-github-release:
     if: failure()
