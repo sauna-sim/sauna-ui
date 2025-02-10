@@ -67,17 +67,22 @@ fn main() {
 
             // Start Sauna API
             if let Ok(resource_path) = &app.path().resource_dir() {
+                let sauna_path = resource_path.join("sauna-api");
+                println!("Trying to start Sauna API from {}", &sauna_path.to_str().unwrap_or_default());
                 app_state_guard
-                .start_sauna_api(resource_path.join("sauna-api"))
+                .start_sauna_api(&sauna_path)
                 .ok();
             }
 
             // Try again from exe dir
             if !app_state_guard.api_builtin {
+                println!("Trying to start Sauna API from {}", PathBuf::from(".").canonicalize().unwrap_or_default().join("sauna-api").to_str().unwrap_or_default());
                 app_state_guard
                 .start_sauna_api(&"sauna-api")
                 .ok();
             }
+
+            println!("Sauna API Built-In? {}", app_state_guard.api_builtin);
 
             // Send Sauna API Built In event
             app.emit("sauna-api-builtin", app_state_guard.api_builtin)
