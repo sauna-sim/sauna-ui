@@ -1,5 +1,5 @@
 name: ${SNAP_PACKAGE_NAME}
-base: core22
+base: core24
 title: ${APP_BINARY_NAME}
 website: ${CARGO_PKG_HOMEPAGE}
 version: '${CARGO_PKG_VERSION}'
@@ -13,8 +13,8 @@ grade: stable
 confinement: strict
 
 layout:
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_ON/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_ON/webkit2gtk-4.1
 
 apps:
   ${SNAP_PACKAGE_NAME}:
@@ -37,10 +37,6 @@ parts:
   build-app:
     plugin: dump
     build-packages:
-      - build-essential
-      - curl
-      - wget
-      - file
       - dpkg
     stage-packages:
       - libwebkit2gtk-4.1-0

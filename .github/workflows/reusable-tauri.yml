@@ -106,6 +106,7 @@ jobs:
         with:
           prefix-key: "${{ inputs.short-os }}-${{ inputs.arch }}"
           shared-key: "tauri-build"
+          cache-on-failure: "true"
           workspaces: |
             ./src-tauri -> target
             ./sauna-vatsim-private -> bin
