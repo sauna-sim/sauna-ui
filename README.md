@@ -1,4 +1,4 @@
-# SaunaSim
+# [SaunaSim](https://sauna-sim.github.io)
 [![Build Status]][actions]
 [![License Img]][license]
 [![Latest Version]][githubreleases]
@@ -12,6 +12,11 @@
 [license]: LICENSE
 [Latest Version]: https://img.shields.io/github/v/release/sauna-sim/sauna-ui?include_prereleases
 [githubreleases]: https://github.com/sauna-sim/sauna-ui/releases/latest
+
+Get the latest version from here:
+
+[![Downloads](https://img.shields.io/badge/downloads-blue?style=for-the-badge)](https://sauna-sim.github.io/downloads)
+
 
 ## About
 This is a project that will allow for simulated ATC sessions (sweatbox sessions). It can be used on the VATSIM sweatbox server or on private FSD servers. By allowing airport and aircraft scenario configurations, it will allow ARTCCs and FIRs to better train their controllers for situations that they may encounter on the VATSIM network.

@@ -142,6 +142,7 @@ jobs:
           echo "$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json) v$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)"
           echo "appBinaryName=$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_OUTPUT
           echo "appVersion=$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_OUTPUT
+          echo "APP_BINARY_NAME=$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_ENV
       - name: npm install
         run: npm install
       - name: Remove .NET 8 Linux Troublesome Dependencies
@@ -154,10 +155,15 @@ jobs:
         shell: pwsh
         run: |
           echo AUR_GENERATE_DEFS=true >> "$env:GITHUB_ENV"
-          echo AUR_PACKAGE_NAME=sauna-sim >> "$env:GITHUB_ENV"
           echo AUR_DEFS_OUTPUT=${{ github.workspace }}/aurpkg >> "$env:GITHUB_ENV"
-          echo AUR_DEB_PREFIX=SaunaSim >> "$env:GITHUB_ENV"
           echo AUR_GITHUB_REPO=${{ github.repository }} >> "$env:GITHUB_ENV"
+      - name: Set Snapcraft Env Vars
+        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
+        shell: pwsh
+        run: |
+          echo SNAP_GENERATE_DEFS=true >> "$env:GITHUB_ENV"
+          echo SNAP_DEFS_OUTPUT=${{ github.workspace }} >> "$env:GITHUB_ENV"
+          echo SNAP_DEB_PATH=src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb >> "$env:GITHUB_ENV"
       - id: tauri-build
         name: Tauri Build
         if: ${{ inputs.publish-release }}
@@ -189,6 +195,18 @@ jobs:
         if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
         shell: pwsh
         run: echo deb-sha256-${{ inputs.arch }}=$((Get-FileHash -Path ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_OUTPUT"
+      - id: snap-build
+        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
+        name: Build Snap
+        uses: snapcore/action-build@v1
+      - name: Publish Snap
+        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
+        with:
+          snap: ${{ steps.snap-build.outputs.snap }}
+          release: edge
       - name: Tar Gzip Build
         if: ${{ inputs.publish-release }}
         shell: pwsh

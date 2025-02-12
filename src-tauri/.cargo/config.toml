@@ -1,0 +1,4 @@
+[env]
+SNAP_PACKAGE_NAME = "sauna-sim"
+AUR_PACKAGE_NAME = "sauna-sim"
+APP_BINARY_NAME = "SaunaSim"

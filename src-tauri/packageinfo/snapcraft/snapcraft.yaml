@@ -1,0 +1,52 @@
+name: ${SNAP_PACKAGE_NAME}
+base: core22
+title: ${APP_BINARY_NAME}
+website: ${CARGO_PKG_HOMEPAGE}
+version: '${CARGO_PKG_VERSION}'
+summary: ${CARGO_PKG_DESCRIPTION} # 79 char long summary
+license: GPL-3.0+
+description: |
+  SaunaSim is an ATC Training tool that simulates an aircraft with a full FMS and autopilot. The aircraft are
+  designed to act as realistically as possible and take into account various factors such as atmospheric and performance data.
+
+grade: stable
+confinement: strict
+
+layout:
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+
+apps:
+  ${SNAP_PACKAGE_NAME}:
+    command: usr/bin/${APP_BINARY_NAME}
+    desktop: usr/share/applications/${APP_BINARY_NAME}.desktop
+    extensions: [gnome]
+    #plugs:
+    #  - network
+    # Add whatever plugs you need here, see https://snapcraft.io/docs/snapcraft-interfaces for more info.
+    # The gnome extension already includes [ desktop, desktop-legacy, gsettings, opengl, wayland, x11, mount-observe, calendar-service ]
+
+package-repositories:
+  - type: apt
+    components: [main]
+    suites: [noble]
+    key-id: 78E1918602959B9C59103100F1831DDAFC42E99D
+    url: http://ppa.launchpad.net/snappy-dev/snapcraft-daily/ubuntu
+
+parts:
+  build-app:
+    plugin: dump
+    build-packages:
+      - build-essential
+      - curl
+      - wget
+      - file
+      - dpkg
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libayatana-appindicator3-1
+    source: .
+    override-build: |
+      set -eu
+      dpkg -x ${SNAP_DEB_PATH}/*.deb $SNAPCRAFT_PART_INSTALL/
+      sed -i -e "s|Icon=${APP_BINARY_NAME}|Icon=/usr/share/icons/hicolor/32x32/apps/${APP_BINARY_NAME}.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/${APP_BINARY_NAME}.desktop
