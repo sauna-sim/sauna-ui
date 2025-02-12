@@ -21,8 +21,9 @@ apps:
     command: usr/bin/${APP_BINARY_NAME}
     desktop: usr/share/applications/${APP_BINARY_NAME}.desktop
     extensions: [gnome]
-    #plugs:
-    #  - network
+    plugs:
+      - network
+      - network-bind
     # Add whatever plugs you need here, see https://snapcraft.io/docs/snapcraft-interfaces for more info.
     # The gnome extension already includes [ desktop, desktop-legacy, gsettings, opengl, wayland, x11, mount-observe, calendar-service ]
 

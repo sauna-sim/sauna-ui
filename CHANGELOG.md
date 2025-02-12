@@ -7,11 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.22.7] - 2025-02-11
+## [0.22.9] - 2025-02-12
 ### Added
 - Snapcraft Build
 - AUR Build
-- Flathub Build
 
 ## [0.22.1] - 2025-02-08
 ### Added
@@ -91,8 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.7...master
-[0.22.7]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.1...v0.22.7
+[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.9...master
+[0.22.9]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.1...v0.22.9
 [0.22.1]: https://github.com/sauna-sim/sauna-ui/compare/v0.21.11...v0.22.1
 [0.21.11]: https://github.com/sauna-sim/sauna-ui/compare/v0.21.10...v0.21.11
 [0.21.10]: https://github.com/sauna-sim/sauna-ui/compare/v0.21.9...v0.21.10
