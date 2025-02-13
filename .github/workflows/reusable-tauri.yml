@@ -164,7 +164,7 @@ jobs:
         run: |
           echo SNAP_GENERATE_DEFS=true >> "$env:GITHUB_ENV"
           echo SNAP_DEFS_OUTPUT=${{ github.workspace }} >> "$env:GITHUB_ENV"
-          echo SNAP_DEB_PATH=src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb >> "$env:GITHUB_ENV"
+          echo SNAP_DEB_PATH=src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/bundle/deb >> "$env:GITHUB_ENV"
       - id: tauri-build
         name: Tauri Build
         if: ${{ inputs.publish-release }}
@@ -182,6 +182,8 @@ jobs:
           updaterJsonPreferNsis: 'true'
           releaseDraft: 'true'
           retryAttempts: 1
+          includeRelease: false
+          includeDebug: true
       - id: upload-aur-artifacts
         name: Upload AUR Artifacts
         if: ${{ inputs.generate-aur-defs && inputs.publish-release }}
@@ -195,7 +197,7 @@ jobs:
         name: Generate DEB SHA256 Checksum
         if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
         shell: pwsh
-        run: echo deb-sha256-${{ inputs.arch }}=$((Get-FileHash -Path ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_OUTPUT"
+        run: echo deb-sha256-${{ inputs.arch }}=$((Get-FileHash -Path ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/bundle/deb/*.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_OUTPUT"
       - id: snap-build
         if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
         name: Build Snap
@@ -214,7 +216,7 @@ jobs:
         run: |
           New-Item -ItemType Directory '${{ github.workspace }}/out/tarpkg'
           Copy-Item -Path "${{ github.workspace }}/src-tauri/sauna-api" -Destination "${{ github.workspace }}/out/tarpkg" -Recurse
-          Copy-Item -Path "${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/*" -Destination "${{ github.workspace }}/out/tarpkg" -Include ${{ steps.app-variables.outputs.appBinaryName }},${{ steps.app-variables.outputs.appBinaryName }}.exe
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/*" -Destination "${{ github.workspace }}/out/tarpkg" -Include ${{ steps.app-variables.outputs.appBinaryName }},${{ steps.app-variables.outputs.appBinaryName }}.exe
           cd ${{ github.workspace }}/out/tarpkg
           tar -cvzf ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
       - name: Upload Tar Gzip Build

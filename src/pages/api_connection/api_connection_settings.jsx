@@ -78,6 +78,7 @@ export const ApiConnectionSettings = ({}) => {
                                         id={"settingsFormApiPort"}
                                         name="port"
                                         keyfilter={"int"}
+                                        type={"number"}
                                         value={values.port}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
