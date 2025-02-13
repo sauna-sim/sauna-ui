@@ -45,7 +45,6 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       publish-release: ${{ true }}
       tauri-create-updater: ${{ matrix.tauri-create-updater }}
-      generate-aur-defs: ${{ matrix.short-os == 'linux' && matrix.arch == 'x64' }}
       api-ref: 'v0.22.4'
     secrets: inherit # Pass all secrets
   create-github-release:

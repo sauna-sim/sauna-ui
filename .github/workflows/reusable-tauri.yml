@@ -44,11 +44,6 @@ on:
         default: true
         required: false
         type: boolean
-      generate-aur-defs:
-        description: 'Should AUR Package Defs be created?'
-        default: false
-        required: false
-        type: boolean
     outputs:
       deb-sha256-x64:
         description: "App Version"
