@@ -1,4 +1,4 @@
-name: ${SNAP_PACKAGE_NAME}
+name: sauna-sim
 base: core24
 title: ${APP_BINARY_NAME}
 website: ${CARGO_PKG_HOMEPAGE}
@@ -15,16 +15,18 @@ confinement: strict
 layout:
   /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_ON/webkit2gtk-4.1:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_ON/webkit2gtk-4.1
+  /etc/profile.d:
+    bind: $SNAP_DATA/etc/profile.d
 
 apps:
-  ${SNAP_PACKAGE_NAME}:
+  sauna-sim:
     command: usr/bin/${APP_BINARY_NAME}
     desktop: usr/share/applications/${APP_BINARY_NAME}.desktop
     extensions: [gnome]
     plugs:
       - network
       - network-bind
-      - network-observe
+      - network-status
     # Add whatever plugs you need here, see https://snapcraft.io/docs/snapcraft-interfaces for more info.
     # The gnome extension already includes [ desktop, desktop-legacy, gsettings, opengl, wayland, x11, mount-observe, calendar-service ]
 

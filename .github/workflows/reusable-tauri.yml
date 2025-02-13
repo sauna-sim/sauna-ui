@@ -50,15 +50,6 @@ on:
         required: false
         type: boolean
     outputs:
-      release-tag:
-        description: "Draft Release Tag"
-        value: ${{ jobs.build.outputs.release-tag }}
-      app-binary-name:
-        description: "App Binary Name"
-        value: ${{ jobs.build.outputs.app-binary-name }}
-      app-version:
-        description: "App Version"
-        value: ${{ jobs.build.outputs.app-version }}
       deb-sha256-x64:
         description: "App Version"
         value: ${{ jobs.build.outputs.deb-sha256-x64 }}
@@ -70,9 +61,6 @@ jobs:
   build:
     runs-on: ${{ inputs.os }}
     outputs:
-      release-tag: v${{ steps.app-variables.outputs.appVersion }}
-      app-binary-name: ${{ steps.app-variables.outputs.appBinaryName }}
-      app-version: ${{ steps.app-variables.outputs.appVersion }}
       deb-sha256-x64: ${{ steps.generate-deb-sha256.outputs.deb-sha256-x64 }}
       deb-sha256-arm64: ${{ steps.generate-deb-sha256.outputs.deb-sha256-arm64 }}
     steps:
@@ -140,9 +128,11 @@ jobs:
         name: Get App Variables
         shell: pwsh
         run: |
-          echo "$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json) v$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)"
-          echo "appBinaryName=$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_OUTPUT
-          echo "appVersion=$(jq -r .version ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_OUTPUT
+          cargo install toml-cli
+          $env:CARGO_TOML = toml get ${{ github.workspace }}/src-tauri/Cargo.toml .
+          echo "CARGO_TOML_PKG_VERSION=$(echo $env:CARGO_TOML | jq -r .package.version)" >> $env:GITHUB_ENV
+          echo "CARGO_TOML_PKG_HOMEPAGE=$(echo $env:CARGO_TOML | jq -r .package.homepage)" >> $env:GITHUB_ENV
+          echo "CARGO_TOML_PKG_DESCRIPTION=$(echo $env:CARGO_TOML | jq -r .package.description)" >> $env:GITHUB_ENV
           echo "APP_BINARY_NAME=$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)" >> $env:GITHUB_ENV
       - name: npm install
         run: npm install
@@ -151,20 +141,6 @@ jobs:
         shell: pwsh
         run: |
           Remove-Item -Path "${{ github.workspace }}/src-tauri/sauna-api/libcoreclrtraceptprovider.so" -Force
-      - name: Set AUR Env Vars
-        if: ${{ inputs.generate-aur-defs && inputs.publish-release }}
-        shell: pwsh
-        run: |
-          echo AUR_GENERATE_DEFS=true >> "$env:GITHUB_ENV"
-          echo AUR_DEFS_OUTPUT=${{ github.workspace }}/aurpkg >> "$env:GITHUB_ENV"
-          echo AUR_GITHUB_REPO=${{ github.repository }} >> "$env:GITHUB_ENV"
-      - name: Set Snapcraft Env Vars
-        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
-        shell: pwsh
-        run: |
-          echo SNAP_GENERATE_DEFS=true >> "$env:GITHUB_ENV"
-          echo SNAP_DEFS_OUTPUT=${{ github.workspace }} >> "$env:GITHUB_ENV"
-          echo SNAP_DEB_PATH=src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/bundle/deb >> "$env:GITHUB_ENV"
       - id: tauri-build
         name: Tauri Build
         if: ${{ inputs.publish-release }}
@@ -184,20 +160,22 @@ jobs:
           retryAttempts: 1
           includeRelease: false
           includeDebug: true
-      - id: upload-aur-artifacts
-        name: Upload AUR Artifacts
-        if: ${{ inputs.generate-aur-defs && inputs.publish-release }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: aur-package-defs
-          path: ${{ env.AUR_DEFS_OUTPUT }}/*
-          retention-days: 1
-          overwrite: true
       - id: generate-deb-sha256
         name: Generate DEB SHA256 Checksum
         if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
         shell: pwsh
         run: echo deb-sha256-${{ inputs.arch }}=$((Get-FileHash -Path ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/bundle/deb/*.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_OUTPUT"
+      - name: Replace snapcraft.yaml Variables
+        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
+        shell: pwsh
+        run: |
+          $env:CARGO_TOML = toml get ${{ github.workspace }}/src-tauri/Cargo.toml .
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/packageinfo/snapcraft/snapcraft.yaml" -Destination "${{ github.workspace }}" -Force
+          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${CARGO_PKG_VERSION}', '${{ env.CARGO_TOML_PKG_VERSION }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
+          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${CARGO_PKG_DESCRIPTION}', '${{ env.CARGO_TOML_PKG_DESCRIPTION }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
+          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${CARGO_PKG_HOMEPAGE}', '${{ env.CARGO_TOML_PKG_HOMEPAGE }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
+          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${APP_BINARY_NAME}', '${{ env.APP_BINARY_NAME }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
+          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${SNAP_DEB_PATH}', 'src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/bundle/deb') | Set-Content ${{ github.workspace }}/snapcraft.yaml
       - id: snap-build
         if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
         name: Build Snap
@@ -216,7 +194,7 @@ jobs:
         run: |
           New-Item -ItemType Directory '${{ github.workspace }}/out/tarpkg'
           Copy-Item -Path "${{ github.workspace }}/src-tauri/sauna-api" -Destination "${{ github.workspace }}/out/tarpkg" -Recurse
-          Copy-Item -Path "${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/*" -Destination "${{ github.workspace }}/out/tarpkg" -Include ${{ steps.app-variables.outputs.appBinaryName }},${{ steps.app-variables.outputs.appBinaryName }}.exe
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/debug/*" -Destination "${{ github.workspace }}/out/tarpkg" -Include ${{ env.APP_BINARY_NAME }},${{ env.APP_BINARY_NAME }}.exe
           cd ${{ github.workspace }}/out/tarpkg
           tar -cvzf ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz *
       - name: Upload Tar Gzip Build
@@ -224,4 +202,4 @@ jobs:
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload v${{ steps.app-variables.outputs.appVersion }} ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz --clobber
+        run: gh release upload v${{ steps.tauri-build.outputs.appVersion }} ${{ github.workspace }}/out/SaunaSim-Standalone-${{ inputs.short-os }}-${{ inputs.arch }}.tar.gz --clobber
