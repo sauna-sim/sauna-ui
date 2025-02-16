@@ -77,13 +77,15 @@ jobs:
         run: |
           $env:CARGO_TOML = toml get ${{ github.workspace }}/src-tauri/Cargo.toml .
           Copy-Item -Path "${{ github.workspace }}/src-tauri/packageinfo/aur" -Destination "${{ github.workspace }}/aurdefs" -Recurse -Force
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${CARGO_PKG_VERSION}', $(echo $env:CARGO_TOML | jq -r .package.version)) | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${CARGO_PKG_DESCRIPTION}', $(echo $env:CARGO_TOML | jq -r .package.description)) | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${CARGO_PKG_HOMEPAGE}', $(echo $env:CARGO_TOML | jq -r .package.homepage)) | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${AUR_GITHUB_REPO}', '${{ github.repository }}') | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${APP_BINARY_NAME}', $(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)) | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${AUR_DEB_SHA256_AMD64}', '${{ needs.build.outputs.deb-sha256-x64 }}') | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).Replace('${AUR_DEB_SHA256_ARM64}', '${{ needs.build.outputs.deb-sha256-arm64 }}') | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
+          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).
+            Replace('${CARGO_PKG_VERSION}', $(echo $env:CARGO_TOML | jq -r .package.version)).
+            Replace('${CARGO_PKG_DESCRIPTION}', $(echo $env:CARGO_TOML | jq -r .package.description)).
+            Replace('${CARGO_PKG_HOMEPAGE}', $(echo $env:CARGO_TOML | jq -r .package.homepage)).
+            Replace('${AUR_GITHUB_REPO}', '${{ github.repository }}').
+            Replace('${APP_BINARY_NAME}', $(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)).
+            Replace('${AUR_DEB_SHA256_AMD64}', '${{ needs.build.outputs.deb-sha256-x64 }}').
+            Replace('${AUR_DEB_SHA256_ARM64}', '${{ needs.build.outputs.deb-sha256-arm64 }}') `
+          | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
       - name: Publish AUR Package
         uses: KSXGitHub/github-actions-deploy-aur@v3
         with:
@@ -96,7 +98,6 @@ jobs:
           ssh_keyscan_types: rsa,ecdsa,ed25519
           assets: |
             ${{ github.workspace }}/aurdefs/sauna-sim.install
-
   cleanup-github-release:
     if: failure()
     runs-on: ubuntu-24.04
