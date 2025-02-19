@@ -1,4 +1,4 @@
-# [SaunaSim](https://sauna-sim.github.io)
+# [SaunaSim](https://saunasim.com)
 [![Build Status]][actions]
 [![License Img]][license]
 [![Latest Version]][githubreleases]
@@ -15,7 +15,7 @@
 
 Get the latest version from here:
 
-[![Downloads](https://img.shields.io/badge/downloads-blue?style=for-the-badge)](https://sauna-sim.github.io/downloads)
+[![Downloads](https://img.shields.io/badge/downloads-blue?style=for-the-badge)](https://saunasim.com/downloads)
 
 
 ## About

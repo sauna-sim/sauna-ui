@@ -1,0 +1,37 @@
+id: com.saunasim.saunasim
+
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+
+command: SaunaSim
+finish-args:
+  - --socket=wayland # Permission needed to show the window
+  - --socket=fallback-x11 # Permission needed to show the window
+  - --device=dri # OpenGL, not necessary for all projects
+  - --share=ipc
+  - --share=network
+
+modules:
+  - name: binary
+    buildsystem: simple
+    sources:
+      - type: file
+        url: https://github.com/sauna-sim/sauna-ui/releases/download/v0.22.14/SaunaSim_0.22.14_amd64.deb
+        sha256: 0d12d90fdde01db7d94ef7201c794b729641862726ced6e8b2780fa2ba032e6e # This is required if you are using a remote source
+        only-arches: [x86_64] #This source is only used on x86_64 Computers
+        # This path points to the binary file which was created in the .deb bundle.
+        # Tauri also creates a folder which corresponds to the content of the unpacked .deb.
+      - type: file
+        path: com.saunasim.saunasim.metainfo.xml
+    build-commands:
+      - ar -x *.deb
+      - tar -xf data.tar.gz
+      - 'install -Dm755 usr/bin/SaunaSim /app/bin/SaunaSim'
+      - install -Dm644 usr/share/applications/SaunaSim.desktop /app/share/applications/com.saunasim.saunasim.desktop
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/SaunaSim.png /app/share/icons/hicolor/128x128/apps/com.saunasim.saunasim.png
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/SaunaSim.png /app/share/icons/hicolor/32x32/apps/com.saunasim.saunasim.png
+      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/SaunaSim.png /app/share/icons/hicolor/256x256@2/apps/com.saunasim.saunasim.png
+      - install -Dm644 com.saunasim.saunasim.metainfo.xml /app/share/metainfo/com.saunasim.saunasim.metainfo.xml
+      - mkdir -p /app/lib/SaunaSim
+      - cp -r usr/lib/SaunaSim /app/lib

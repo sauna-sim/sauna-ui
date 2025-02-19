@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "SaunaSim",
   "mainBinaryName": "SaunaSim",
-  "identifier": "com.sauna.saunasim",
+  "identifier": "com.saunasim.saunasim",
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
@@ -58,7 +58,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "Sauna",
+        "title": "SaunaSim",
         "width": 800,
         "minHeight": 400,
         "minWidth": 450,
