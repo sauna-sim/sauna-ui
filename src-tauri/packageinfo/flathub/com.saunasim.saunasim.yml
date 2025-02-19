@@ -1,8 +1,12 @@
 id: com.saunasim.saunasim
 
 runtime: org.gnome.Platform
-runtime-version: '46'
+runtime-version: '47'
 sdk: org.gnome.Sdk
+
+rename-icon: SaunaSim
+rename-desktop-file: SaunaSim.desktop
+rename-appdata-file: SaunaSim.metainfo.xml
 
 command: SaunaSim
 finish-args:
@@ -22,16 +26,15 @@ modules:
         only-arches: [x86_64] #This source is only used on x86_64 Computers
         # This path points to the binary file which was created in the .deb bundle.
         # Tauri also creates a folder which corresponds to the content of the unpacked .deb.
-      - type: file
-        path: com.saunasim.saunasim.metainfo.xml
+
     build-commands:
       - ar -x *.deb
       - tar -xf data.tar.gz
       - 'install -Dm755 usr/bin/SaunaSim /app/bin/SaunaSim'
-      - install -Dm644 usr/share/applications/SaunaSim.desktop /app/share/applications/com.saunasim.saunasim.desktop
-      - install -Dm644 usr/share/icons/hicolor/128x128/apps/SaunaSim.png /app/share/icons/hicolor/128x128/apps/com.saunasim.saunasim.png
-      - install -Dm644 usr/share/icons/hicolor/32x32/apps/SaunaSim.png /app/share/icons/hicolor/32x32/apps/com.saunasim.saunasim.png
-      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/SaunaSim.png /app/share/icons/hicolor/256x256@2/apps/com.saunasim.saunasim.png
-      - install -Dm644 com.saunasim.saunasim.metainfo.xml /app/share/metainfo/com.saunasim.saunasim.metainfo.xml
+      - install -Dm644 usr/share/applications/SaunaSim.desktop /app/share/applications/SaunaSim.desktop
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/SaunaSim.png /app/share/icons/hicolor/128x128/apps/SaunaSim.png
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/SaunaSim.png /app/share/icons/hicolor/32x32/apps/SaunaSim.png
+      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/SaunaSim.png /app/share/icons/hicolor/256x256@2/apps/SaunaSim.png
+      - install -Dm644 usr/share/metainfo/SaunaSim.metainfo.xml /app/share/metainfo/SaunaSim.metainfo.xml
       - mkdir -p /app/lib/SaunaSim
       - cp -r usr/lib/SaunaSim /app/lib

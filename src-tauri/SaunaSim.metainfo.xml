@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>SaunaSim</id>
+  
+  <name>SaunaSim</name>
+  <summary>An ATC Training Simulator</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <developer id="com.saunasim">
+    <name>SaunaSim</name>
+  </developer>
+
+  <content_rating type="oars-1.1" />
+
+  <url type="homepage">https://saunasim.com/</url>
+  <url type="vcs-browser">https://github.com/sauna-sim/sauna-ui</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://saunasim.com/screenshot_3.png</image>
+      <caption>Main Window, Map, and Command Window</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://saunasim.com/screenshot_1.png</image>
+      <caption>Main Window</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://saunasim.com/screenshot_2.png</image>
+      <caption>Map Window</caption>
+    </screenshot>
+  </screenshots>
+  
+  <requires>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <display_length compare="ge">768</display_length>
+  </requires>
+  
+  <description>
+    <p>
+      SaunaSim is an ATC Training tool that simulates an aircraft with a full FMS and autopilot. The aircraft are designed to act as realistically as possible and take into account various factors such as atmospheric and performance data.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">SaunaSim.desktop</launchable>
+
+  <releases>
+    <release version="0.22.14" date="2025-02-13">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.22.14</url>
+      <description>
+        <p>Release description</p>
+          <ul>
+            <li>Snapcraft Build Permissions</li>
+          </ul>
+      </description>
+    </release>
+  </releases>
+</component>

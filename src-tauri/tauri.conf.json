@@ -37,7 +37,11 @@
         "bundleMediaFramework": true
       },
       "deb": {
-        "depends": []
+        "depends": [],
+        "files": {
+          "/usr/share/README.md": "../README.md",
+          "/usr/share/metainfo/SaunaSim.metainfo.xml": "SaunaSim.metainfo.xml"
+        }
       }
     }
   },
