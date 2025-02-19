@@ -27,6 +27,10 @@ fn main() {
     // Env path fix
     let _ = fix_path_env::fix();
 
+    // Wayland Webkit2GTK Protocol Error fix
+    #[cfg(target_os = "linux")]
+    std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_websocket::init())

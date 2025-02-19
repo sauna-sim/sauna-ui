@@ -47,12 +47,13 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
-    <release version="0.22.14" date="2025-02-13">
-      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.22.14</url>
+  <release version="0.22.17" date="2025-02-19">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.22.17</url>
       <description>
         <p>Release description</p>
           <ul>
             <li>Snapcraft Build Permissions</li>
+            <li>Wayland NVidia Webkit2GTK issues on Linux</li>
           </ul>
       </description>
     </release>

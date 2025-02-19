@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.17] - 2025-02-19
+### Fixed
+- Wayland NVidia Webkit2GTK issues on Linux
+
 ## [0.22.14] - 2025-02-13
 ### Fixed
 - Snapcraft Build Permissions
@@ -97,7 +101,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.14...master
+[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.17...master
+[0.22.17]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.14...v0.22.17
 [0.22.14]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.13...v0.22.14
 [0.22.13]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.1...v0.22.13
 [0.22.1]: https://github.com/sauna-sim/sauna-ui/compare/v0.21.11...v0.22.1

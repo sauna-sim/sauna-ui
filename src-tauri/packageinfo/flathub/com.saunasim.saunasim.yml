@@ -1,7 +1,7 @@
 id: com.saunasim.saunasim
 
 runtime: org.gnome.Platform
-runtime-version: '47'
+runtime-version: '46'
 sdk: org.gnome.Sdk
 
 rename-icon: SaunaSim
@@ -13,19 +13,20 @@ finish-args:
   - --socket=wayland # Permission needed to show the window
   - --socket=fallback-x11 # Permission needed to show the window
   - --device=dri # OpenGL, not necessary for all projects
-  - --share=ipc
-  - --share=network
+  - --share=ipc # To interface with Tauri Backend
+  - --share=network # To connect to VATSIM Network
 
 modules:
   - name: binary
     buildsystem: simple
     sources:
       - type: file
-        url: https://github.com/sauna-sim/sauna-ui/releases/download/v0.22.14/SaunaSim_0.22.14_amd64.deb
-        sha256: 0d12d90fdde01db7d94ef7201c794b729641862726ced6e8b2780fa2ba032e6e # This is required if you are using a remote source
+        #url: https://github.com/sauna-sim/sauna-ui/releases/download/v0.22.14/SaunaSim_0.22.14_amd64.deb
+        #sha256: 0d12d90fdde01db7d94ef7201c794b729641862726ced6e8b2780fa2ba032e6e # This is required if you are using a remote source
         only-arches: [x86_64] #This source is only used on x86_64 Computers
         # This path points to the binary file which was created in the .deb bundle.
         # Tauri also creates a folder which corresponds to the content of the unpacked .deb.
+        path: SaunaSim_0.22.16_amd64.deb
 
     build-commands:
       - ar -x *.deb
