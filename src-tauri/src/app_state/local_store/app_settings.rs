@@ -34,7 +34,7 @@ fn default_api_host_name() -> String {
     "localhost".to_string()
 }
 fn default_api_port() -> u16 {
-    5000
+    5052
 }
 
 #[derive(Serialize, Deserialize)]

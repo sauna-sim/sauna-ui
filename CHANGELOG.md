@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2025-02-23
+### Changed
+- SaunaApi to v0.23.0
+  - World Magnetic Model (WMM) updated to 2025 model.
+- NPM Package Upgrades
+- License to LGPL v3.0
+
+### Fixed
+- Default Port for dev builds.
+
 ## [0.22.17] - 2025-02-19
 ### Fixed
 - Wayland NVidia Webkit2GTK issues on Linux
@@ -101,7 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.17...master
+[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.0...master
+[0.23.0]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.17...v0.23.0
 [0.22.17]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.14...v0.22.17
 [0.22.14]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.13...v0.22.14
 [0.22.13]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.1...v0.22.13

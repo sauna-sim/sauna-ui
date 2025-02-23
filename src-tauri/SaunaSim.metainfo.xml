@@ -3,10 +3,10 @@
   <id>SaunaSim</id>
   
   <name>SaunaSim</name>
-  <summary>An ATC Training Simulator</summary>
+  <summary>ATC Training Simulator</summary>
   
   <metadata_license>MIT</metadata_license>
-  <project_license>GPL-3.0-or-later</project_license>
+  <project_license>LGPL-3.0-or-later</project_license>
 
   <developer id="com.saunasim">
     <name>SaunaSim</name>
@@ -47,14 +47,33 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
-  <release version="0.22.17" date="2025-02-19">
+    <release version="0.23.0" date="2025-02-23">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.23.0</url>
+      <description>
+        <h3>Changed</h3>
+        <ul>
+          <li>SaunaApi to v0.23.0
+            <ul>
+              <li>World Magnetic Model (WMM) updated to 2025 model.</li>
+            </ul>
+          </li>
+          <li>NPM Package Upgrades</li>
+          <li>License to LGPL v3.0</li>
+        </ul>
+        <h3>Fixed</h3>
+        <ul>
+          <li>Default Port for dev builds.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.22.17" date="2025-02-19">
       <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.22.17</url>
       <description>
         <p>Release description</p>
-          <ul>
-            <li>Snapcraft Build Permissions</li>
-            <li>Wayland NVidia Webkit2GTK issues on Linux</li>
-          </ul>
+        <ul>
+          <li>Snapcraft Build Permissions</li>
+          <li>Wayland NVidia Webkit2GTK issues on Linux</li>
+        </ul>
       </description>
     </release>
   </releases>

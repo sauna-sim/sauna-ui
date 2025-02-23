@@ -165,6 +165,7 @@ export const SettingsModal = ({}) => {
                                         id={"settingsFormFsdHostName"}
                                         name="fsdConnection.hostname"
                                         value={values.fsdConnection.hostname}
+                                        autoCorrect={"off"}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         invalid={getIn(touched, "fsdConnection.hostname") && getIn(errors, "fsdConnection.hostname")}
@@ -204,6 +205,7 @@ export const SettingsModal = ({}) => {
                                         id={"settingsFormFsdNid"}
                                         name="fsdConnection.networkId"
                                         value={values.fsdConnection.networkId}
+                                        autoCorrect={"off"}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         invalid={getIn(touched, "fsdConnection.networkId") && getIn(errors, "fsdConnection.networkId")}
@@ -217,6 +219,7 @@ export const SettingsModal = ({}) => {
                                         inputClassName={"w-full"}
                                         inputId={"settingsFormFsdPass"}
                                         name="fsdConnection.password"
+                                        autoCorrect={"off"}
                                         value={values.fsdConnection.password}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
