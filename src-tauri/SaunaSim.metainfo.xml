@@ -47,20 +47,16 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
-    <release version="0.23.0" date="2025-02-23">
-      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.23.0</url>
+    <release version="0.23.1" date="2025-02-23">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.23.1</url>
       <description>
-        <h3>Changed</h3>
+        <p>Changed</p>
         <ul>
-          <li>SaunaApi to v0.23.0
-            <ul>
-              <li>World Magnetic Model (WMM) updated to 2025 model.</li>
-            </ul>
-          </li>
+          <li>SaunaApi to v0.23.0: World Magnetic Model (WMM) updated to 2025 model.</li>
           <li>NPM Package Upgrades</li>
           <li>License to LGPL v3.0</li>
         </ul>
-        <h3>Fixed</h3>
+        <p>Fixed</p>
         <ul>
           <li>Default Port for dev builds.</li>
         </ul>
