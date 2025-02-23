@@ -1,17 +1,17 @@
 pkgname=sauna-sim
-pkgver=${CARGO_PKG_VERSION}
+pkgver={{app.version}}
 pkgrel=1
-pkgdesc="${CARGO_PKG_DESCRIPTION}"
+pkgdesc="{{app.shortDesc}}"
 arch=('x86_64' 'aarch64')
-url="${CARGO_PKG_HOMEPAGE}"
+url="{{app.homepage}}"
 license=('gpl-3')
 depends=('cairo' 'desktop-file-utils' 'gdk-pixbuf2' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libsoup' 'pango' 'webkit2gtk-4.1')
 options=('!strip' '!emptydirs')
 install=${pkgname}.install
-source_x86_64=("https://github.com/${AUR_GITHUB_REPO}/releases/download/v$pkgver/${APP_BINARY_NAME}_"$pkgver"_amd64.deb")
-source_aarch64=("https://github.com/${AUR_GITHUB_REPO}/releases/download/v$pkgver/${APP_BINARY_NAME}_"$pkgver"_arm64.deb")
-sha256sums_x86_64=('${AUR_DEB_SHA256_AMD64}')
-sha256sums_aarch64=('${AUR_DEB_SHA256_ARM64}')
+source_x86_64=("https://github.com/{{githubRepo}}/releases/download/v$pkgver/{{app.binaryName}}_"$pkgver"_amd64.deb")
+source_aarch64=("https://github.com/{{githubRepo}}/releases/download/v$pkgver/{{app.binaryName}}_"$pkgver"_arm64.deb")
+sha256sums_x86_64=('{{deb.sha256.amd64}}')
+sha256sums_aarch64=('{{deb.sha256.arm64}}')
 
 package() {
 

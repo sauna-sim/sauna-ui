@@ -1,9 +1,9 @@
 name: sauna-sim
 base: core24
-title: ${APP_BINARY_NAME}
-website: ${CARGO_PKG_HOMEPAGE}
-version: '${CARGO_PKG_VERSION}'
-summary: ${CARGO_PKG_DESCRIPTION} # 79 char long summary
+title: {{app.binaryName}}
+website: {{app.homepage}}
+version: '{{app.version}}'
+summary: {{app.shortDesc}} # 79 char long summary
 license: GPL-3.0+
 description: |
   SaunaSim is an ATC Training tool that simulates an aircraft with a full FMS and autopilot. The aircraft are
@@ -20,8 +20,8 @@ layout:
 
 apps:
   sauna-sim:
-    command: usr/bin/${APP_BINARY_NAME}
-    desktop: usr/share/applications/${APP_BINARY_NAME}.desktop
+    command: usr/bin/{{app.binaryName}}
+    desktop: usr/share/applications/{{app.binaryName}}.desktop
     extensions: [gnome]
     plugs:
       - network
@@ -49,5 +49,5 @@ parts:
     source: .
     override-build: |
       set -eu
-      dpkg -x ${SNAP_DEB_PATH}/*.deb $SNAPCRAFT_PART_INSTALL/
-      sed -i -e "s|Icon=${APP_BINARY_NAME}|Icon=/usr/share/icons/hicolor/32x32/apps/${APP_BINARY_NAME}.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/${APP_BINARY_NAME}.desktop
+      dpkg -x SaunaSim.deb $SNAPCRAFT_PART_INSTALL/
+      sed -i -e "s|Icon={{app.binaryName}}|Icon=/usr/share/icons/hicolor/32x32/apps/{{app.binaryName}}.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/{{app.binaryName}}.desktop

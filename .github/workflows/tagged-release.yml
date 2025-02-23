@@ -47,6 +47,45 @@ jobs:
       tauri-create-updater: ${{ matrix.tauri-create-updater }}
       api-ref: 'v0.22.4'
     secrets: inherit # Pass all secrets
+  generate-handlebars-variables:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
+    needs: build
+    runs-on:  ubuntu-22.04
+    steps:
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
+      - name: Use Stable Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install toml-cli
+        shell: pwsh
+        run: cargo install toml-cli
+      - name: Generate variables
+        shell: pwsh
+        run: |
+          $env:CARGO_TOML = toml get ${{ github.workspace }}/src-tauri/Cargo.toml .
+          echo @"
+          {
+            "app": {
+              "binaryName": "$(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)",
+              "version": "$(echo $env:CARGO_TOML | jq -r .package.version)",
+              "homepage": "$(echo $env:CARGO_TOML | jq -r .package.homepage)",
+              "shortDesc": "$(echo $env:CARGO_TOML | jq -r .package.description)"
+            },
+            "githubRepo": "${{ github.repository }}",
+            "deb": {
+              "sha256": {
+                "amd64": "${{ needs.build.outputs.deb-sha256-x64 }}",
+                "arm64": "${{ needs.build.outputs.deb-sha256-arm64 }}"
+              }
+            }
+          }
+          "@ > variables.json
+          echo $(cat variables.json)
+      - name: Upload variables.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: variables-json
+          path: variables.json
   create-github-release:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
     runs-on: ubuntu-22.04
@@ -59,33 +98,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: gh release edit ${{ github.ref_name }} --latest --draft=false
-  create-aur-package:
+  publish-aur-package:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
     runs-on: ubuntu-22.04
-    needs: build
+    needs: [generate-handlebars-variables, create-github-release]
     continue-on-error: true
     steps:
       - name: Checkout Sauna UI
         uses: actions/checkout@v4
       - name: Use Stable Rust
         uses: dtolnay/rust-toolchain@stable
-      - name: Install toml-cli
+      - name: Install hbs-cli
         shell: pwsh
-        run: cargo install toml-cli
+        run: cargo install hbs-cli
+      - name: Download variables.json
+        uses: actions/download-artifact@v4
+        with:
+          name: variables-json
       - name: Replace PKGBUILD Variables
         shell: pwsh
         run: |
-          $env:CARGO_TOML = toml get ${{ github.workspace }}/src-tauri/Cargo.toml .
           Copy-Item -Path "${{ github.workspace }}/src-tauri/packageinfo/aur" -Destination "${{ github.workspace }}/aurdefs" -Recurse -Force
-          (Get-Content ${{ github.workspace }}/aurdefs/PKGBUILD).
-            Replace('${CARGO_PKG_VERSION}', $(echo $env:CARGO_TOML | jq -r .package.version)).
-            Replace('${CARGO_PKG_DESCRIPTION}', $(echo $env:CARGO_TOML | jq -r .package.description)).
-            Replace('${CARGO_PKG_HOMEPAGE}', $(echo $env:CARGO_TOML | jq -r .package.homepage)).
-            Replace('${AUR_GITHUB_REPO}', '${{ github.repository }}').
-            Replace('${APP_BINARY_NAME}', $(jq -r .mainBinaryName ${{ github.workspace }}/src-tauri/tauri.conf.json)).
-            Replace('${AUR_DEB_SHA256_AMD64}', '${{ needs.build.outputs.deb-sha256-x64 }}').
-            Replace('${AUR_DEB_SHA256_ARM64}', '${{ needs.build.outputs.deb-sha256-arm64 }}') `
-          | Set-Content ${{ github.workspace }}/aurdefs/PKGBUILD
+          hbs-cli ${{ github.workspace }}/variables.json ${{ github.workspace }}/aurdefs/PKGBUILD | Set-Content -Path ${{ github.workspace }}/aurdefs/PKGBUILD
+          echo $(cat ${{ github.workspace }}/aurdefs/PKGBUILD)
       - name: Publish AUR Package
         uses: KSXGitHub/github-actions-deploy-aur@v3
         with:
@@ -98,6 +133,81 @@ jobs:
           ssh_keyscan_types: rsa,ecdsa,ed25519
           assets: |
             ${{ github.workspace }}/aurdefs/sauna-sim.install
+  publish-snap-package:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
+    needs: [generate-handlebars-variables, create-github-release]
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            deb-arch: amd64
+          - os: ubuntu-22.04-arm
+            deb-arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
+      - name: Use Stable Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install hbs-cli
+        shell: pwsh
+        run: cargo install hbs-cli
+      - name: Download variables.json
+        uses: actions/download-artifact@v4
+        with:
+          name: variables-json
+      - name: Replace snapcraft.yml variables
+        shell: pwsh
+        run: |
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/packageinfo/snapcraft/snapcraft.yaml" -Destination "${{ github.workspace }}" -Force
+          hbs-cli ${{ github.workspace }}/variables.json ${{ github.workspace }}/snapcraft.yaml | Set-Content -Path ${{ github.workspace }}/snapcraft.yaml
+          echo $(cat ${{ github.workspace }}/snapcraft.yaml)
+      - name: Download deb file
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${{ github.ref_name }} -p "$(jq -r .app.binaryName ${{ github.workspace }}/variables.json)_$(jq -r .app.version ${{ github.workspace }}/variables.json)_${{ matrix.deb-arch }}.deb" -O SaunaSim.deb
+      - id: snap-build
+        name: Build Snap
+        uses: snapcore/action-build@v1
+      - name: Publish Snap
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
+        with:
+          snap: ${{ steps.snap-build.outputs.snap }}
+          release: edge
+  publish-flathub-package:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
+    runs-on: ubuntu-22.04
+    needs: [generate-handlebars-variables, create-github-release]
+    continue-on-error: true
+    steps:
+      - name: Checkout Sauna UI
+        uses: actions/checkout@v4
+      - name: Use Stable Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install hbs-cli
+        shell: pwsh
+        run: cargo install hbs-cli
+      - name: Download variables.json
+        uses: actions/download-artifact@v4
+        with:
+          name: variables-json
+      - name: Replace flathub manifest variables
+        shell: pwsh
+        run: |
+          Copy-Item -Path "${{ github.workspace }}/src-tauri/packageinfo/flathub/com.saunasim.saunasim.yml" -Destination "${{ github.workspace }}" -Force
+          hbs-cli ${{ github.workspace }}/variables.json ${{ github.workspace }}/com.saunasim.saunasim.yml | Set-Content -Path ${{ github.workspace }}/com.saunasim.saunasim.yml
+          echo $(cat ${{ github.workspace }}/com.saunasim.saunasim.yml)
+      - name: Upload flathub manifest to release
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.ref_name }} ${{ github.workspace }}/com.saunasim.saunasim.yml --clobber
   cleanup-github-release:
     if: failure()
     runs-on: ubuntu-22.04

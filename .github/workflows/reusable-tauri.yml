@@ -153,30 +153,7 @@ jobs:
         name: Generate DEB SHA256 Checksum
         if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
         shell: pwsh
-        run: echo deb-sha256-${{ inputs.arch }}=$((Get-FileHash -Path ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb -Algorithm SHA256).Hash) >> "$env:GITHUB_OUTPUT"
-      - name: Replace snapcraft.yaml Variables
-        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
-        shell: pwsh
-        run: |
-          $env:CARGO_TOML = toml get ${{ github.workspace }}/src-tauri/Cargo.toml .
-          Copy-Item -Path "${{ github.workspace }}/src-tauri/packageinfo/snapcraft/snapcraft.yaml" -Destination "${{ github.workspace }}" -Force
-          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${CARGO_PKG_VERSION}', '${{ env.CARGO_TOML_PKG_VERSION }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
-          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${CARGO_PKG_DESCRIPTION}', '${{ env.CARGO_TOML_PKG_DESCRIPTION }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
-          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${CARGO_PKG_HOMEPAGE}', '${{ env.CARGO_TOML_PKG_HOMEPAGE }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
-          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${APP_BINARY_NAME}', '${{ env.APP_BINARY_NAME }}') | Set-Content ${{ github.workspace }}/snapcraft.yaml
-          (Get-Content ${{ github.workspace }}/snapcraft.yaml).Replace('${SNAP_DEB_PATH}', 'src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb') | Set-Content ${{ github.workspace }}/snapcraft.yaml
-      - id: snap-build
-        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
-        name: Build Snap
-        uses: snapcore/action-build@v1
-      - name: Publish Snap
-        if: ${{ inputs.short-os == 'linux' && inputs.publish-release }}
-        uses: snapcore/action-publish@v1
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
-        with:
-          snap: ${{ steps.snap-build.outputs.snap }}
-          release: edge
+        run: echo deb-sha256-${{ inputs.arch }}=$((Get-FileHash -Path ${{ github.workspace }}/src-tauri/target/${{ inputs.rust-arch }}-${{ inputs.rust-os }}/release/bundle/deb/*.deb -Algorithm SHA256).Hash.ToLower()) >> "$env:GITHUB_OUTPUT"
       - name: Tar Gzip Build
         if: ${{ inputs.publish-release }}
         shell: pwsh
