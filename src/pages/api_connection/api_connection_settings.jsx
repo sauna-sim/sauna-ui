@@ -54,8 +54,8 @@ export const ApiConnectionSettings = ({}) => {
                       isSubmitting,
                   }) => (
                     <form onSubmit={handleSubmit} noValidate={true} className={"m-3"}>
-                        <div className={"formgrid grid"}>
-                            <div className={"field sm:col-7 col-12 mt-3"}>
+                        <div className={"grid grid-cols-12 gap-2"}>
+                            <div className={"sm:col-span-7 col-span-12 mt-3"}>
                                 <FloatLabel>
                                     <InputText
                                         className={"w-full"}
@@ -71,7 +71,7 @@ export const ApiConnectionSettings = ({}) => {
                                 </FloatLabel>
                                 <FormikPrErrorMessage name={"hostName"} />
                             </div>
-                            <div className={"field sm:col-3 col-12 mt-3"}>
+                            <div className={"sm:col-span-3 col-span-12 mt-3"}>
                                 <FloatLabel>
                                     <InputText
                                         className={"w-full"}
@@ -88,7 +88,7 @@ export const ApiConnectionSettings = ({}) => {
                                 </FloatLabel>
                                 <FormikPrErrorMessage name={"port"} />
                             </div>
-                            <div className={"sm:col-2 col-12 sm:mt-3"}>
+                            <div className={"sm:col-span-2 col-span-12 sm:mt-3"}>
                                 <Button className={"w-full"} type={"submit"} loading={isSubmitting}>
                                     <div className={"m-auto"}>Save</div>
                                 </Button>

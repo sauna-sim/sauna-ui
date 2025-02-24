@@ -9,7 +9,7 @@ export const AircraftPage = ({}) => {
         <div className={"p-2 h-full"} style={{overflow: "auto"}}>
             <h2>Aircraft</h2>
             <div
-                className={"p-datatable p-component p-datatable-scrollable p-datatable-responsive-scroll flex flex-column"}
+                className={"p-datatable p-component p-datatable-scrollable p-datatable-responsive-scroll flex flex-col"}
                 data-showgridlines="false">
                 <div className={"p-datatable-wrapper"}>
                     <table className={"p-datatable-table p-datatable-scrollable-table"}>

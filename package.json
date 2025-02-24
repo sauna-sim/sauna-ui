@@ -23,9 +23,9 @@
   },
   "homepage": "https://saunasim.com",
   "devDependencies": {
+    "@tailwindcss/vite": "^4.0.8",
     "@tauri-apps/cli": "^2.2.7",
     "@vitejs/plugin-react": "^4.3.4",
-    "sass": "^1.85.0",
     "vite": "^6.1.1"
   },
   "dependencies": {
@@ -33,7 +33,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@navigraph/pkce": "^1.0.3",
-    "@reduxjs/toolkit": "^2.5.1",
+    "@reduxjs/toolkit": "^2.6.0",
     "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",
@@ -46,12 +46,13 @@
     "formik": "^2.4.6",
     "lodash": "^4.17.21",
     "maplibre-gl": "^5.1.1",
-    "primeflex": "^4.0.0",
     "primereact": "^10.9.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.2.0",
+    "react-router": "^7.2.0",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss": "^4.0.8",
     "yup": "^1.6.1"
   }
 }

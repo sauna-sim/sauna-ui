@@ -92,7 +92,7 @@ export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, chil
                                 }}
                                 label={"Select All"}
                             />
-                            <div className={"flex flex-column gap-1"}>
+                            <div className={"flex flex-col gap-1"}>
                                 {Object.keys(availValues).map((key) => (
                                     <div className={"flex"} key={key}>
                                         <Checkbox

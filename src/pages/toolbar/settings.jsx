@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from "react";
-import {Formik, getIn} from "formik";
-import {getApiSettings, getFsdSettings, getStoreItem, saveApiSettings, saveFsdSettings, storeSave} from "../../actions/local_store_actions.js";
-import {getFsdProtocolRevisions} from "../../actions/enum_actions.js";
-import {updateServerSettings} from "../../actions/data_actions.js";
+import React, { useEffect, useState } from "react";
+import { Formik, getIn } from "formik";
+import { getApiSettings, getFsdSettings, getStoreItem, saveApiSettings, saveFsdSettings, storeSave } from "../../actions/local_store_actions.js";
+import { getFsdProtocolRevisions } from "../../actions/enum_actions.js";
+import { updateServerSettings } from "../../actions/data_actions.js";
 import * as Yup from "yup";
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
-import {Button} from "primereact/button";
-import {Dialog} from "primereact/dialog";
-import {InputText} from "primereact/inputtext";
-import {Dropdown} from "primereact/dropdown";
-import {Password} from "primereact/password";
-import {InputMask} from "primereact/inputmask";
-import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGear } from "@fortawesome/free-solid-svg-icons/faGear";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
+import { Password } from "primereact/password";
+import { InputMask } from "primereact/inputmask";
+import { FormikPrErrorMessage } from "../../components/primereact_form.jsx";
 
-export const SettingsModal = ({}) => {
+export const SettingsModal = ({ }) => {
     const [showModal, setShowModal] = useState(false);
     const [protocolRevisions, setProtocolRevisions] = useState([]);
     const [uiSettings, setUiSettings] = useState(null);
@@ -64,7 +64,7 @@ export const SettingsModal = ({}) => {
         severity={"secondary"}
         onClick={open}
         size={"small"}
-        icon={(options) => <FontAwesomeIcon icon={faGear} {...options.iconProps}/>}/>;
+        icon={(options) => <FontAwesomeIcon icon={faGear} {...options.iconProps} />} />;
 
     if (!uiSettings) {
         return getButton();
@@ -103,26 +103,26 @@ export const SettingsModal = ({}) => {
                 closable={false}
                 closeOnEscape={false}
                 header={"Settings"}
-                style={{width: '50vw'}}
+                style={{ width: '50vw' }}
                 visible={showModal}>
                 <Formik
                     initialValues={uiSettings}
                     onSubmit={onSubmit}
                     validationSchema={formSchema}>
                     {({
-                          values,
-                          errors,
-                          touched,
-                          handleChange,
-                          handleBlur,
-                          handleSubmit,
-                          isSubmitting,
-                          setFieldValue
-                      }) => (
+                        values,
+                        errors,
+                        touched,
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        isSubmitting,
+                        setFieldValue
+                    }) => (
                         <form onSubmit={handleSubmit} noValidate={true}>
                             <h5>Sauna API Server Settings</h5>
-                            <div className={"formgrid grid"}>
-                                <div className={"field col-12 md:col-6"}>
+                            <div className={"grid grid-cols-12 gap-2"}>
+                                <div className={"col-span-12 md:col-span-6"}>
                                     <label htmlFor={"settingsFormPosCalcRate"}>Position Calculation Rate</label>
                                     <div className={"p-inputgroup flex-1"}>
                                         <InputText
@@ -138,7 +138,7 @@ export const SettingsModal = ({}) => {
                                     </div>
                                     <FormikPrErrorMessage name={"apiSettings.posCalcRate"} />
                                 </div>
-                                <div className={"field col-12 md:col-6"}>
+                                <div className={"col-span-12 md:col-span-6"}>
                                     <label htmlFor={"settingsFormCommandFrequency"}>Command Frequency</label>
                                     <div className={"p-inputgroup flex-1"}>
                                         <InputMask
@@ -157,8 +157,8 @@ export const SettingsModal = ({}) => {
                             </div>
 
                             <h5>FSD Connection Info</h5>
-                            <div className={"formgrid grid"}>
-                                <div className={"field col-12 md:col-5"}>
+                            <div className={"grid grid-cols-12 gap-2"}>
+                                <div className={"col-span-12 md:col-span-5"}>
                                     <label htmlFor={"settingsFormFsdHostName"}>Hostname</label>
                                     <InputText
                                         className={"w-full"}
@@ -172,7 +172,7 @@ export const SettingsModal = ({}) => {
                                     />
                                     <FormikPrErrorMessage name={"fsdConnection.hostname"} />
                                 </div>
-                                <div className={"field col-12 md:col-3"}>
+                                <div className={"col-span-12 md:col-span-3"}>
                                     <label htmlFor={"settingsFormFsdPort"}>Port</label>
                                     <InputText
                                         className={"w-full"}
@@ -186,10 +186,10 @@ export const SettingsModal = ({}) => {
                                     />
                                     <FormikPrErrorMessage name={"fsdConnection.port"} />
                                 </div>
-                                <div className={"field col-12 md:col-4"}>
+                                <div className={"col-span-12 md:col-span-4"}>
                                     <label htmlFor={"settingsFormFsdProtocol"}>Protocol Version</label>
                                     <Dropdown
-                                        className={"w-full"}
+                                        pt={{ root: () => ({ className: "md:w-full" }) }}
                                         id={"settingsFormFsdProtocol"}
                                         name="fsdConnection.protocol"
                                         value={values.fsdConnection.protocol}
@@ -197,8 +197,8 @@ export const SettingsModal = ({}) => {
                                         options={protocolRevisions} />
                                 </div>
                             </div>
-                            <div className={"formgrid grid"}>
-                                <div className={"field col-12 md:col-6"}>
+                            <div className={"grid grid-cols-12 gap-2 mt-2"}>
+                                <div className={"col-span-12 md:col-span-6"}>
                                     <label htmlFor={"settingsFormFsdNid"}>Network ID</label>
                                     <InputText
                                         className={"w-full"}
@@ -212,7 +212,7 @@ export const SettingsModal = ({}) => {
                                     />
                                     <FormikPrErrorMessage name={"fsdConnection.networkId"} />
                                 </div>
-                                <div className={"field col-12 md:col-6"}>
+                                <div className={"col-span-12 md:col-span-6"}>
                                     <label htmlFor={"settingsFormFsdPass"}>Password</label>
                                     <Password
                                         className={"w-full"}
@@ -225,15 +225,15 @@ export const SettingsModal = ({}) => {
                                         onBlur={handleBlur}
                                         feedback={false}
                                         toggleMask={true}
-                                        pt={{iconField: {root: {className: "w-full"}}}}
+                                        pt={{ iconField: { root: { className: "w-full" } } }}
                                         invalid={getIn(touched, "fsdConnection.password") && getIn(errors, "fsdConnection.password")}
                                     />
                                     <FormikPrErrorMessage name={"fsdConnection.password"} />
                                 </div>
                             </div>
-                            <div className={"formgrid grid justify-content-end mr-1"}>
-                                <Button type={"button"} severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} className={"mr-2"}/>
-                                <Button type="submit" loading={isSubmitting} label={"Save"}/>
+                            <div className={"flex justify-end gap-2 mt-2"}>
+                                <Button type={"button"} severity="secondary" onClick={close} disabled={isSubmitting} label={"Close"} />
+                                <Button type="submit" loading={isSubmitting} label={"Save"} />
                             </div>
                         </form>
                     )}

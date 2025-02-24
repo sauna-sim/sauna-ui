@@ -1,0 +1,34 @@
+@import "tailwindcss/theme.css" layer(tailwind-theme);
+@import "./sauna-theme.css" layer(tailwind-theme);
+@import "tailwindcss/preflight.css" layer(tailwind-base);
+@import "tailwindcss/utilities" layer(tailwind-utilities);
+
+/* Scan PrimeReact files */
+@source "../../../node_modules/primereact";
+
+@layer tailwind-theme, tailwind-base, primereact, tailwind-components, tailwind-utilities;
+
+/* // FMA/PFD Colors */
+.pfd-selected {
+  color: var(--cyan-500);
+}
+
+.pfd-managed {
+  color: var(--pink-700);
+}
+
+.pfd-measured {
+  color: var(--green-500);
+}
+
+.fma-active-conv {
+  color: var(--green-500);
+}
+
+.fma-active-fms {
+  color: var(--pink-700);
+}
+
+.fma-armed {
+  color: #ffffff;
+}

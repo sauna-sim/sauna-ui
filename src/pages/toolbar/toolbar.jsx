@@ -95,7 +95,7 @@ export const MainToolbar = ({}) => {
         return (
             <>
                 {pauseButton}
-                <div className={"p-inputgroup flex-1 mr-2"}>
+                <div className={"p-inputgroup flex-1"}>
                     <InputNumber
                         style={{width: "50px"}}
                         value={simState.simRate}
@@ -110,7 +110,6 @@ export const MainToolbar = ({}) => {
                 </div>
                 <Button
                     severity="danger"
-                    className="mr-2"
                     onClick={removeAllAircraft}
                     icon={(options) => <FontAwesomeIcon icon={faTrash} {...options.iconProps}/>}
                     label={"All"}
@@ -123,32 +122,29 @@ export const MainToolbar = ({}) => {
         <>
             <Toolbar
                 className={"m-2"}
-                start={<div className={"flex flex-wrap"}>
+                start={<div className={"flex flex-wrap gap-2"}>
                     {getSimStateActions()}
                 </div>}
-                end={<div className={"flex flex-wrap"}>
+                end={<div className={"flex flex-wrap gap-2"}>
                     <Button
                         onClick={createSaunaScenarioMakerWindow}
                         tooltip={"Open Sauna Scenario Maker"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                        className={"mr-2"}
                         label={"Scenario Maker"}/>
                     <Button
                         severity={"secondary"}
                         onClick={createCommandWindow}
                         tooltip={"Open Command Window"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                        className={"mr-2"}
                         icon={(options) => <FontAwesomeIcon icon={faMessage} {...options.iconProps}/>}/>
                     <Button
                         severity={"secondary"}
                         onClick={openMapPage}
                         tooltip={"Open Map Window"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                        className={"mr-2"}
                         icon={(options) => <FontAwesomeIcon icon={faMap} {...options.iconProps}/>}/>
 
-                    <ButtonGroup className={"mr-2"} size={"small"}>
+                    <ButtonGroup size={"small"}>
                         <NavigraphAuthButton/>
                         <SectorFilesButton/>
                     </ButtonGroup>
@@ -170,7 +166,6 @@ export const MainToolbar = ({}) => {
                     <Button
                         icon={(options) => <FontAwesomeIcon icon={faPlane} {...options.iconProps}/>}
                         label={<>Scenario <FontAwesomeIcon icon={faChevronDown}/></>}
-                        className={"mr-2"}
                         onClick={(event) => scenarioMenu.current.toggle(event)}
                     />
                     <SettingsModal/>

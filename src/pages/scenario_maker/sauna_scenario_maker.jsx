@@ -10,7 +10,7 @@ export default function SaunaScenarioMaker() {
 
     return (
         <TabView
-            className={"h-screen flex flex-column"}
+            className={"h-screen flex flex-col"}
             panelContainerClassName={"flex-grow-1"}
             activeIndex={key}
             onTabChange={(k) => setKey(k.index)}

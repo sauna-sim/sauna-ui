@@ -6,8 +6,8 @@ export const ApiConnectionPage = ({usingBuiltIn}) => {
         <>
             <div>
                 {!usingBuiltIn && <ApiConnectionSettings/>}
-                <div className={"text-center sm:absolute sm:bottom-50 sm:w-screen sm:left-0"}>
-                    <h1>Trying to connect to Sauna API...</h1>
+                <div className={"text-center sm:absolute sm:bottom-1/2 sm:w-screen sm:left-0"}>
+                    <h1 className={"text-4xl font-bold"}>Trying to connect to Sauna API...</h1>
                 </div>
             </div>
         </>
