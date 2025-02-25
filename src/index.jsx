@@ -9,8 +9,8 @@ import SaunaScenarioMaker from './pages/scenario_maker/sauna_scenario_maker';
 import { MapPage } from './pages/map/map';
 import { CommandWindow } from "./pages/command_window/command_window.jsx";
 import { PrimeReactProvider } from "primereact/api";
-import Tailwind from "primereact/passthrough/tailwind";
 import { twMerge } from 'tailwind-merge';
+import SaunaPrimeReactTailwind from './components/primereact_tailwind.js';
 
 // React DOM Render
 const root = createRoot(document.getElementById('root'));
@@ -19,7 +19,7 @@ root.render(
         <Provider store={store}>
             <PrimeReactProvider value={{
                 unstyled: true,
-                pt: Tailwind,
+                pt: SaunaPrimeReactTailwind,
                 ptOptions: { mergeSections: true, mergeProps: true, classNameMergeFunction: twMerge }
             }}>
                 <HashRouter>

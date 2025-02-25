@@ -13,6 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Password } from "primereact/password";
 import { InputMask } from "primereact/inputmask";
 import { FormikPrErrorMessage } from "../../components/primereact_form.jsx";
+import { InputGroup, InputGroupAddon } from "../../components/primereact_tailwind.js";
 
 export const SettingsModal = ({ }) => {
     const [showModal, setShowModal] = useState(false);
@@ -120,28 +121,30 @@ export const SettingsModal = ({ }) => {
                         setFieldValue
                     }) => (
                         <form onSubmit={handleSubmit} noValidate={true}>
-                            <h5>Sauna API Server Settings</h5>
-                            <div className={"grid grid-cols-12 gap-2"}>
+                            <h5 className={"text-xl"}>Sauna API Server Settings</h5>
+                            <div className={"grid grid-cols-12 gap-2 mt-2"}>
                                 <div className={"col-span-12 md:col-span-6"}>
                                     <label htmlFor={"settingsFormPosCalcRate"}>Position Calculation Rate</label>
-                                    <div className={"p-inputgroup flex-1"}>
+                                    <div className={`w-full ${InputGroup}`}>
                                         <InputText
                                             id={"settingsFormPosCalcRate"}
                                             name="apiSettings.posCalcRate"
+                                            className={"flex-1 w-full"}
                                             disabled={true}
                                             value={values.apiSettings.posCalcRate}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             invalid={getIn(touched, "apiSettings.posCalcRate") && getIn(errors, "apiSettings.posCalcRate")}
                                         />
-                                        <span className={"p-inputgroup-addon"}>ms</span>
+                                        <span className={InputGroupAddon}>ms</span>
                                     </div>
                                     <FormikPrErrorMessage name={"apiSettings.posCalcRate"} />
                                 </div>
                                 <div className={"col-span-12 md:col-span-6"}>
                                     <label htmlFor={"settingsFormCommandFrequency"}>Command Frequency</label>
-                                    <div className={"p-inputgroup flex-1"}>
+                                    <div className={`w-full ${InputGroup}`}>
                                         <InputMask
+                                            className={"flex-1 w-full"}
                                             id={"settingsFormCommandFrequency"}
                                             name="apiSettings.commandFrequency"
                                             value={values.apiSettings.commandFrequency}
@@ -150,14 +153,14 @@ export const SettingsModal = ({ }) => {
                                             mask={"999.99?9"}
                                             invalid={getIn(touched, "apiSettings.commandFrequency") && getIn(errors, "apiSettings.commandFrequency")}
                                         />
-                                        <span className={"p-inputgroup-addon"}>MHz</span>
+                                        <span className={InputGroupAddon}>MHz</span>
                                     </div>
                                     <FormikPrErrorMessage name={"apiSettings.commandFrequency"} />
                                 </div>
                             </div>
 
-                            <h5>FSD Connection Info</h5>
-                            <div className={"grid grid-cols-12 gap-2"}>
+                            <h5 className={"text-xl mt-5"}>FSD Connection Info</h5>
+                            <div className={"grid grid-cols-12 gap-2 mt-2"}>
                                 <div className={"col-span-12 md:col-span-5"}>
                                     <label htmlFor={"settingsFormFsdHostName"}>Hostname</label>
                                     <InputText
@@ -189,7 +192,7 @@ export const SettingsModal = ({ }) => {
                                 <div className={"col-span-12 md:col-span-4"}>
                                     <label htmlFor={"settingsFormFsdProtocol"}>Protocol Version</label>
                                     <Dropdown
-                                        pt={{ root: () => ({ className: "md:w-full" }) }}
+                                        className={"w-full"}
                                         id={"settingsFormFsdProtocol"}
                                         name="fsdConnection.protocol"
                                         value={values.fsdConnection.protocol}

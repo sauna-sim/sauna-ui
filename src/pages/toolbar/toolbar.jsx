@@ -18,6 +18,7 @@ import {pauseall, removeAllAircraft, setAllSimRate, unpauseall} from "../../acti
 import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useSelector} from "react-redux";
 import {InputNumber} from "primereact/inputnumber";
+import { InputGroup, InputGroupAddon } from "../../components/primereact_tailwind.js";
 
 export const MainToolbar = ({}) => {
     const scenarioMenu = useRef(null);
@@ -95,16 +96,17 @@ export const MainToolbar = ({}) => {
         return (
             <>
                 {pauseButton}
-                <div className={"p-inputgroup flex-1"}>
+                <div className={`w-20 ${InputGroup}`}>
                     <InputNumber
-                        style={{width: "50px"}}
+                        className={"[&>input]:rounded-none [&>input]:rounded-l-md"}
+                        inputClassName={"w-full"}
                         value={simState.simRate}
                         onValueChange={async (e) => setAllSimRate(e.value)}
                         minFractionDigits={0}
                         maxFractionDigits={1}
                         min={0.1}
                         max={8} />
-                    <span className={"p-inputgroup-addon"}>
+                    <span className={InputGroupAddon}>
                         x
                     </span>
                 </div>
