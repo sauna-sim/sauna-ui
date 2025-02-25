@@ -1572,7 +1572,7 @@ const SaunaPrimeReactTailwind = {
             className: 'py-3 px-5 border-b border-inherit bg-gray-50 dark:bg-gray-800 m-0 rounded-t-lg flex items-center justify-between'
         },
         filtercontainer: {
-            className: classNames('relative')
+            className: classNames('relative mr-1')
         },
         filter: {
             className: classNames(
@@ -1589,7 +1589,14 @@ const SaunaPrimeReactTailwind = {
             className: classNames('absolute top-1/2 -mt-2', 'right-2 text-gray-600 dark:text-white/70')
         },
         closeButton: {
-            className: 'w-8 h-8 border-none bg-transparent rounded-full flex items-center justify-center shrink-0 overflow-hidden relative ml-auto transition hover:border-transparent hover:bg-gray-200 text-gray-500'
+            className: classNames(
+                'flex items-center justify-center overflow-hidden relative cursor-pointer',
+                'w-8 h-8 text-gray-500 border-0 bg-transparent rounded-full transition duration-200 ease-in-out mr-2 last:mr-0',
+                'hover:text-gray-700 hover:border-transparent hover:bg-gray-200',
+                'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]', // focus
+                'dark:hover:text-white/80 dark:hover:border-transparent dark:hover:bg-gray-700/80 dark:focus:shadow-[inset_0_0_0_0.2rem_rgba(147,197,253,0.5)]'
+            )
+            //className: 'w-8 h-8 border-none bg-transparent rounded-full flex items-center justify-center shrink-0 overflow-hidden relative ml-auto transition hover:border-transparent hover:bg-gray-200 text-gray-500'
         },
         transition: TRANSITIONS.overlay
     },
@@ -2527,19 +2534,19 @@ const SaunaPrimeReactTailwind = {
     },
     tree: {
         root: ({ props }) => ({
-            className: classNames('max-w-[30rem] md:w-full', 'bg-white dark:bg-gray-900 text-gray-700 dark:text-white/80 p-5', {
+            className: classNames('max-w-[30rem] md:w-full', 'bg-white dark:bg-gray-900 text-gray-700 dark:text-white/80 p-2', {
                 'border border-solid border-gray-300 dark:border-blue-900/40 rounded-md': props.__parentMetadata?.parent.props.__TYPE !== 'TreeSelect'
             })
         }),
         wrapper: 'overflow-auto',
         container: 'm-0 p-0 list-none overflow-auto',
-        node: 'p-1 outline-none',
+        node: 'p-0 outline-none',
         content: ({ context, props }) => ({
             className: classNames(
                 'flex items-center',
-                'rounded-lg transition-shadow duration-200 p-2',
+                'rounded-lg transition-shadow duration-200 p-1',
                 'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)] dark:focus:shadow-[0_0_0_0.2rem_rgba(147,197,253,0.5)]',
-                { 'bg-blue-50 text-blue-600': context.selected },
+                { 'bg-blue-400 text-white dark:text-white/80': context.selected },
                 { 'cursor-pointer select-none': props.selectionMode == 'single' || props.selectionMode == 'multiple' }
             )
         }),
@@ -2550,7 +2557,7 @@ const SaunaPrimeReactTailwind = {
                 'hover:border-transparent focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)] dark:focus:shadow-[0_0_0_0.2rem_rgba(147,197,253,0.5)]',
                 {
                     'text-gray-500 dark:text-white/80 hover:bg-gray-200 dark:hover:bg-gray-800/80  hover:text-gray-800 dark:hover:text-white/80': !context.selected,
-                    'text-blue-600 hover:bg-white/30': context.selected
+                    'bg-blue-400 text-white dark:text-white/80 hover:bg-white/30': context.selected
                 },
                 {
                     invisible: context.leaf

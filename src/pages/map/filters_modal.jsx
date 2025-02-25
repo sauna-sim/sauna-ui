@@ -104,8 +104,8 @@ export const FiltersModal = ({display, visibleFeatures, setVisibleFeatures, chil
                                     </div>
                                 ))}
                             </div>
-                            <div className={"formgrid grid justify-content-end mr-1"}>
-                                <Button type={"button"} severity="secondary" onClick={handleClose} disabled={isSubmitting} label={"Cancel"} className={"mr-3"}/>
+                            <div className={"flex gap-2 justify-end pr-1"}>
+                                <Button type={"button"} severity="secondary" onClick={handleClose} disabled={isSubmitting} label={"Cancel"}/>
                                 <Button type="submit" loading={isSubmitting} label={"Apply"}/>
                             </div>
                         </form>

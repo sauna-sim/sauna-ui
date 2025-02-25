@@ -167,20 +167,16 @@ export const AircraftRow = ({callsign}) => {
 
     const getFma = () => {
         return <>
-            <div className={"flex flex-row"}>
-
-            </div>
-            <div className={"flex flex-row"}>
-                <div className={"col fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</div>
-                <div
-                    className={isModeFms(aircraft.autopilot.currentLateralMode) ? "col fma-active-fms" : "col fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</div>
-                <div
-                    className={isModeFms(aircraft.autopilot.currentVerticalMode) ? "col fma-active-fms" : "col fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</div>
-            </div>
-            <div className={"flex flex-row"}>
-                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedThrustModes)}</div>
-                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedLateralModes)}</div>
-                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedVerticalModes)}</div>
+            <div className="grid grid-cols-3 gap-2 justify-items-center items-center min-w-40">
+                <div />
+                <div />
+                <div />
+                <div className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</div>
+                <div className={isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</div>
+                <div className={isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</div>
+                <div className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedThrustModes)}</div>
+                <div className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedLateralModes)}</div>
+                <div className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedVerticalModes)}</div>
             </div>
         </>
     }
@@ -196,7 +192,7 @@ export const AircraftRow = ({callsign}) => {
         return <tr/>
     }
 
-    return <tr>
+    return <tr className="border-b-1 border-inherit [&>td]:p-2">
         <td>{getAircraftActions()}</td>
         <td>{aircraft.callsign}</td>
         <td>
@@ -233,7 +229,7 @@ export const AircraftRow = ({callsign}) => {
         <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
         <td>{`${round(aircraft.position.altimeterSetting.hectopascals)}hPa`}</td>
         <td>{`${round(aircraft.position.windDirection.degrees)} @ ${round(aircraft.position.windSpeed.knots)}kts`}</td>
-        <td><div style={{overflow: "auto", height: "100px"}}>{aircraft.fms.asString}</div></td>
+        <td><div className="overflow-auto max-h-5">{aircraft.fms.asString}</div></td>
         <td><AircraftDetail aircraft={aircraft}/></td>
     </tr>
 }

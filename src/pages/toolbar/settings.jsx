@@ -64,7 +64,6 @@ export const SettingsModal = ({ }) => {
     const getButton = () => <Button
         severity={"secondary"}
         onClick={open}
-        size={"small"}
         icon={(options) => <FontAwesomeIcon icon={faGear} {...options.iconProps} />} />;
 
     if (!uiSettings) {

@@ -10,23 +10,23 @@
 
 /* // FMA/PFD Colors */
 .pfd-selected {
-  color: var(--cyan-500);
+  color: var(--color-cyan-500);
 }
 
 .pfd-managed {
-  color: var(--pink-700);
+  color: var(--color-pink-700);
 }
 
 .pfd-measured {
-  color: var(--green-500);
+  color: var(--color-green-500);
 }
 
 .fma-active-conv {
-  color: var(--green-500);
+  color: var(--color-green-500);
 }
 
 .fma-active-fms {
-  color: var(--pink-700);
+  color: var(--color-pink-700);
 }
 
 .fma-armed {

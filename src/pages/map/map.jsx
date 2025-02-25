@@ -150,20 +150,14 @@ export const MapPage = () => {
 
     return (
         <>
-            <div style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100vh",
-                width: "100vw"
-            }}>
+            <div className={"flex flex-col w-screen h-screen"}>
                 <Toolbar
                     className={"m-2"}
-                    start={<h4 className={"m-0"}>{curDisplay.fullName}</h4>}
+                    start={<h4 className={"m-0 text-lg"}>{curDisplay.fullName}</h4>}
                     end={
-                        <div className={"flex flex-wrap"}>
+                        <div className={"flex flex-wrap gap-2"}>
                             {facilities &&
                                 <TreeSelect
-                                    className={"mr-2"}
                                     filter={true}
                                     value={facilityIndex}
                                     onChange={onFacilityDropdownChange}
@@ -176,7 +170,6 @@ export const MapPage = () => {
                             {facilities && curDisplay && curDisplay.facility &&
                                 <>
                                     <Dropdown
-                                        className={"mr-2"}
                                         value={displayIndex}
                                         onChange={(e) => setDisplayIndex(e.value)}
                                         options={curDisplay.facility.displays.map((disp, key) => {
@@ -193,12 +186,12 @@ export const MapPage = () => {
                             {facilities && curDisplay &&
                                 <FiltersModal visibleFeatures={visibleFeatures} setVisibleFeatures={setVisibleFeatures} display={curDisplay}>
                                     {({handleShow}) => (
-                                        <Button severity="secondary" onClick={handleShow} label={"Filters"} className={"mr-2"}/>
+                                        <Button severity="secondary" onClick={handleShow} label={"Filters"}/>
                                     )}
                                 </FiltersModal>
                             }
                             {facilities &&
-                                <Button onClick={handleSavePackage} label={"Save"} className={"mr-2"}/>
+                                <Button onClick={handleSavePackage} label={"Save"}/>
                             }
                             <Button
                                 label={<>Load <FontAwesomeIcon icon={faChevronDown}/></>}
@@ -219,7 +212,7 @@ export const MapPage = () => {
                         </div>
                     }
                 />
-                <div style={{flexGrow: "1"}}>
+                <div className={"flex-1"}>
                     <MapLibre features={curDisplay.mapData} zoom={mapZoom} center={mapCenter} rotation={mapRotation}/>
                 </div>
             </div>
