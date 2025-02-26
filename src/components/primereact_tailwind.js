@@ -299,7 +299,7 @@ const SaunaPrimeReactTailwind = {
     },
     dialog: {
         root: ({ state }) => ({
-            className: classNames('rounded-lg shadow-lg border-0', 'max-h-[90%] transform scale-100', 'm-0 w-[50vw]', 'dark:border dark:border-blue-900/40', {
+            className: classNames('rounded-lg shadow-lg border-0', 'max-h-[90%] transform scale-100 flex flex-col', 'm-0 w-[50vw]', 'dark:border dark:border-gray-800', {
                 'transition-none transform-none !w-screen !h-screen !max-h-full !top-0 !left-0': state.maximized
             })
         }),
@@ -319,7 +319,7 @@ const SaunaPrimeReactTailwind = {
         },
         closeButtonIcon: 'w-4 h-4 inline-block',
         content: ({ props, state }) => ({
-            className: classNames('overflow-y-auto', 'bg-white text-gray-700 px-6 pb-8 pt-0', { 'rounded-bl-lg rounded-br-lg': !props.footer }, 'dark:bg-gray-900  dark:text-white/80 ', {
+            className: classNames('overflow-y-auto grow', 'bg-white text-gray-700 px-6 pb-8 pt-0', { 'rounded-bl-lg rounded-br-lg': !props.footer }, 'dark:bg-gray-900  dark:text-white/80 ', {
                 grow: state.maximized
             })
         }),
