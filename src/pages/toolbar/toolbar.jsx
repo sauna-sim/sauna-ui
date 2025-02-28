@@ -18,6 +18,7 @@ import {pauseall, removeAllAircraft, setAllSimRate, unpauseall} from "../../acti
 import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useSelector} from "react-redux";
 import {InputNumber} from "primereact/inputnumber";
+import { InputGroup, InputGroupAddon } from "../../components/primereact_tailwind.js";
 
 export const MainToolbar = ({}) => {
     const scenarioMenu = useRef(null);
@@ -95,22 +96,22 @@ export const MainToolbar = ({}) => {
         return (
             <>
                 {pauseButton}
-                <div className={"p-inputgroup flex-1 mr-2"}>
+                <div className={`w-20 ${InputGroup}`}>
                     <InputNumber
-                        style={{width: "50px"}}
+                        className={"[&>input]:rounded-none [&>input]:rounded-l-md"}
+                        inputClassName={"w-full"}
                         value={simState.simRate}
                         onValueChange={async (e) => setAllSimRate(e.value)}
                         minFractionDigits={0}
                         maxFractionDigits={1}
                         min={0.1}
                         max={8} />
-                    <span className={"p-inputgroup-addon"}>
+                    <span className={InputGroupAddon}>
                         x
                     </span>
                 </div>
                 <Button
                     severity="danger"
-                    className="mr-2"
                     onClick={removeAllAircraft}
                     icon={(options) => <FontAwesomeIcon icon={faTrash} {...options.iconProps}/>}
                     label={"All"}
@@ -123,32 +124,29 @@ export const MainToolbar = ({}) => {
         <>
             <Toolbar
                 className={"m-2"}
-                start={<div className={"flex flex-wrap"}>
+                start={<div className={"flex flex-wrap gap-2"}>
                     {getSimStateActions()}
                 </div>}
-                end={<div className={"flex flex-wrap"}>
+                end={<div className={"flex flex-wrap gap-2"}>
                     <Button
                         onClick={createSaunaScenarioMakerWindow}
                         tooltip={"Open Sauna Scenario Maker"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                        className={"mr-2"}
                         label={"Scenario Maker"}/>
                     <Button
                         severity={"secondary"}
                         onClick={createCommandWindow}
                         tooltip={"Open Command Window"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                        className={"mr-2"}
                         icon={(options) => <FontAwesomeIcon icon={faMessage} {...options.iconProps}/>}/>
                     <Button
                         severity={"secondary"}
                         onClick={openMapPage}
                         tooltip={"Open Map Window"}
                         tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
-                        className={"mr-2"}
                         icon={(options) => <FontAwesomeIcon icon={faMap} {...options.iconProps}/>}/>
 
-                    <ButtonGroup className={"mr-2"} size={"small"}>
+                    <ButtonGroup size={"small"}>
                         <NavigraphAuthButton/>
                         <SectorFilesButton/>
                     </ButtonGroup>
@@ -170,7 +168,6 @@ export const MainToolbar = ({}) => {
                     <Button
                         icon={(options) => <FontAwesomeIcon icon={faPlane} {...options.iconProps}/>}
                         label={<>Scenario <FontAwesomeIcon icon={faChevronDown}/></>}
-                        className={"mr-2"}
                         onClick={(event) => scenarioMenu.current.toggle(event)}
                     />
                     <SettingsModal/>

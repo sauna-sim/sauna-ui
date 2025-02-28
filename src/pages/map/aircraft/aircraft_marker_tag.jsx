@@ -128,12 +128,11 @@ export const AircraftMarkerTag = ({aircraft, map, offset, onOffsetChange, onSize
         onPointerLeave={handleMouseUp}
         onClick={(e) => e.preventDefault()}
     >
-        <div ref={tagRef} className={"p-1"} style={{
+        <div ref={tagRef} className={"p-1 font-mono"} style={{
             position: "absolute",
             left: 0,
             top: 0,
             background: "rgba(50, 50, 50, 0.25)",
-            fontFamily: "var(--font-family-monospace)",
             lineHeight: "1rem",
             whiteSpace: "nowrap",
         }}>

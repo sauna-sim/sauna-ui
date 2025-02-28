@@ -8,7 +8,7 @@
 [actions]: https://github.com/sauna-sim/sauna-ui/actions?query=branch%3Amaster
 [Changelog Img]: https://img.shields.io/badge/Changelog-blue
 [changelog]: CHANGELOG.md
-[License Img]: https://img.shields.io/badge/License-GPLv3-blue
+[License Img]: https://img.shields.io/badge/License-LGPLv3-blue
 [license]: LICENSE
 [Latest Version]: https://img.shields.io/github/v/release/sauna-sim/sauna-ui?include_prereleases
 [githubreleases]: https://github.com/sauna-sim/sauna-ui/releases/latest

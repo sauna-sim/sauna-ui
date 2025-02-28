@@ -3,6 +3,6 @@ import {ErrorMessage} from "formik";
 
 export const FormikPrErrorMessage = ({name}) => (
     <ErrorMessage name={name}>
-        {msg => <small className={"p-error"}>{msg}</small> }
+        {msg => <small className={"text-red-500"}>{msg}</small> }
     </ErrorMessage>
 );

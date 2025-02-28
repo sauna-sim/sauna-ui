@@ -96,12 +96,12 @@ export const Updater = () => {
                 const percent = round(downloadSize ? downloaded * 100 / downloadSize : 0);
 
                 return <>
-                    <h3>Downloading...</h3>
+                    <h3 className="text-xl">Downloading...</h3>
                     <ProgressBar value={percent}  />
                 </>;
             case updaterSteps.INSTALLING:
                 return <>
-                    <h3>Installing...</h3>
+                    <h3 className="text-xl">Installing...</h3>
                     <ProgressBar mode={"indeterminate"} />
                 </>
         }
@@ -131,7 +131,7 @@ export const Updater = () => {
                     <Button type={"button"} severity={"success"} label={"Update"} onClick={performUpdate}/>
                 </>}
             >
-                <h3 className={"mt-0"}>Version {update?.version} is available!</h3>
+                <h3 className={"mt-0 text-xl"}>Version {update?.version} is available!</h3>
                 <p>Would you like to download and install it?</p>
                 <small>This will cause the application to restart after installing.</small>
                 <p>You can skip this version to not be prompted again until the next version.</p>

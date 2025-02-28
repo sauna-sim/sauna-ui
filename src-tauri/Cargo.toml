@@ -1,9 +1,9 @@
 [package]
 name = "sauna_sim"
-version = "0.22.17"
+version = "0.23.3"
 description = "An ATC Training Simulator."
 authors = ["SaunaSim"]
-license = "GPL-3"
+license = "LGPL-3.0-or-later"
 repository = "git+https://github.com/sauna-sim/sauna-ui.git"
 homepage = "https://saunasim.com"
 #default-run = "app"

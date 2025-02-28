@@ -1,41 +1,45 @@
 id: com.saunasim.saunasim
 
 runtime: org.gnome.Platform
-runtime-version: '46'
+runtime-version: '47'
 sdk: org.gnome.Sdk
 
-rename-icon: SaunaSim
-rename-desktop-file: SaunaSim.desktop
+rename-icon: {{app.binaryName}}
+rename-desktop-file: {{app.binaryName}}.desktop
 rename-appdata-file: SaunaSim.metainfo.xml
 
-command: SaunaSim
+command: {{app.binaryName}}
 finish-args:
-  - --socket=wayland # Permission needed to show the window
-  - --socket=fallback-x11 # Permission needed to show the window
+  - --socket=x11 # Permission needed to show the window
+  #- --socket=wayland # Permission needed to show the window (Disabled for now until a solution is found for Webkit2GTK on wayland titlebar/scaling issues)
+  #- --socket=fallback-x11 # Permission needed to show the window
   - --device=dri # OpenGL, not necessary for all projects
   - --share=ipc # To interface with Tauri Backend
   - --share=network # To connect to VATSIM Network
 
 modules:
-  - name: binary
+  - name: {{app.binaryName}}
     buildsystem: simple
     sources:
       - type: file
-        #url: https://github.com/sauna-sim/sauna-ui/releases/download/v0.22.14/SaunaSim_0.22.14_amd64.deb
-        #sha256: 0d12d90fdde01db7d94ef7201c794b729641862726ced6e8b2780fa2ba032e6e # This is required if you are using a remote source
-        only-arches: [x86_64] #This source is only used on x86_64 Computers
-        # This path points to the binary file which was created in the .deb bundle.
-        # Tauri also creates a folder which corresponds to the content of the unpacked .deb.
-        path: SaunaSim_0.22.16_amd64.deb
+        url: https://github.com/{{githubRepo}}/releases/download/v{{app.version}}/{{app.binaryName}}_{{app.version}}_amd64.deb
+        sha256: {{deb.sha256.amd64}}
+        only-arches: [x86_64]
+        dest-filename: SaunaSim.deb
+      - type: file
+        url: https://github.com/{{githubRepo}}/releases/download/v{{app.version}}/{{app.binaryName}}_{{app.version}}_arm64.deb
+        sha256: {{deb.sha256.arm64}}
+        only-arches: [aarch64]
+        dest-filename: SaunaSim.deb
 
     build-commands:
-      - ar -x *.deb
+      - ar -x SaunaSim.deb
       - tar -xf data.tar.gz
-      - 'install -Dm755 usr/bin/SaunaSim /app/bin/SaunaSim'
-      - install -Dm644 usr/share/applications/SaunaSim.desktop /app/share/applications/SaunaSim.desktop
-      - install -Dm644 usr/share/icons/hicolor/128x128/apps/SaunaSim.png /app/share/icons/hicolor/128x128/apps/SaunaSim.png
-      - install -Dm644 usr/share/icons/hicolor/32x32/apps/SaunaSim.png /app/share/icons/hicolor/32x32/apps/SaunaSim.png
-      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/SaunaSim.png /app/share/icons/hicolor/256x256@2/apps/SaunaSim.png
+      - install -Dm755 usr/bin/{{app.binaryName}} /app/bin/{{app.binaryName}}
+      - install -Dm644 usr/share/applications/{{app.binaryName}}.desktop /app/share/applications/{{app.binaryName}}.desktop
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/{{app.binaryName}}.png /app/share/icons/hicolor/128x128/apps/{{app.binaryName}}.png
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/{{app.binaryName}}.png /app/share/icons/hicolor/32x32/apps/{{app.binaryName}}.png
+      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/{{app.binaryName}}.png /app/share/icons/hicolor/256x256@2/apps/{{app.binaryName}}.png
       - install -Dm644 usr/share/metainfo/SaunaSim.metainfo.xml /app/share/metainfo/SaunaSim.metainfo.xml
-      - mkdir -p /app/lib/SaunaSim
-      - cp -r usr/lib/SaunaSim /app/lib
+      - mkdir -p /app/lib/{{app.binaryName}}
+      - cp -r usr/lib/{{app.binaryName}} /app/lib
