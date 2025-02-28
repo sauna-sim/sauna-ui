@@ -1,6 +1,6 @@
 {
   "name": "sauna-ui",
-  "version": "0.23.3",
+  "version": "0.24.0",
   "description": "User Interface for Sauna ATC Training Simulator.",
   "type": "module",
   "main": "index.js",
@@ -16,17 +16,17 @@
     "type": "git",
     "url": "git+https://github.com/sauna-sim/sauna-ui.git"
   },
-  "author": "Sauna (ATC Training Simulator)",
+  "author": "SaunaSim",
   "license": "LGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/sauna-sim/sauna-ui/issues"
   },
   "homepage": "https://saunasim.com",
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.8",
-    "@tauri-apps/cli": "^2.2.7",
+    "@tailwindcss/vite": "^4.0.9",
+    "@tauri-apps/cli": "^2.3.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^6.1.1"
+    "vite": "^6.2.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -34,15 +34,15 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@navigraph/pkce": "^1.0.3",
     "@reduxjs/toolkit": "^2.6.0",
-    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/api": "^2.3.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",
     "@tauri-apps/plugin-process": "^2.2.0",
     "@tauri-apps/plugin-shell": "^2.2.0",
-    "@tauri-apps/plugin-updater": "^2.5.0",
+    "@tauri-apps/plugin-updater": "^2.5.1",
     "@tauri-apps/plugin-websocket": "^2.3.0",
     "@turf/turf": "^7.2.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "formik": "^2.4.6",
     "lodash": "^4.17.21",
     "maplibre-gl": "^5.1.1",
