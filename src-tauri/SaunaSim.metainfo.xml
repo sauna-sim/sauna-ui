@@ -47,6 +47,15 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
+    <release version="0.23.3" date="2025-02-28">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.23.3</url>
+      <description>
+        <p>Changed</p>
+        <ul>
+          <li>Replaced icon with temporary icon.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.23.1" date="2025-02-23">
       <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.23.1</url>
       <description>
