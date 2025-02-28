@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.3] - 2025-02-27
+### Changed
+- Icon replaced with temporary placeholder.
+
 ## [0.23.1] - 2025-02-23
 ### Changed
 - SaunaApi to v0.23.0
@@ -111,7 +115,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.1...master
+[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.3...master
+[0.23.3]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.1...v0.23.3
 [0.23.1]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.17...v0.23.1
 [0.22.17]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.14...v0.22.17
 [0.22.14]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.13...v0.22.14
