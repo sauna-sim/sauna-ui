@@ -52,7 +52,11 @@ export async function getSessionSettings() {
 }
 
 export async function saveSessionSettings(sessionSettings) {
-    await setStoreItem("sessionSettings");
+    await setStoreItem("sessionSettings", sessionSettings);
+}
+
+export async function saveFsdProfiles(profiles) {
+    await setStoreItem("sessionSettings.fsdProfiles", profiles);
 }
 
 export async function getApiHostname(){
