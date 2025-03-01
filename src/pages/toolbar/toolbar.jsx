@@ -22,7 +22,7 @@ import { InputGroup, InputGroupAddon } from "../../components/primereact_tailwin
 
 export const MainToolbar = ({}) => {
     const scenarioMenu = useRef(null);
-    const apiServer = useSelector(state => state.apiServer);
+    const session = useSelector(state => state.session);
 
     const openMapPage = async () => {
         await createMapWindow();
@@ -74,7 +74,7 @@ export const MainToolbar = ({}) => {
     }
 
     const getSimStateActions = () => {
-        const {simState} = apiServer;
+        const {simState} = session;
         let pauseButton;
         if (simState.paused) {
             pauseButton = <Button
@@ -170,7 +170,7 @@ export const MainToolbar = ({}) => {
                         label={<>Scenario <FontAwesomeIcon icon={faChevronDown}/></>}
                         onClick={(event) => scenarioMenu.current.toggle(event)}
                     />
-                    <SettingsModal/>
+                    {/*<SettingsModal/>*/}
                 </div>}
             />
         </>

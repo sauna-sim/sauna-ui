@@ -1,7 +1,6 @@
-import React, {useEffect, useRef, useState} from "react";
-import {getSessionSettings, saveFsdProfiles} from "../../actions/local_store_actions.js";
-import {Form, Formik, getIn} from "formik";
-import * as Yup from "yup";
+import React, {useRef, useState} from "react";
+import {saveFsdProfiles} from "../../actions/local_store_actions.js";
+import {getIn} from "formik";
 import {Dropdown} from "primereact/dropdown";
 import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
 import {Button} from "primereact/button";

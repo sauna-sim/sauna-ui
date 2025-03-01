@@ -3,29 +3,26 @@ import React, {useEffect, useState} from "react";
 import {getSessionSettings, saveSessionSettings} from "../../actions/local_store_actions.js";
 import {SelectButton} from "primereact/selectbutton";
 import {getSweatboxServers} from "../../actions/vatsim_actions.js";
-import {InputText} from "primereact/inputtext";
 import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
 import * as Yup from "yup";
-import {Dropdown} from "primereact/dropdown";
 import {Button} from "primereact/button";
-import {Password} from "primereact/password";
 import {InputGroup, InputGroupAddon} from "../../components/primereact_tailwind.js";
 import {InputMask} from "primereact/inputmask";
 import SweatboxSettingsForm from "./sweatbox_settings.jsx";
-import {getFsdProtocolRevisions} from "../../actions/enum_actions.js";
 import FsdSettingsForm from "./fsd_settings.jsx";
-import {createSession} from "../../actions/session_actions.js";
+import {createSession, startWebSocket} from "../../actions/session_actions.js";
+import {onSessionInitialize, onSessionSettingsChange} from "../../redux/slices/sessionSlice.js";
+import {useNavigate} from "react-router";
 
 const SessionPage = () => {
     const [settings, setSettings] = useState();
     const [availSweatboxServers, setAvailSweatboxServers] = useState([]);
-    const [protocolRevisions, setProtocolRevisions] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         (async () => {
             setSettings(await getSessionSettings());
             setAvailSweatboxServers(await getSweatboxServers());
-            setProtocolRevisions(await getFsdProtocolRevisions());
         })();
     }, []);
 
@@ -76,7 +73,10 @@ const SessionPage = () => {
         }
 
         const sessionId = await createSession(reqObj);
-        console.log(sessionId);
+        onSessionInitialize(sessionId);
+        onSessionSettingsChange(values);
+        void startWebSocket(sessionId);
+        navigate("/main");
     }
 
     const refreshProfiles = async () => {
