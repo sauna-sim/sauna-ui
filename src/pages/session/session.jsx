@@ -1,6 +1,6 @@
 import {Form, Formik, getIn} from "formik";
 import React, {useEffect, useState} from "react";
-import {getSessionSettings, saveSessionSettings} from "../../actions/local_store_actions.js";
+import {getStoreSessionId, getStoreSessionSettings, saveStoreSessionId, saveStoreSessionSettings} from "../../actions/local_store_actions.js";
 import {SelectButton} from "primereact/selectbutton";
 import {getSweatboxServers} from "../../actions/vatsim_actions.js";
 import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
@@ -10,18 +10,36 @@ import {InputGroup, InputGroupAddon} from "../../components/primereact_tailwind.
 import {InputMask} from "primereact/inputmask";
 import SweatboxSettingsForm from "./sweatbox_settings.jsx";
 import FsdSettingsForm from "./fsd_settings.jsx";
-import {createSession, startWebSocket} from "../../actions/session_actions.js";
-import {onSessionInitialize, onSessionSettingsChange} from "../../redux/slices/sessionSlice.js";
+import {createSession, getSessionSettings} from "../../actions/session_actions.js";
+import {onSessionInitialize, onSessionSettingsChange, resetSession} from "../../redux/slices/sessionSlice.js";
 import {useNavigate} from "react-router";
+import {useDispatch} from "react-redux";
 
 const SessionPage = () => {
     const [settings, setSettings] = useState();
     const [availSweatboxServers, setAvailSweatboxServers] = useState([]);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         (async () => {
-            setSettings(await getSessionSettings());
+            const sessionId = await getStoreSessionId();
+            const sessionSettings = await getStoreSessionSettings();
+            if (sessionId) {
+                try {
+                    await getSessionSettings(sessionId);
+                    dispatch(onSessionInitialize(sessionId));
+                    dispatch(onSessionSettingsChange(sessionSettings));
+                    navigate("/main");
+                    return;
+                } catch (e) {
+                    // Session is not valid
+                    await saveStoreSessionId("");
+                    dispatch(resetSession());
+                }
+            }
+
+            setSettings(sessionSettings);
             setAvailSweatboxServers(await getSweatboxServers());
         })();
     }, []);
@@ -38,7 +56,7 @@ const SessionPage = () => {
         values.fsdProfiles = settings.fsdProfiles;
 
         // Save settings
-        await saveSessionSettings(values);
+        await saveStoreSessionSettings(values);
 
         // Create session request object
         const reqObj = {};
@@ -67,20 +85,21 @@ const SessionPage = () => {
 
                 const profile = values.fsdProfiles.find((prf) => prf.profileName === values.selectedFsdProfile);
                 reqObj.connectionDetails = {
-                    ...profile
+                    ...profile,
+                    commandFrequency: values.commandFrequency
                 }
                 break;
         }
 
         const sessionId = await createSession(reqObj);
-        onSessionInitialize(sessionId);
-        onSessionSettingsChange(values);
-        void startWebSocket(sessionId);
+        await saveStoreSessionId(sessionId);
+        dispatch(onSessionInitialize(sessionId));
+        dispatch(onSessionSettingsChange(values));
         navigate("/main");
     }
 
     const refreshProfiles = async () => {
-        setSettings(await getSessionSettings());
+        setSettings(await getStoreSessionSettings());
     }
 
     const formSchema = Yup.object().shape({
@@ -144,17 +163,17 @@ const SessionPage = () => {
                                     availSweatboxServers={availSweatboxServers}
                                     handleBlur={handleBlur}
                                     handleChange={handleChange}
-                                    touched={touched} />
+                                    touched={touched}/>
                             }
                             {values.sessionType === "PRIVATE_FSD" &&
                                 <FsdSettingsForm
-                                values={values}
-                                errors={errors}
-                                handleChange={handleChange}
-                                touched={touched}
-                                profiles={settings.fsdProfiles}
-                                refreshProfiles={refreshProfiles}
-                                setFieldValue={setFieldValue}/>
+                                    values={values}
+                                    errors={errors}
+                                    handleChange={handleChange}
+                                    touched={touched}
+                                    profiles={settings.fsdProfiles}
+                                    refreshProfiles={refreshProfiles}
+                                    setFieldValue={setFieldValue}/>
                             }
                             {(values.sessionType === "VATSIM_SWEATBOX" || values.sessionType === "PRIVATE_FSD") &&
                                 <>

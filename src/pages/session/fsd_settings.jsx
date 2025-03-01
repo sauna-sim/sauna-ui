@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {saveFsdProfiles} from "../../actions/local_store_actions.js";
+import {saveStoreFsdProfiles} from "../../actions/local_store_actions.js";
 import {getIn} from "formik";
 import {Dropdown} from "primereact/dropdown";
 import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
@@ -53,7 +53,7 @@ const FsdSettingsForm = ({values, handleChange, handleBlur, errors, touched, pro
             newProfiles[editProfileIndex.current] = values;
         }
 
-        await saveFsdProfiles(newProfiles);
+        await saveStoreFsdProfiles(newProfiles);
         refreshProfiles();
         setFieldValue('selectedFsdProfile', values.profileName);
         setShowModal(false);
@@ -63,7 +63,7 @@ const FsdSettingsForm = ({values, handleChange, handleBlur, errors, touched, pro
     const onDeleteProfile = async () => {
         const newProfiles = profiles.filter((prf) => prf.profileName !== values.selectedFsdProfile);
 
-        await saveFsdProfiles(newProfiles);
+        await saveStoreFsdProfiles(newProfiles);
         refreshProfiles();
         setFieldValue('selectedFsdProfile', '');
     }

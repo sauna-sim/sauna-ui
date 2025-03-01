@@ -7,12 +7,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPause, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {getApiHostname, getApiPort} from "../../actions/local_store_actions";
 import WebSocket from "@tauri-apps/plugin-websocket";
+import {useSelector} from "react-redux";
 
 export const AircraftRow = ({callsign}) => {
     const ws = useRef(null);
     const shouldRunWebSocket = useRef(false);
     const [aircraft, setAircraft] = useState(null);
     const [simState, setSimState] = useState(null);
+    const session = useSelector(state => state.session);
 
     useEffect(() => {
         shouldRunWebSocket.current = true;
@@ -37,7 +39,7 @@ export const AircraftRow = ({callsign}) => {
             return;
         }
 
-        const wsUrl = `ws://${await getApiHostname()}:${await getApiPort()}/api/aircraft/websocketByCallsign/${callsign}`;
+        const wsUrl = `ws://${await getApiHostname()}:${await getApiPort()}/api/session/${session.id}/aircraft/${callsign}/websocket`;
 
         try {
             ws.current = await WebSocket.connect(wsUrl);
@@ -119,7 +121,7 @@ export const AircraftRow = ({callsign}) => {
                     severity={"success"}
                     outlined={true}
                     className="mr-2"
-                    onClick={() => unpauseAircraft(aircraft.callsign)}
+                    onClick={() => unpauseAircraft(session.id, aircraft.callsign)}
                     icon={(options) => <FontAwesomeIcon icon={faPlay} {...options.iconProps} />}
                 />;
             } else {
@@ -127,7 +129,7 @@ export const AircraftRow = ({callsign}) => {
                     severity={"danger"}
                     outlined={true}
                     className="mr-2"
-                    onClick={() => pauseAircraft(aircraft.callsign)}
+                    onClick={() => pauseAircraft(session.id, aircraft.callsign)}
                     icon={(options) => <FontAwesomeIcon icon={faPause} {...options.iconProps} />}
                 />;
             }
@@ -196,8 +198,8 @@ export const AircraftRow = ({callsign}) => {
         <td>{getAircraftActions()}</td>
         <td>{aircraft.callsign}</td>
         <td>
+            <div>{aircraft.delayMs < 0 ? "Active" : `Delayed ${getTimeStr(aircraft.delayMs)}`}</div>
             <div>{aircraft.connectionStatus}</div>
-            <div>{aircraft.connectionStatus === "WAITING" ? getTimeStr(aircraft.delayMs) + "min" : ""}</div>
         </td>
         <td>
             <div className={"pfd-selected"}>{aircraft.autopilot.selectedHeading}</div>
@@ -229,7 +231,7 @@ export const AircraftRow = ({callsign}) => {
         <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
         <td>{`${round(aircraft.position.altimeterSetting.hectopascals)}hPa`}</td>
         <td>{`${round(aircraft.position.windDirection.degrees)} @ ${round(aircraft.position.windSpeed.knots)}kts`}</td>
-        <td><div className="overflow-auto max-h-5">{aircraft.fms.asString}</div></td>
+        <td><div className="overflow-auto max-h-[4rem]">{aircraft.fms.asString}</div></td>
         <td><AircraftDetail aircraft={aircraft}/></td>
     </tr>
 }

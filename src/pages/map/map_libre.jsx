@@ -6,6 +6,7 @@ import * as turf from "@turf/turf";
 import TargetMarkerPng from "../../assets/images/TargetMarker.png";
 import {AircraftMarker} from "./aircraft/aircraft_marker.jsx";
 import {makeIcon} from "./map_icon.js";
+import {useSelector} from "react-redux";
 
 export const MapLibre = ({features, center, zoom, rotation}) => {
     const mapContainer = useRef(null);
@@ -16,6 +17,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
     const [oldLineLayers, setOldLineLayers] = useState([]);
     const defaultIcons = useRef(null);
     const aircraftOptions = useRef(new Map());
+    const session = useSelector(state => state.session);
 
     // Default Icons
     const getDefaultIcons = () => {
@@ -249,7 +251,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
 
     const aircraftPollFunc = async () => {
         try {
-            const aircraftList = await getAircraftList(true);
+            const aircraftList = await getAircraftList(session.id,true);
 
             setAircrafts((prevState) => {
                 // History trails

@@ -1,11 +1,11 @@
 import {invoke} from "@tauri-apps/api/core";
 import {getAllWebviewWindows, WebviewWindow} from "@tauri-apps/api/webviewWindow";
-import {storeSave} from "./local_store_actions";
+import {saveStoreSessionId, storeSave} from "./local_store_actions";
 import {listen} from "@tauri-apps/api/event";
 import {store as reduxStore} from "../redux/store";
 import {onBuiltInChange} from "../redux/slices/apiSlice";
 import {mkdir, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
-import {save, open} from '@tauri-apps/plugin-dialog';
+import {open, save} from '@tauri-apps/plugin-dialog';
 
 
 export async function openAircraftScenarioFile({setFileHandle}) {
@@ -71,7 +71,8 @@ export async function createSaunaScenarioMakerWindow() {
 
 // Register window close event for main window
 const webview = new WebviewWindow("main");
-webview.onCloseRequested(async function (e) {
+void webview.onCloseRequested(async function (e) {
+    await saveStoreSessionId("");
     await storeSave();
     for (const window of await getAllWebviewWindows()) {
         if (window.label !== "main") {

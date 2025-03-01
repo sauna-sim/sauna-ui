@@ -2,6 +2,7 @@ import {store as reduxStore} from '../redux/store';
 import axios from "axios";
 import {onConnectionLost} from "../redux/slices/apiSlice";
 import {onAircraftCreated, onAircraftDeleted, resetAircraftList,} from "../redux/slices/aircraftSlice";
+import {resetSession} from "../redux/slices/sessionSlice.js";
 
 // Axios Sauna-API Settings
 export const axiosSaunaApi = axios.create();
@@ -21,6 +22,7 @@ axiosSaunaApi.interceptors.response.use(
                 // Connection has been lost
                 reduxStore.dispatch(onConnectionLost());
                 reduxStore.dispatch(resetAircraftList());
+                reduxStore.dispatch(resetSession());
 
                 return Promise.reject(error);
             }

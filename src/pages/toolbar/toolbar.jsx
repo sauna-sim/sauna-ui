@@ -1,11 +1,10 @@
 import React, {useRef} from "react";
 import {open} from '@tauri-apps/plugin-dialog';
-import {loadEuroscopeScenario, loadSaunaScenario} from "../../actions/data_actions";
 import {SettingsModal} from "./settings.jsx";
 import {NavigraphAuthButton} from "./navigraph_auth.jsx";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {SectorFilesButton} from "./sector_files_button.jsx";
-import {createCommandWindow, createMapWindow, createSaunaScenarioMakerWindow} from "../../actions/tauri_actions";
+import {createCommandWindow, createMapWindow, createSaunaScenarioMakerWindow, saveAircraftScenarioFile} from "../../actions/tauri_actions";
 import {Toolbar} from "primereact/toolbar";
 import {Button} from "primereact/button";
 import {ButtonGroup} from "primereact/buttongroup";
@@ -14,15 +13,22 @@ import {faChevronDown} from "@fortawesome/free-solid-svg-icons/faChevronDown";
 import {faMessage} from "@fortawesome/free-solid-svg-icons/faMessage";
 import {faMap} from "@fortawesome/free-solid-svg-icons/faMap";
 import {faPlane} from "@fortawesome/free-solid-svg-icons/faPlane";
-import {pauseall, removeAllAircraft, setAllSimRate, unpauseall} from "../../actions/aircraft_actions.js";
+import {removeAllAircraft} from "../../actions/aircraft_actions.js";
 import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {InputNumber} from "primereact/inputnumber";
-import { InputGroup, InputGroupAddon } from "../../components/primereact_tailwind.js";
+import {InputGroup, InputGroupAddon} from "../../components/primereact_tailwind.js";
+import {loadEuroscopeScenario, loadSaunaScenario, pauseSession, setSessionSimRate, unpauseSession} from "../../actions/session_actions.js";
+import {faCircleXmark} from "@fortawesome/free-solid-svg-icons/faCircleXmark";
+import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
+import {saveStoreSessionId} from "../../actions/local_store_actions.js";
+import {resetSession} from "../../redux/slices/sessionSlice.js";
+import {classNames} from "primereact/utils";
 
 export const MainToolbar = ({}) => {
     const scenarioMenu = useRef(null);
     const session = useSelector(state => state.session);
+    const dispatch = useDispatch();
 
     const openMapPage = async () => {
         await createMapWindow();
@@ -42,11 +48,11 @@ export const MainToolbar = ({}) => {
             if (Array.isArray(selected)) {
                 // Multiple scenario files selected
                 for (const filename of selected) {
-                    await loadEuroscopeScenario(filename);
+                    await loadEuroscopeScenario(session.id, filename);
                 }
             } else {
                 // Single file selected
-                await loadEuroscopeScenario(selected);
+                await loadEuroscopeScenario(session.id, selected);
             }
         }
     }
@@ -64,11 +70,11 @@ export const MainToolbar = ({}) => {
             if (Array.isArray(selected)) {
                 // Multiple scenario files selected
                 for (const filename of selected) {
-                    await loadSaunaScenario(filename);
+                    await loadSaunaScenario(session.id, filename);
                 }
             } else {
                 // Single file selected
-                await loadSaunaScenario(selected);
+                await loadSaunaScenario(session.id, selected);
             }
         }
     }
@@ -81,7 +87,7 @@ export const MainToolbar = ({}) => {
                 severity={"success"}
                 outlined={true}
                 className="mr-2"
-                onClick={unpauseall}
+                onClick={() => unpauseSession(session.id)}
                 icon={(options) => <FontAwesomeIcon icon={faPlay} {...options.iconProps}/>}
             />;
         } else {
@@ -89,7 +95,7 @@ export const MainToolbar = ({}) => {
                 severity={"danger"}
                 outlined={true}
                 className="mr-2"
-                onClick={pauseall}
+                onClick={() => pauseSession(session.id)}
                 icon={(options) => <FontAwesomeIcon icon={faPause} {...options.iconProps}/>}
             />;
         }
@@ -101,11 +107,11 @@ export const MainToolbar = ({}) => {
                         className={"[&>input]:rounded-none [&>input]:rounded-l-md"}
                         inputClassName={"w-full"}
                         value={simState.simRate}
-                        onValueChange={async (e) => setAllSimRate(e.value)}
+                        onValueChange={async (e) => setSessionSimRate(session.id, e.value)}
                         minFractionDigits={0}
                         maxFractionDigits={1}
                         min={0.1}
-                        max={8} />
+                        max={8}/>
                     <span className={InputGroupAddon}>
                         x
                     </span>
@@ -119,13 +125,59 @@ export const MainToolbar = ({}) => {
             </>
         )
     }
+    console.log(session);
+
+    const sessionName = () => {
+        switch (session.settings.sessionType) {
+            case "STANDALONE":
+                return "Standalone";
+            case "VATSIM_SWEATBOX":
+                return "VATSIM Sweatbox";
+            case "PRIVATE_FSD":
+                return "Private FSD";
+        }
+    }
+
+    const closeSession = () => {
+        confirmDialog({
+            message: "Are you sure you want to end the current session?",
+            header: "End Session",
+            acceptLabel: "Yes",
+            rejectLabel: "Cancel",
+
+            async accept() {
+                dispatch(resetSession());
+                await saveStoreSessionId("");
+            }
+        })
+    }
 
     return (
         <>
+            <ConfirmDialog pt={{
+                acceptButton: {
+                    root: {
+                        className: classNames(
+                            'text-white bg-red-500 border border-red-500 hover:bg-red-600 hover:border-red-600'
+                        )
+                    }
+                }
+            }}/>
             <Toolbar
                 className={"m-2"}
                 start={<div className={"flex flex-wrap gap-2"}>
                     {getSimStateActions()}
+                </div>}
+                center={<div className={"flex flex-wrap gap-2"}>
+                    <h5 className={"text-xl self-center"}>{sessionName()} Session</h5>
+                    <Button
+                        severity={"danger"}
+                        tooltip={"End Session"}
+                        tooltipOptions={{position: "bottom", showDelay: 250, hideDelay: 400}}
+                        text={true}
+                        onClick={() => closeSession()}
+                        icon={(options) => <FontAwesomeIcon icon={faCircleXmark} {...options.iconProps}/>}/>
+
                 </div>}
                 end={<div className={"flex flex-wrap gap-2"}>
                     <Button

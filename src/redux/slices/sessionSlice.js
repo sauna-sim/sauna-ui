@@ -19,6 +19,9 @@ export const sessionSlice = createSlice({
         onSessionClose: (state, action) => {
             state.id = null;
         },
+        resetSession: (state) => {
+            state.id = null;
+        },
         onSimStateChange: (state, action) => {
             state.simState = action.payload;
         },
@@ -32,7 +35,8 @@ export const {
     onSessionInitialize,
     onSessionClose,
     onSimStateChange,
-    onSessionSettingsChange
+    onSessionSettingsChange,
+    resetSession
 } = sessionSlice.actions;
 
 export const sessionReducer = sessionSlice.reducer;

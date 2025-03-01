@@ -1,10 +1,16 @@
 import {MainToolbar} from "./toolbar/toolbar.jsx";
 import {AircraftPage} from "./aircraft/aircraft";
 import {useSelector} from "react-redux";
-import {ApiConnectionPage} from "./api_connection/api_connection.jsx";
-import {Updater} from "./updater/updater.jsx";
+import {useNavigate} from "react-router";
 
 const MainPage = ({}) => {
+    const session = useSelector(state => state.session);
+    const navigate = useNavigate();
+
+    if (!session.id){
+        navigate("/initSession");
+    }
+
     return <>
         <div className={"flex flex-col h-screen"}>
             <MainToolbar/>

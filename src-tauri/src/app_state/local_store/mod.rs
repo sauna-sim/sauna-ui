@@ -3,7 +3,7 @@ use crate::app_state::local_store::navigraph_settings::NavigraphSettings;
 use crate::AppStateWrapper;
 use api_connection_details::ApiConnectionDetails;
 use serde::{Deserialize, Serialize};
-use session_settings::SessionSettings;
+use session_settings::SessionInfo;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -23,7 +23,7 @@ pub struct LocalStore {
     #[serde(default)]
     pub settings: Settings,
     #[serde(default)]
-    pub session_settings: SessionSettings,
+    pub session: SessionInfo,
     #[serde(default)]
     pub navigraph: NavigraphSettings,
 }

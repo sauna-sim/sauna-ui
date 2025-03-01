@@ -7,6 +7,7 @@ import {InputText} from "primereact/inputtext";
 export const CommandWindow = ({}) => {
     const messages = useSelector((state) => state.messages);
     const aircraftList = useSelector(state => state.aircraftList);
+    const session = useSelector(state => state.session);
     const [selectedCallsign, setSelectedCallsign] = useState("");
     const [commandText, setCommandText] = useState("");
 
@@ -26,7 +27,7 @@ export const CommandWindow = ({}) => {
     const onCommandKeyPress = (e) => {
         if (e.key === "Enter") {
             if (commandText) {
-                void sendTextCommand(selectedCallsign, commandText);
+                void sendTextCommand(sessionId, selectedCallsign, commandText);
                 setCommandText("");
             }
             e.preventDefault();

@@ -2,6 +2,15 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
+pub struct SessionInfo {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub settings: SessionSettings
+}
+
+#[derive(Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct SessionSettings {
     #[serde(default)]
     pub session_type: String,
