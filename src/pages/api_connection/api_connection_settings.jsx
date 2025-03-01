@@ -7,7 +7,7 @@ import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
 import {FormikPrErrorMessage} from "../../components/primereact_form.jsx";
 
-export const ApiConnectionSettings = ({}) => {
+export const ApiConnectionSettings = ({attemptConnection}) => {
     const [apiServerDetails, setApiServerDetails] = useState(null);
 
     useEffect(() => {
@@ -23,6 +23,8 @@ export const ApiConnectionSettings = ({}) => {
         await storeSave();
 
         setApiServerDetails(await getApiServerDetails());
+
+        void attemptConnection();
     }
 
     if (!apiServerDetails) {

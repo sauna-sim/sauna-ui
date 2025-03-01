@@ -40,11 +40,19 @@ export async function saveFsdSettings(fsdSettings){
 }
 
 export async function getApiServerDetails(){
-    return await getStoreItem("settings.apiServer");
+    return await getStoreItem("apiConnectionDetails");
 }
 
 export async function saveApiServerDetails(apiServerDetails){
-    await setStoreItem("settings.apiServer", apiServerDetails);
+    await setStoreItem("apiConnectionDetails", apiServerDetails);
+}
+
+export async function getSessionSettings() {
+    return await getStoreItem("sessionSettings");
+}
+
+export async function saveSessionSettings(sessionSettings) {
+    await setStoreItem("sessionSettings");
 }
 
 export async function getApiHostname(){

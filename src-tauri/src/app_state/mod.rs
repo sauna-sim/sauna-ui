@@ -59,8 +59,8 @@ impl AppState {
         if self.api_process.0.is_none() {
             self.api_builtin = false;
             if let Some(local_store) = &self.local_store {
-                self.api_hostname = local_store.store.settings.api_server.host_name.clone();
-                self.api_port = local_store.store.settings.api_server.port;
+                self.api_hostname = local_store.store.api_connection_details.host_name.clone();
+                self.api_port = local_store.store.api_connection_details.port;
             }
         }
 
@@ -91,8 +91,8 @@ impl AppState {
 
         if let Some(local_store) = &self.local_store {
             return ApiConnectionPayload {
-                hostname: local_store.store.settings.api_server.host_name.clone(),
-                port: local_store.store.settings.api_server.port,
+                hostname: local_store.store.api_connection_details.host_name.clone(),
+                port: local_store.store.api_connection_details.port,
             };
         }
 

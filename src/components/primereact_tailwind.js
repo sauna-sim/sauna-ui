@@ -41,7 +41,7 @@ const SaunaPrimeReactTailwind = {
         .progress-spinner-circle {
             stroke-dasharray: 89, 200;
             stroke-dashoffset: 0;
-            animation: p-progress-spinner-dash 1.5s ease-in-out infinite, p-progress-spinner-color 6s ease-in-out infinite;
+            animation: p-progress-spinner-dash 1.5s ease-in-out infinite;
             stroke-linecap: round;
         }
 
@@ -58,20 +58,6 @@ const SaunaPrimeReactTailwind = {
             100% {
                 stroke-dasharray: 89, 200;
                 stroke-dashoffset: -124px;
-            }
-        }
-        @keyframes p-progress-spinner-color {
-            100%, 0% {
-                stroke: #ff5757;
-            }
-            40% {
-                stroke: #696cff;
-            }
-            66% {
-                stroke: #1ea97c;
-            }
-            80%, 90% {
-                stroke: #cc8925;
             }
         }
 
@@ -1017,12 +1003,12 @@ const SaunaPrimeReactTailwind = {
         button: ({ context }) => ({
             className: classNames(
                 'inline-flex cursor-pointer select-none items-center align-bottom text-center overflow-hidden relative',
-                'px-4 py-3',
+                'px-3 py-1.5 text-base',
                 'transition duration-200 border border-r-0',
                 'first:rounded-l-md first:rounded-tr-none first:rounded-br-none last:border-r last:rounded-tl-none last:rounded-bl-none last:rounded-r-md',
                 'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)] dark:focus:shadow-[0_0_0_0.2rem_rgba(147,197,253,0.5)]',
                 {
-                    'bg-white dark:bg-gray-900 text-gray-700 dark:text-white/80 border-gray-300 dark:border-blue-900/40 hover:bg-gray-50 dark:hover:bg-gray-800/80 ': !context.selected,
+                    'text-white bg-gray-600 border border-gray-600 hover:bg-gray-600/80 hover:border-gray-600/80': !context.selected,
                     'bg-blue-500 border-blue-500 text-white hover:bg-blue-600': context.selected,
                     'opacity-60 select-none pointer-events-none cursor-default': context.disabled
                 }
@@ -1191,11 +1177,16 @@ const SaunaPrimeReactTailwind = {
         root: ({ props }) => ({
             className: classNames(
                 'cursor-pointer inline-flex relative select-none',
-                'bg-white border border-gray-300 transition-colors duration-200 ease-in-out rounded-md',
-                'dark:bg-gray-900 dark:border-gray-700',
+                'bg-white border transition-colors duration-200 ease-in-out rounded-md',
+                'dark:bg-gray-900',
                 //'w-full md:w-56',
-                'hover:border-gray-500 focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)] dark:focus:shadow-[0_0_0_0.2rem_rgba(147,197,253,0.5)]',
-                { 'opacity-60 select-none pointer-events-none cursor-default': props.disabled },
+                'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)] dark:focus:shadow-[0_0_0_0.2rem_rgba(147,197,253,0.5)]',
+                {
+                    'hover:border-gray-500': !props.invalid && !props.disabled,
+                    'opacity-60 select-none pointer-events-none cursor-default': props.disabled,
+                    'border-gray-300 dark:border-gray-700': !props.invalid,
+                    'border-red-500 hover:border-red-500/80 focus:border-red-500': props.invalid && !props.disabled,
+                },
 
             )
         }),
@@ -1806,8 +1797,8 @@ const SaunaPrimeReactTailwind = {
         root: {
             className: classNames('relative mx-auto w-28 h-28 inline-block', 'before:block before:pt-full')
         },
-        spinner: 'absolute top-0 bottom-0 left-0 right-0 m-auto w-full h-full transform origin-center animate-spin',
-        circle: 'text-red-500 progress-spinner-circle'
+        spinner: 'absolute top-0 bottom-0 left-0 right-0 m-auto w-full h-full origin-center animate-spin',
+        circle: 'progress-spinner-circle stroke-blue-500'
     },
     skeleton: {
         root: ({ props }) => ({

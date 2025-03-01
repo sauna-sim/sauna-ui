@@ -5,24 +5,11 @@ import {ApiConnectionPage} from "./api_connection/api_connection.jsx";
 import {Updater} from "./updater/updater.jsx";
 
 const MainPage = ({}) => {
-    const apiServer = useSelector((state) => state.apiServer);
-
-    const getMainPage = () => {
-        if (apiServer.connected) {
-            return (
-                <div className={"flex flex-col h-screen"}>
-                    <MainToolbar/>
-                    <AircraftPage/>
-                </div>
-            )
-        }
-
-        return <ApiConnectionPage usingBuiltIn={apiServer.usingBuiltIn}/>;
-    }
-
     return <>
-        <Updater/>
-        {getMainPage()}
+        <div className={"flex flex-col h-screen"}>
+            <MainToolbar/>
+            <AircraftPage/>
+        </div>
     </>;
 };
 

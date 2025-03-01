@@ -20,8 +20,8 @@ fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "2", features = [] }
-zip = "0.6.6"
-reqwest = { version = "0.11.22", features = ["blocking"] }
+zip = "2.2.3"
+reqwest = { version = "0.12.12", features = ["blocking"] }
 sct-reader = "0.5.0"
 tauri-plugin-dialog = "2"
 tauri-plugin-shell = "2"
