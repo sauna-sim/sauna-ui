@@ -13,7 +13,7 @@ export const AircraftMarker = ({aircraft, icon, map, onClick}) => {
     }
 
     return (
-        <>
+        <div>
             <AircraftMarkerSymbol
                 icon={icon}
                 position={{
@@ -38,6 +38,6 @@ export const AircraftMarker = ({aircraft, icon, map, onClick}) => {
                 tagOffset={tagPosition}
                 tagSize={tagSize}
             />
-        </>
+        </div>
     );
 }

@@ -72,7 +72,6 @@ export async function createSaunaScenarioMakerWindow() {
 // Register window close event for main window
 const webview = new WebviewWindow("main");
 void webview.onCloseRequested(async function (e) {
-    await saveStoreSessionId("");
     await storeSave();
     for (const window of await getAllWebviewWindows()) {
         if (window.label !== "main") {

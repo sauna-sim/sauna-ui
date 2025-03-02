@@ -190,7 +190,7 @@ export const AircraftRow = ({callsign}) => {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    if (!aircraft) {
+    if (!aircraft || !aircraft.position || !aircraft.autopilot) {
         return <tr/>
     }
 
@@ -202,8 +202,8 @@ export const AircraftRow = ({callsign}) => {
             <div>{aircraft.connectionStatus}</div>
         </td>
         <td>
-            <div className={"pfd-selected"}>{aircraft.autopilot.selectedHeading}</div>
-            <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag.degrees, 2)}</div>
+            <div className={"pfd-selected"}>{aircraft.autopilot?.selectedHeading}</div>
+            <div className={"pfd-measured"}>{round(aircraft.position?.heading_Mag.degrees, 2)}</div>
         </td>
         <td>
             <div className={aircraft.autopilot?.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
@@ -211,11 +211,11 @@ export const AircraftRow = ({callsign}) => {
                     aircraft.autopilot.selectedSpeed :
                     `M${round(aircraft.autopilot?.selectedSpeed / 100.0, 2)}`}
             </div>
-            <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed.knots, 2)}</div>
+            <div className={"pfd-measured"}>{round(aircraft.position?.indicatedAirSpeed.knots, 2)}</div>
         </td>
         <td>
-            <div className={"pfd-selected"}>{aircraft.autopilot.selectedAltitude}</div>
-            <div className={"pfd-measured"}>{round(aircraft.position.indicatedAltitude.feet, 2)}</div>
+            <div className={"pfd-selected"}>{aircraft.autopilot?.selectedAltitude}</div>
+            <div className={"pfd-measured"}>{round(aircraft.position?.indicatedAltitude.feet, 2)}</div>
         </td>
         <td>
             <div className={"pfd-selected"}>{aircraft.autopilot.selectedVerticalSpeed}</div>

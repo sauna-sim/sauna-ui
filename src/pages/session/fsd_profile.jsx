@@ -30,7 +30,7 @@ const FsdProfileModal = ({show, onClose, profile, onSave, excludeProfileNames}) 
         networkId: Yup.string().required("Required"),
         password: Yup.string().required("Required"),
         realName: Yup.string().required("Required"),
-        protocol: Yup.string().required("Required")
+        protocolRevision: Yup.string().required("Required")
     });
 
     if (!profile) {
@@ -154,8 +154,8 @@ const FsdProfileModal = ({show, onClose, profile, onSave, excludeProfileNames}) 
                             <Dropdown
                                 className={"w-full"}
                                 id={"profileModalProtocol"}
-                                name="protocol"
-                                value={values.protocol}
+                                name="protocolRevision"
+                                value={values.protocolRevision}
                                 onChange={handleChange}
                                 options={protocolRevisions}/>
                         </div>

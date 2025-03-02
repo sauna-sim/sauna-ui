@@ -125,7 +125,7 @@ const FsdSettingsForm = ({values, handleChange, handleBlur, errors, touched, pro
                     <label>Protocol Version</label>
                     <InputText
                         className={"w-full"}
-                        value={currentProfile?.protocol ?? ""}
+                        value={currentProfile?.protocolRevision ?? ""}
                         disabled={true}/>
                 </div>
             </div>

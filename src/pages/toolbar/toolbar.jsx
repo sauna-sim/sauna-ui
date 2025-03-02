@@ -18,7 +18,14 @@ import {faPause, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useDispatch, useSelector} from "react-redux";
 import {InputNumber} from "primereact/inputnumber";
 import {InputGroup, InputGroupAddon} from "../../components/primereact_tailwind.js";
-import {loadEuroscopeScenario, loadSaunaScenario, pauseSession, setSessionSimRate, unpauseSession} from "../../actions/session_actions.js";
+import {
+    deleteSession,
+    loadEuroscopeScenario,
+    loadSaunaScenario,
+    pauseSession,
+    setSessionSimRate,
+    unpauseSession
+} from "../../actions/session_actions.js";
 import {faCircleXmark} from "@fortawesome/free-solid-svg-icons/faCircleXmark";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {saveStoreSessionId} from "../../actions/local_store_actions.js";
@@ -118,7 +125,7 @@ export const MainToolbar = ({}) => {
                 </div>
                 <Button
                     severity="danger"
-                    onClick={removeAllAircraft}
+                    onClick={() => removeAllAircraft(session.id)}
                     icon={(options) => <FontAwesomeIcon icon={faTrash} {...options.iconProps}/>}
                     label={"All"}
                 />
@@ -146,6 +153,7 @@ export const MainToolbar = ({}) => {
             rejectLabel: "Cancel",
 
             async accept() {
+                await deleteSession(session.id);
                 dispatch(resetSession());
                 await saveStoreSessionId("");
             }

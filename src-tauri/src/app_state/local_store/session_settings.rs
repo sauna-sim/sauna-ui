@@ -53,7 +53,7 @@ pub struct FsdConnectionProfile {
     #[serde(default = "default_fsd_port")]
     pub port: u16,
     #[serde(default = "default_fsd_protocol")]
-    pub protocol: String,
+    pub protocol_revision: String,
 }
 
 impl Default for FsdConnectionProfile {
@@ -64,7 +64,7 @@ impl Default for FsdConnectionProfile {
             password: "".to_string(),
             hostname: "".to_string(),
             port: default_fsd_port(),
-            protocol: default_fsd_protocol(),
+            protocol_revision: default_fsd_protocol(),
             real_name: String::default()
         }
     }
