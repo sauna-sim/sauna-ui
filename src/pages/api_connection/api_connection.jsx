@@ -8,7 +8,7 @@ import {axiosSaunaApi} from "../../actions/api_connection_handler.js";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router";
 
-export const ApiConnectionPage = ({usingBuiltIn}) => {
+export const ApiConnectionPage = ({}) => {
     const tryingApiConnection = useRef(false);
     const apiServer = useSelector((state) => state.apiServer);
     const dispatch = useDispatch();
@@ -51,7 +51,7 @@ export const ApiConnectionPage = ({usingBuiltIn}) => {
     return (
         <>
             <div>
-                {!usingBuiltIn && <ApiConnectionSettings attemptConnection={attemptConnection}/>}
+                {!apiServer.usingBuiltIn && <ApiConnectionSettings attemptConnection={attemptConnection}/>}
                 <div className={"text-center sm:absolute sm:bottom-1/2 sm:w-screen sm:left-0"}>
                     <ProgressSpinner />
                     <h1 className={"text-4xl font-bold"}>Loading...</h1>
