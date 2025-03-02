@@ -17,6 +17,11 @@
   <url type="homepage">https://saunasim.com/</url>
   <url type="vcs-browser">https://github.com/sauna-sim/sauna-ui</url>
 
+  <branding>
+    <color type="primary" scheme_preference="light">#CDA678</color>
+    <color type="primary" scheme_preference="dark">#281710</color>
+  </branding>
+
   <screenshots>
     <screenshot type="default">
       <image>https://saunasim.com/screenshot_3.png</image>
@@ -47,7 +52,7 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
-    <release version="0.24.1" date="2025-03-02">
+    <release version="0.24.2" date="2025-03-02">
       <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.24.1</url>
       <description>
         <p>Added</p>

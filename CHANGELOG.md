@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.24.1] - 2025-03-02
+## [0.24.2] - 2025-03-02
 ### Added
 - Standalone Mode
 - Session Screen
@@ -125,8 +125,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Deleting Aircraft Bug
 
-[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.24.1...master
-[0.24.1]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.3...v0.24.1
+[Unreleased]: https://github.com/sauna-sim/sauna-ui/compare/v0.24.2...master
+[0.24.2]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.3...v0.24.2
 [0.23.3]: https://github.com/sauna-sim/sauna-ui/compare/v0.23.1...v0.23.3
 [0.23.1]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.17...v0.23.1
 [0.22.17]: https://github.com/sauna-sim/sauna-ui/compare/v0.22.14...v0.22.17
