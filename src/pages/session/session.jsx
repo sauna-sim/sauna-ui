@@ -145,7 +145,7 @@ const SessionPage = () => {
                             allowEmpty={false}
                             options={[
                                 {value: "STANDALONE", label: "Standalone"},
-                                {value: "VATSIM_SWEATBOX", label: "VATSIM Sweatbox"},
+                                {value: "VATSIM_SWEATBOX", label: "VATSIM Sweatbox", disabled: true},
                                 {value: "PRIVATE_FSD", label: "FSD Server (Advanced)"}
                             ]}
                         />

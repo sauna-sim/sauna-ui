@@ -47,6 +47,21 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
+    <release version="0.24.0" date="2025-03-01">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.24.0</url>
+      <description>
+        <p>Added</p>
+        <ul>
+          <li>Standalone Mode</li>
+          <li>Session Screen</li>
+        </ul>
+        <p>Change</p>
+        <ul>
+          <li>UI using Tailwind instead of PrimeFlex</li>
+          <li>SaunaApi to v0.24.0</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.23.3" date="2025-02-28">
       <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.23.3</url>
       <description>
