@@ -284,6 +284,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                 return aircraftList;
             });
         } catch (e) {
+            setAircrafts([]);
             console.log(e);
         }
     }
