@@ -45,7 +45,7 @@ jobs:
       tauri-bundles: ${{ matrix.tauri-bundles }}
       publish-release: ${{ true }}
       tauri-create-updater: ${{ matrix.tauri-create-updater }}
-      api-ref: 'v0.23.0'
+      api-ref: 'v0.24.0'
     secrets: inherit # Pass all secrets
   create-github-release:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
