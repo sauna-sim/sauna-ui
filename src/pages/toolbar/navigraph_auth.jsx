@@ -111,7 +111,7 @@ export const NavigraphAuthButton = ({}) => {
             {getNavigraphButton()}
 
             <Dialog visible={showVerificationModal} onHide={closeVerification}
-                    header={"Navigraph Authentication"}>
+                    header={"Navigraph Authentication"} closable={false}>
                 <a
                     href={verificationUrl}
                     className="text-blue-600 bg-gray-500/10 p-3 rounded-lg"

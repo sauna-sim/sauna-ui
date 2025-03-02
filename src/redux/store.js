@@ -3,9 +3,11 @@ import {navigraphReducer, setNvgAuthenticated, setNvgPackageInfo} from "./slices
 import {sectorFilesReducer} from "./slices/sectorFilesSlice";
 import {aircraftReducer} from "./slices/aircraftSlice";
 import {apiServerReducer} from "./slices/apiSlice";
-import { getNavigraphPackageInfo, isNavigraphAuthenticated } from "../actions/local_store_actions";
+import {getNavigraphPackageInfo, isNavigraphAuthenticated} from "../actions/local_store_actions";
 import {messagesReducer} from "./slices/messagesSlice.js";
 import {updaterReducer} from "./slices/updaterSlice.js";
+import {sessionReducer} from "./slices/sessionSlice.js";
+import {sessionMiddleware} from "./middleware/session_middleware.js";
 
 export const store = configureStore({
     reducer: {
@@ -14,8 +16,10 @@ export const store = configureStore({
         aircraftList: aircraftReducer,
         apiServer: apiServerReducer,
         messages: messagesReducer,
-        updater: updaterReducer
-    }
+        updater: updaterReducer,
+        session: sessionReducer
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sessionMiddleware)
 });
 
 // Load initial data

@@ -23,28 +23,32 @@ export async function storeSave(){
     return await invoke('store_save', {});
 }
 
-export async function getApiSettings(){
-    return await getStoreItem("settings.apiSettings");
-}
-
-export async function saveApiSettings(apiSettings){
-    await setStoreItem("settings.apiSettings", apiSettings);
-}
-
-export async function getFsdSettings(){
-    return await getStoreItem("settings.fsdConnection");
-}
-
-export async function saveFsdSettings(fsdSettings){
-    await setStoreItem("settings.fsdConnection", fsdSettings);
-}
-
 export async function getApiServerDetails(){
-    return await getStoreItem("settings.apiServer");
+    return await getStoreItem("apiConnectionDetails");
 }
 
 export async function saveApiServerDetails(apiServerDetails){
-    await setStoreItem("settings.apiServer", apiServerDetails);
+    await setStoreItem("apiConnectionDetails", apiServerDetails);
+}
+
+export async function getStoreSessionId() {
+    return await getStoreItem("session.id");
+}
+
+export async function saveStoreSessionId(sessionId){
+    await setStoreItem("session.id", sessionId);
+}
+
+export async function getStoreSessionSettings() {
+    return await getStoreItem("session.settings");
+}
+
+export async function saveStoreSessionSettings(sessionSettings) {
+    await setStoreItem("session.settings", sessionSettings);
+}
+
+export async function saveStoreFsdProfiles(profiles) {
+    await setStoreItem("session.settings.fsdProfiles", profiles);
 }
 
 export async function getApiHostname(){

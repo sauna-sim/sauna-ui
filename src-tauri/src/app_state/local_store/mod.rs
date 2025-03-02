@@ -1,7 +1,9 @@
 use crate::app_state::local_store::app_settings::Settings;
 use crate::app_state::local_store::navigraph_settings::NavigraphSettings;
 use crate::AppStateWrapper;
+use api_connection_details::ApiConnectionDetails;
 use serde::{Deserialize, Serialize};
+use session_settings::SessionInfo;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -10,6 +12,21 @@ use std::path::{Path, PathBuf};
 
 pub mod app_settings;
 pub mod navigraph_settings;
+pub mod api_connection_details;
+pub mod session_settings;
+
+#[derive(Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalStore {
+    #[serde(default)]
+    pub api_connection_details: ApiConnectionDetails,
+    #[serde(default)]
+    pub settings: Settings,
+    #[serde(default)]
+    pub session: SessionInfo,
+    #[serde(default)]
+    pub navigraph: NavigraphSettings,
+}
 
 pub struct StoreContainer {
     pub store: LocalStore,
@@ -139,12 +156,4 @@ pub fn store_set(
     } else {
         Err("Local Store is null".to_owned())
     }
-}
-
-#[derive(Serialize, Deserialize, Default)]
-pub struct LocalStore {
-    #[serde(default)]
-    pub settings: Settings,
-    #[serde(default)]
-    pub navigraph: NavigraphSettings,
 }

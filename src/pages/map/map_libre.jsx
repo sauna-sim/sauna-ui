@@ -3,9 +3,9 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {getAircraftList} from "../../actions/aircraft_actions";
 import * as turf from "@turf/turf";
-import TargetMarkerPng from "../../assets/images/TargetMarker.png";
 import {AircraftMarker} from "./aircraft/aircraft_marker.jsx";
 import {makeIcon} from "./map_icon.js";
+import {getStoreSessionId} from "../../actions/local_store_actions.js";
 
 export const MapLibre = ({features, center, zoom, rotation}) => {
     const mapContainer = useRef(null);
@@ -249,7 +249,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
 
     const aircraftPollFunc = async () => {
         try {
-            const aircraftList = await getAircraftList(true);
+            const aircraftList = await getAircraftList(await getStoreSessionId(),true);
 
             setAircrafts((prevState) => {
                 // History trails
@@ -284,6 +284,7 @@ export const MapLibre = ({features, center, zoom, rotation}) => {
                 return aircraftList;
             });
         } catch (e) {
+            setAircrafts([]);
             console.log(e);
         }
     }

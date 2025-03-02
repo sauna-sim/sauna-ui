@@ -7,12 +7,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPause, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {getApiHostname, getApiPort} from "../../actions/local_store_actions";
 import WebSocket from "@tauri-apps/plugin-websocket";
+import {useSelector} from "react-redux";
 
 export const AircraftRow = ({callsign}) => {
     const ws = useRef(null);
     const shouldRunWebSocket = useRef(false);
     const [aircraft, setAircraft] = useState(null);
     const [simState, setSimState] = useState(null);
+    const session = useSelector(state => state.session);
 
     useEffect(() => {
         shouldRunWebSocket.current = true;
@@ -37,7 +39,7 @@ export const AircraftRow = ({callsign}) => {
             return;
         }
 
-        const wsUrl = `ws://${await getApiHostname()}:${await getApiPort()}/api/aircraft/websocketByCallsign/${callsign}`;
+        const wsUrl = `ws://${await getApiHostname()}:${await getApiPort()}/api/session/${session.id}/aircraft/${callsign}/websocket`;
 
         try {
             ws.current = await WebSocket.connect(wsUrl);
@@ -119,7 +121,7 @@ export const AircraftRow = ({callsign}) => {
                     severity={"success"}
                     outlined={true}
                     className="mr-2"
-                    onClick={() => unpauseAircraft(aircraft.callsign)}
+                    onClick={() => unpauseAircraft(session.id, aircraft.callsign)}
                     icon={(options) => <FontAwesomeIcon icon={faPlay} {...options.iconProps} />}
                 />;
             } else {
@@ -127,7 +129,7 @@ export const AircraftRow = ({callsign}) => {
                     severity={"danger"}
                     outlined={true}
                     className="mr-2"
-                    onClick={() => pauseAircraft(aircraft.callsign)}
+                    onClick={() => pauseAircraft(session.id, aircraft.callsign)}
                     icon={(options) => <FontAwesomeIcon icon={faPause} {...options.iconProps} />}
                 />;
             }
@@ -167,20 +169,16 @@ export const AircraftRow = ({callsign}) => {
 
     const getFma = () => {
         return <>
-            <div className={"flex flex-row"}>
-
-            </div>
-            <div className={"flex flex-row"}>
-                <div className={"col fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</div>
-                <div
-                    className={isModeFms(aircraft.autopilot.currentLateralMode) ? "col fma-active-fms" : "col fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</div>
-                <div
-                    className={isModeFms(aircraft.autopilot.currentVerticalMode) ? "col fma-active-fms" : "col fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</div>
-            </div>
-            <div className={"flex flex-row"}>
-                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedThrustModes)}</div>
-                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedLateralModes)}</div>
-                <div className={"col fma-armed"}>{getArmedModes(aircraft.autopilot.armedVerticalModes)}</div>
+            <div className="grid grid-cols-3 gap-2 justify-items-center items-center min-w-40">
+                <div />
+                <div />
+                <div />
+                <div className={"fma-active-conv"}>{aircraft.autopilot.currentThrustMode}</div>
+                <div className={isModeFms(aircraft.autopilot.currentLateralMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentLateralMode}</div>
+                <div className={isModeFms(aircraft.autopilot.currentVerticalMode) ? "fma-active-fms" : "fma-active-conv"}>{aircraft.autopilot.currentVerticalMode}</div>
+                <div className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedThrustModes)}</div>
+                <div className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedLateralModes)}</div>
+                <div className={"fma-armed"}>{getArmedModes(aircraft.autopilot.armedVerticalModes)}</div>
             </div>
         </>
     }
@@ -192,20 +190,20 @@ export const AircraftRow = ({callsign}) => {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    if (!aircraft) {
+    if (!aircraft || !aircraft.position || !aircraft.autopilot) {
         return <tr/>
     }
 
-    return <tr>
+    return <tr className="border-b-1 border-inherit [&>td]:p-2">
         <td>{getAircraftActions()}</td>
         <td>{aircraft.callsign}</td>
         <td>
+            <div>{aircraft.delayMs < 0 ? "Active" : `Delayed ${getTimeStr(aircraft.delayMs)}`}</div>
             <div>{aircraft.connectionStatus}</div>
-            <div>{aircraft.connectionStatus === "WAITING" ? getTimeStr(aircraft.delayMs) + "min" : ""}</div>
         </td>
         <td>
-            <div className={"pfd-selected"}>{aircraft.autopilot.selectedHeading}</div>
-            <div className={"pfd-measured"}>{round(aircraft.position.heading_Mag.degrees, 2)}</div>
+            <div className={"pfd-selected"}>{aircraft.autopilot?.selectedHeading}</div>
+            <div className={"pfd-measured"}>{round(aircraft.position?.heading_Mag.degrees, 2)}</div>
         </td>
         <td>
             <div className={aircraft.autopilot?.selectedSpeedMode === "MANUAL" ? "pfd-selected" : "pfd-managed"}>
@@ -213,11 +211,11 @@ export const AircraftRow = ({callsign}) => {
                     aircraft.autopilot.selectedSpeed :
                     `M${round(aircraft.autopilot?.selectedSpeed / 100.0, 2)}`}
             </div>
-            <div className={"pfd-measured"}>{round(aircraft.position.indicatedAirSpeed.knots, 2)}</div>
+            <div className={"pfd-measured"}>{round(aircraft.position?.indicatedAirSpeed.knots, 2)}</div>
         </td>
         <td>
-            <div className={"pfd-selected"}>{aircraft.autopilot.selectedAltitude}</div>
-            <div className={"pfd-measured"}>{round(aircraft.position.indicatedAltitude.feet, 2)}</div>
+            <div className={"pfd-selected"}>{aircraft.autopilot?.selectedAltitude}</div>
+            <div className={"pfd-measured"}>{round(aircraft.position?.indicatedAltitude.feet, 2)}</div>
         </td>
         <td>
             <div className={"pfd-selected"}>{aircraft.autopilot.selectedVerticalSpeed}</div>
@@ -233,7 +231,7 @@ export const AircraftRow = ({callsign}) => {
         <td>{round(aircraft.data.thrustLeverPos, 2)}</td>
         <td>{`${round(aircraft.position.altimeterSetting.hectopascals)}hPa`}</td>
         <td>{`${round(aircraft.position.windDirection.degrees)} @ ${round(aircraft.position.windSpeed.knots)}kts`}</td>
-        <td><div style={{overflow: "auto", height: "100px"}}>{aircraft.fms.asString}</div></td>
+        <td><div className="overflow-auto max-h-[4rem]">{aircraft.fms.asString}</div></td>
         <td><AircraftDetail aircraft={aircraft}/></td>
     </tr>
 }
