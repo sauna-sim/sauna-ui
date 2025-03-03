@@ -626,7 +626,7 @@ const SaunaPrimeReactTailwind = {
                 'transition duration-200 ease-in-out',
                 'focus:outline-none focus:outline-offset-0',
                 {
-                    'text-white bg-blue-500 border border-blue-500 hover:bg-blue-600 hover:border-blue-600 focus:shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(157,193,251,1),0_1px_2px_0_rgba(0,0,0,1)] dark:focus:shadow-[0_0_0_2px_rgba(28,33,39,1),0_0_0_4px_rgba(147,197,253,0.7),0_1px_2px_0_rgba(0,0,0,0)]':
+                    'text-white bg-vesuvius-500 dark:bg-vesuvius-600 border border-vesuvius-500 dark:border-vesuvius-600 hover:bg-vesuvius-600 dark:hover:bg-vesuvius-700 hover:border-vesuvius-600 dark:hover:border-vesuvius-700 focus:shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(245,176,42,1),0_1px_2px_0_rgba(0,0,0,1)] dark:focus:shadow-[0_0_0_2px_rgba(28,33,39,1),0_0_0_4px_rgba(211,107,12,0.7),0_1px_2px_0_rgba(0,0,0,0)]':
                         !props.link && props.severity === null && !props.text && !props.outlined && !props.plain,
                     'text-blue-600 bg-transparent border-transparent focus:shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(157,193,251,1),0_1px_2px_0_rgba(0,0,0,1)] dark:focus:shadow-[0_0_0_2px_rgba(28,33,39,1),0_0_0_4px_rgba(147,197,253,0.7),0_1px_2px_0_rgba(0,0,0,0)]':
                         props.link

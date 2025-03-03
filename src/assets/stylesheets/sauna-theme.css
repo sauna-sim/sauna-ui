@@ -4,6 +4,43 @@
     --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
+    /* Theme Colors */
+    --color-tan-50: #faf7f2;
+    --color-tan-100: #f4ede0;
+    --color-tan-200: #e8d9c0;
+    --color-tan-300: #d9bf98;
+    --color-tan-400: #cda678;
+    --color-tan-500: #be8851;
+    --color-tan-600: #b07446;
+    --color-tan-700: #935d3b;
+    --color-tan-800: #774c35;
+    --color-tan-900: #60402e;
+    --color-tan-950: #332017;
+
+    --color-vesuvius-50: #fefaec;
+    --color-vesuvius-100: #fcefc9;
+    --color-vesuvius-200: #fadd8d;
+    --color-vesuvius-300: #f7c652;
+    --color-vesuvius-400: #f5b02a;
+    --color-vesuvius-500: #ee8f12;
+    --color-vesuvius-600: #d36b0c;
+    --color-vesuvius-700: #af4a0e;
+    --color-vesuvius-800: #8e3a12;
+    --color-vesuvius-900: #753012;
+    --color-vesuvius-950: #431705;
+
+    --color-woodbark-50: #e8e6e3;
+    --color-woodbark-100: #ded9d3;
+    --color-woodbark-200: #cabfb4;
+    --color-woodbark-300: #b7a695;
+    --color-woodbark-400: #a88f76;
+    --color-woodbark-500: #927559;
+    --color-woodbark-600: #745c44;
+    --color-woodbark-700: #554230;
+    --color-woodbark-800: #35291d;
+    --color-woodbark-900: #140f0b;
+    --color-woodbark-950: #040302;
+
     /* --- Colors --- */
     --color-red-50: #fdf2f3;
     --color-red-100: #fbe9eb;
@@ -125,15 +162,15 @@
     --color-pink-900: #6a1540;
     --color-pink-950: #4c0f2e;
 
-    --color-gray-50: #f5f6f6;
-    --color-gray-100: #f8f9fa;
-    --color-gray-200: #e9ecef;
-    --color-gray-300: #dee2e6;
-    --color-gray-400: #ced4da;
-    --color-gray-500: #adb5bd;
-    --color-gray-600: #6c757d;
-    --color-gray-700: #495057;
-    --color-gray-800: #343a40;
-    --color-gray-900: #212529;
-    --color-gray-950: #242628;
+    --color-gray-50: #e6e6e6;
+    --color-gray-100: #d9d9d9;
+    --color-gray-200: #bfbfbf;
+    --color-gray-300: #a6a6a6;
+    --color-gray-400: #8f8f8f;
+    --color-gray-500: #757575;
+    --color-gray-600: #5c5c5c;
+    --color-gray-700: #424242;
+    --color-gray-800: #2c2925;
+    --color-gray-900: #120f0d;
+    --color-gray-950: #040302;
 }
