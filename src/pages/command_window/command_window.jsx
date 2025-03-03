@@ -27,7 +27,7 @@ export const CommandWindow = ({}) => {
     const onCommandKeyPress = (e) => {
         if (e.key === "Enter") {
             if (commandText) {
-                void sendTextCommand(sessionId, selectedCallsign, commandText);
+                void sendTextCommand(session.id, selectedCallsign, commandText);
                 setCommandText("");
             }
             e.preventDefault();

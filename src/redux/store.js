@@ -3,10 +3,10 @@ import {navigraphReducer, setNvgAuthenticated, setNvgPackageInfo} from "./slices
 import {sectorFilesReducer} from "./slices/sectorFilesSlice";
 import {aircraftReducer} from "./slices/aircraftSlice";
 import {apiServerReducer} from "./slices/apiSlice";
-import {getNavigraphPackageInfo, isNavigraphAuthenticated} from "../actions/local_store_actions";
+import {getNavigraphPackageInfo, getStoreSessionId, isNavigraphAuthenticated} from "../actions/local_store_actions";
 import {messagesReducer} from "./slices/messagesSlice.js";
 import {updaterReducer} from "./slices/updaterSlice.js";
-import {sessionReducer} from "./slices/sessionSlice.js";
+import {onSessionInitialize, sessionReducer} from "./slices/sessionSlice.js";
 import {sessionMiddleware} from "./middleware/session_middleware.js";
 
 export const store = configureStore({
@@ -27,6 +27,11 @@ export const store = configureStore({
     try {
         store.dispatch(setNvgAuthenticated(await isNavigraphAuthenticated()));
         store.dispatch(setNvgPackageInfo(await getNavigraphPackageInfo()));
+
+        const sessionId = await getStoreSessionId();
+        if (sessionId){
+            store.dispatch(onSessionInitialize(sessionId));
+        }
     } catch (e) {
         console.error("Failed to load redux state!", e);
     }
