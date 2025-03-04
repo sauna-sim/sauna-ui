@@ -478,7 +478,7 @@ const SaunaPrimeReactTailwind = {
     },
     toolbar: {
         root: {
-            className: classNames('flex items-center justify-between flex-wrap', 'bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-3 rounded-md gap-2')
+            className: classNames('flex items-center justify-between flex-wrap', 'bg-tan-100 dark:bg-tan-950 border border-tan-300 dark:border-tan-700 p-3 rounded-md gap-2')
         },
         start: 'flex items-center',
         center: 'flex items-center',
@@ -646,7 +646,7 @@ const SaunaPrimeReactTailwind = {
                         props.severity === 'danger'
                 },
                 {
-                    'text-white bg-gray-600 border border-gray-600 hover:bg-gray-600/80 hover:border-gray-600/80':
+                    'text-white bg-tan-600 dark:bg-tan-700 border border-tan-600 dark:border-tan-700 hover:bg-tan-700 hover:border-tan-700 dark:hover:bg-tan-800 dark:hover:border-tan-800':
                         props.severity === 'secondary' && !props.text && !props.outlined && !props.plain,
                     'text-white bg-green-500 border border-green-500 hover:bg-green-600 hover:border-green-600':
                         props.severity === 'success' && !props.text && !props.outlined && !props.plain,
