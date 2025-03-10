@@ -71,6 +71,7 @@
     ],
     "security": {
       "csp": null
-    }
+    },
+    "enableGTKAppId": true
   }
 }

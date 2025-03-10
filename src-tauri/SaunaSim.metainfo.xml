@@ -52,8 +52,17 @@
   <launchable type="desktop-id">SaunaSim.desktop</launchable>
 
   <releases>
+    <release version="0.24.3" date="2025-03-10">
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.24.3</url>
+      <description>
+        <p>Fixed</p>
+        <ul>
+          <li>Command window doesn't work</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.24.2" date="2025-03-02">
-      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.24.1</url>
+      <url type="details">https://github.com/sauna-sim/sauna-ui/blob/master/CHANGELOG.md#0.24.2</url>
       <description>
         <p>Added</p>
         <ul>
